@@ -16,3 +16,5 @@ binance-dex-java-api is a lightweight Java library for interacting with the [Bin
 
 ## Examples
 Examples can be found at https://github.com/binance-chain/java-sdk/tree/master/src/test/java/com/binance/dex/api/client/examples.
+
+If you want to run the examples in an IDE, please run `mvn compile` first to generate the protobuf classes.
