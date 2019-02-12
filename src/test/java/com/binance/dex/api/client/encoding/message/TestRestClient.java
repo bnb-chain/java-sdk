@@ -18,7 +18,7 @@ public class TestRestClient {
 
     private String address = "tbnb1q4mgtmswxz9qelue30j9ny48la3tl0naqrzlhj";
 
-    private String symbol  = "ADA.B-B63_BNB";
+    private String symbol = "ADA.B-B63_BNB";
 
     @Test
     public void testGetMarkets() {

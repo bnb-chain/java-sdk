@@ -7,7 +7,6 @@ import org.bitcoinj.core.Utils;
 import org.bitcoinj.crypto.*;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

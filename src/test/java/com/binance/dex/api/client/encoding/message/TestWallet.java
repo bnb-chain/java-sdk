@@ -65,17 +65,27 @@ public class TestWallet {
         System.out.println(resp.get(0));
     }
 
-    // does not work
     @Test
     public void testFreeze() throws IOException, NoSuchAlgorithmException {
         String symbol = "BNB";
         TokenFreeze freeze = new TokenFreeze();
         freeze.setSymbol(symbol);
-        freeze.setFrom("bnc1grpf0955h0ykzq3ar5nmum7y6gdfl6lxzdz36p");
-        freeze.setAmount("1.234567");
+        freeze.setAmount("0.5");
 
         TransactionOption options = new TransactionOption("test", 1, null);
         List<TransactionMetadata> resp = client.freeze(freeze, wallet, options, true);
+        System.out.println(resp.get(0));
+    }
+
+    @Test
+    public void testUnfreeze() throws IOException, NoSuchAlgorithmException {
+        String symbol = "BNB";
+        TokenUnfreeze unfreeze = new TokenUnfreeze();
+        unfreeze.setSymbol(symbol);
+        unfreeze.setAmount("0.5");
+
+        TransactionOption options = new TransactionOption("test", 1, null);
+        List<TransactionMetadata> resp = client.unfreeze(unfreeze, wallet, options, true);
         System.out.println(resp.get(0));
     }
 }

@@ -192,4 +192,12 @@ public class BinanceDexApiRestClientImpl implements BinanceDexApiRestClient {
         RequestBody requestBody = assembler.buildTokenFreeze(freeze);
         return broadcast(requestBody, sync, wallet);
     }
+
+    public List<TransactionMetadata> unfreeze(TokenUnfreeze unfreeze, Wallet wallet, TransactionOption options, boolean sync)
+            throws IOException, NoSuchAlgorithmException {
+        wallet.ensureWalletIsReady(this);
+        TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
+        RequestBody requestBody = assembler.buildTokenUnfreeze(unfreeze);
+        return broadcast(requestBody, sync, wallet);
+    }
 }

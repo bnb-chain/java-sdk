@@ -27,8 +27,6 @@ public class EncodeTest {
 
     @Test
     public void testJsonEncodeAndSign() throws Exception {
-
-        byte[] addressBytes = toByteArray(new int[]{182, 86, 29, 204, 16, 65, 48, 5, 154, 124, 8, 244, 140, 100, 97, 12, 31, 111, 144, 100});
         NewOrderMessage no = NewOrderMessage.newBuilder()
                 .setSender("bnc1hgm0p7khfk85zpz5v0j8wnej3a90w7098fpxyh")
                 .setId("BA36F0FAD74D8F41045463E4774F328F4AF779E5-36")

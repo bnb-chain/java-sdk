@@ -2,6 +2,7 @@ package com.binance.dex.api.client.encoding.message;
 
 import com.binance.dex.api.client.Wallet;
 import com.binance.dex.api.client.domain.broadcast.TokenFreeze;
+import com.binance.dex.api.client.domain.broadcast.TokenUnfreeze;
 import com.binance.dex.api.client.domain.broadcast.TransactionOption;
 import com.binance.dex.api.client.domain.broadcast.Transfer;
 import com.binance.dex.api.client.encoding.Crypto;
@@ -133,7 +134,8 @@ public class TransactionRequestAssembler {
         return createRequestBody(stdTx);
     }
 
-    private CancelOrderMessage createCancelOrderMessage(
+    @VisibleForTesting
+    CancelOrderMessage createCancelOrderMessage(
             com.binance.dex.api.client.domain.broadcast.CancelOrder cancelOrder) {
         CancelOrderMessage bean =
                 new CancelOrderMessage();
@@ -143,7 +145,8 @@ public class TransactionRequestAssembler {
         return bean;
     }
 
-    private byte[] encodeCancelOrderMessage(CancelOrderMessage cancelOrder)
+    @VisibleForTesting
+    byte[] encodeCancelOrderMessage(CancelOrderMessage cancelOrder)
             throws IOException {
         com.binance.dex.api.proto.CancelOrder proto = com.binance.dex.api.proto.CancelOrder.newBuilder()
                 .setSender(ByteString.copyFrom(wallet.getAddressBytes()))
@@ -233,21 +236,25 @@ public class TransactionRequestAssembler {
         return createRequestBody(stdTx);
     }
 
-    private TokenFreezeMessage createTokenFreezeMessage(TokenFreeze freeze) {
+    @VisibleForTesting
+    TokenFreezeMessage createTokenFreezeMessage(TokenFreeze freeze) {
         TokenFreezeMessage msg = new TokenFreezeMessage();
         msg.setAmount(doubleToLong(freeze.getAmount()));
-        msg.setFrom(freeze.getFrom());
+        msg.setFrom(wallet.getAddress());
         msg.setSymbol(freeze.getSymbol());
         return msg;
     }
 
-    private byte[] encodeTokenFreezeMessage(TokenFreezeMessage freeze) throws IOException {
+    @VisibleForTesting
+    byte[] encodeTokenFreezeMessage(TokenFreezeMessage freeze) throws IOException {
         byte[] address = Crypto.decodeAddress(freeze.getFrom());
-        com.binance.dex.api.proto.TokenFreeze proto =
-                com.binance.dex.api.proto.TokenFreeze.newBuilder().setFrom(ByteString.copyFrom(address))
+        com.binance.dex.api.proto.TokenOpMsgBase op =
+                com.binance.dex.api.proto.TokenOpMsgBase.newBuilder().setFrom(ByteString.copyFrom(address))
                         .setAmount(freeze.getAmount())
                         .setSymbol(freeze.getSymbol())
                         .build();
+        com.binance.dex.api.proto.TokenFreeze proto =
+                com.binance.dex.api.proto.TokenFreeze.newBuilder().setOp(op).build();
         return EncodeUtils.aminoWrap(proto.toByteArray(), MessageType.TokenFreeze.getTypePrefixBytes(), false);
     }
 
@@ -255,6 +262,38 @@ public class TransactionRequestAssembler {
             throws IOException, NoSuchAlgorithmException {
         TokenFreezeMessage msgBean = createTokenFreezeMessage(freeze);
         byte[] msg = encodeTokenFreezeMessage(msgBean);
+        byte[] signature = encodeSignature(sign(msgBean));
+        byte[] stdTx = encodeStdTx(msg, signature);
+        return createRequestBody(stdTx);
+    }
+
+    @VisibleForTesting
+    TokenUnfreezeMessage createTokenUnfreezeMessage(TokenUnfreeze unfreeze) {
+        TokenUnfreezeMessage msg = new TokenUnfreezeMessage();
+        msg.setAmount(doubleToLong(unfreeze.getAmount()));
+        msg.setFrom(wallet.getAddress());
+        msg.setSymbol(unfreeze.getSymbol());
+        return msg;
+    }
+
+    @VisibleForTesting
+    byte[] encodeTokenUnfreezeMessage(TokenUnfreezeMessage unfreeze) throws IOException {
+        byte[] address = Crypto.decodeAddress(unfreeze.getFrom());
+        com.binance.dex.api.proto.TokenOpMsgBase op =
+                com.binance.dex.api.proto.TokenOpMsgBase.newBuilder().setFrom(ByteString.copyFrom(address))
+                        .setAmount(unfreeze.getAmount())
+                        .setSymbol(unfreeze.getSymbol())
+                        .build();
+        com.binance.dex.api.proto.TokenUnfreeze proto =
+                com.binance.dex.api.proto.TokenUnfreeze.newBuilder().setOp(op)
+                        .build();
+        return EncodeUtils.aminoWrap(proto.toByteArray(), MessageType.TokenUnfreeze.getTypePrefixBytes(), false);
+    }
+
+    public RequestBody buildTokenUnfreeze(TokenUnfreeze unfreeze)
+            throws IOException, NoSuchAlgorithmException {
+        TokenUnfreezeMessage msgBean = createTokenUnfreezeMessage(unfreeze);
+        byte[] msg = encodeTokenUnfreezeMessage(msgBean);
         byte[] signature = encodeSignature(sign(msgBean));
         byte[] stdTx = encodeStdTx(msg, signature);
         return createRequestBody(stdTx);

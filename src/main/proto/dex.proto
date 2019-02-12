@@ -50,20 +50,22 @@ message CancelOrder {
     string refid = 3; // order id of the one to cancel
 }
 
-// please note the field name is the JSON name.
-message TokenFreeze {
-    //    0xE774B32D   // hardcoded, object type prefix in 4 bytes
+message TokenOpMsgBase {
     bytes from = 1; // owner address
     string symbol = 2; // token symbol, in full name with "-" suffix
     int64 amount = 3; // amount of token to freeze
 }
 
 // please note the field name is the JSON name.
+message TokenFreeze {
+    //    0xE774B32D   // hardcoded, object type prefix in 4 bytes
+    TokenOpMsgBase op = 1;
+}
+
+// please note the field name is the JSON name.
 message TokenUnfreeze {
     //    0x6515FF0D   // hardcoded, object type prefix in 4 bytes
-    bytes from = 1; // owner address
-    string symbol = 2; // token symbol, in full name with "-" suffix
-    int64 amount = 3; // amount of token to unfreeze
+    TokenOpMsgBase op = 1;
 }
 
 // please note the field name is the JSON name.

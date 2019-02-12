@@ -3,7 +3,7 @@ package com.binance.dex.api.client.domain.broadcast;
 import com.binance.dex.api.client.BinanceDexConstants;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-public class TokenFreeze {
+public class TokenUnfreeze {
     private String symbol;
     private String amount;
 

@@ -67,4 +67,7 @@ public interface BinanceDexApiRestClient {
 
     List<TransactionMetadata> freeze(TokenFreeze freeze, Wallet wallet, TransactionOption options, boolean sync)
             throws IOException, NoSuchAlgorithmException;
+
+    List<TransactionMetadata> unfreeze(TokenUnfreeze unfreeze, Wallet wallet, TransactionOption options, boolean sync)
+            throws IOException, NoSuchAlgorithmException;
 }

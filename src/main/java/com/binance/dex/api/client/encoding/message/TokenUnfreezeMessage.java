@@ -7,9 +7,10 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder(alphabetic = true)
-public class TokenFreezeMessage implements BinanceDexTransactionMessage {
+public class TokenUnfreezeMessage implements BinanceDexTransactionMessage {
     private String from;
     private String symbol;
+
     private long amount;
 
     public String getFrom() {
