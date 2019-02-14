@@ -27,7 +27,7 @@ public class TestWallet {
 
     @Test
     public void testNewOrder() throws IOException, NoSuchAlgorithmException {
-        String symbol = "ADA.B-B63_BNB";
+        String symbol = "ADA.B-F2F_BNB";
         NewOrder no = new NewOrder();
         no.setTimeInForce(TimeInForce.GTE);
         no.setOrderType(OrderType.LIMIT);
@@ -43,7 +43,7 @@ public class TestWallet {
 
     @Test
     public void testCancelOrder() throws IOException, NoSuchAlgorithmException {
-        String symbol = "ADA.B-B63_BNB";
+        String symbol = "ADA.B-F2F_BNB";
         CancelOrder co = new CancelOrder();
         co.setSymbol(symbol);
         co.setRefId("057685EE0E308A0CFF998BE45992A7FF62BFBE7D-13");

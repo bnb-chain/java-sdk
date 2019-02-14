@@ -248,13 +248,11 @@ public class TransactionRequestAssembler {
     @VisibleForTesting
     byte[] encodeTokenFreezeMessage(TokenFreezeMessage freeze) throws IOException {
         byte[] address = Crypto.decodeAddress(freeze.getFrom());
-        com.binance.dex.api.proto.TokenOpMsgBase op =
-                com.binance.dex.api.proto.TokenOpMsgBase.newBuilder().setFrom(ByteString.copyFrom(address))
+        com.binance.dex.api.proto.TokenFreeze proto =
+                com.binance.dex.api.proto.TokenFreeze.newBuilder().setFrom(ByteString.copyFrom(address))
                         .setAmount(freeze.getAmount())
                         .setSymbol(freeze.getSymbol())
                         .build();
-        com.binance.dex.api.proto.TokenFreeze proto =
-                com.binance.dex.api.proto.TokenFreeze.newBuilder().setOp(op).build();
         return EncodeUtils.aminoWrap(proto.toByteArray(), MessageType.TokenFreeze.getTypePrefixBytes(), false);
     }
 
@@ -279,13 +277,10 @@ public class TransactionRequestAssembler {
     @VisibleForTesting
     byte[] encodeTokenUnfreezeMessage(TokenUnfreezeMessage unfreeze) throws IOException {
         byte[] address = Crypto.decodeAddress(unfreeze.getFrom());
-        com.binance.dex.api.proto.TokenOpMsgBase op =
-                com.binance.dex.api.proto.TokenOpMsgBase.newBuilder().setFrom(ByteString.copyFrom(address))
+        com.binance.dex.api.proto.TokenUnfreeze proto =
+                com.binance.dex.api.proto.TokenUnfreeze.newBuilder().setFrom(ByteString.copyFrom(address))
                         .setAmount(unfreeze.getAmount())
                         .setSymbol(unfreeze.getSymbol())
-                        .build();
-        com.binance.dex.api.proto.TokenUnfreeze proto =
-                com.binance.dex.api.proto.TokenUnfreeze.newBuilder().setOp(op)
                         .build();
         return EncodeUtils.aminoWrap(proto.toByteArray(), MessageType.TokenUnfreeze.getTypePrefixBytes(), false);
     }
