@@ -16,9 +16,9 @@ public class TestRestClient {
     private BinanceDexApiRestClient client =
             BinanceDexApiClientFactory.newInstance().newRestClient(BinanceDexEnvironment.TEST_NET.getBaseUrl());
 
-    private String address = "tbnb1q4mgtmswxz9qelue30j9ny48la3tl0naqrzlhj";
+    private String address = "tbnb16hywxpvvkaz6cecjz89mf2w0da3vfeg6z6yky2";
 
-    private String symbol = "ADA.B-B63_BNB";
+    private String symbol = "ADA.B-F2F_BNB";
 
     @Test
     public void testGetMarkets() {

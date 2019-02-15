@@ -15,10 +15,12 @@
  * limitations under the License.
  */
 
-package org.bitcoinj.core;
+package com.binance.dex.api.client.encoding;
+
+import org.bitcoinj.core.Base58;
 
 @SuppressWarnings("serial")
-// TODO: Copied from https://github.com/bitcoinj/bitcoinj. Remove these files after they are inclued in a new bitconj release
+// TODO: Copied from https://github.com/bitcoinj/bitcoinj. Remove these files after they are included in a new bitconj release
 public class AddressFormatException extends IllegalArgumentException {
     public AddressFormatException() {
         super();
