@@ -225,4 +225,10 @@ public class TransactionRequestAssemblerTest {
                 "9c01f0625dee0a286515ff0d0a14d8e1f06bf747f71907c130bf63f2b4a943b584b012074e4e422d4333461880c2d72f126c0a26eb5ae987210280ec8943329305e43b2e6112728423ef9f9a7e7125621c3545c2f30ce08bf83c12409ceabe0262a75b0da7556303580f56a094486cc9938a728f903a57054061bd833288979fbc8dc5ee07743df5110cb773c25d9974f34158a4f6ed6ac6899740c22009",
                 EncodeUtils.bytesToHex(assembler.encodeStdTx(encodedMsg, encodedSignature)));
     }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testOverFlow() {
+        String n = "922337203685";
+        TransactionRequestAssembler.doubleToLong(n);
+    }
 }

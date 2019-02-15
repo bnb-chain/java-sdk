@@ -27,6 +27,7 @@ import java.util.List;
 public class TransactionRequestAssembler {
     private static final okhttp3.MediaType MEDIA_TYPE = okhttp3.MediaType.parse("text/plain; charset=utf-8");
     private static final BigDecimal MULTIPLY_FACTOR = BigDecimal.valueOf(1e8);
+    private static final BigDecimal MAX_NUMBER = new BigDecimal(Long.MAX_VALUE);
 
     private Wallet wallet;
     private TransactionOption options;
@@ -37,7 +38,11 @@ public class TransactionRequestAssembler {
     }
 
     public static long doubleToLong(String d) {
-        return new BigDecimal(d).multiply(MULTIPLY_FACTOR).longValue();
+        BigDecimal encodeValue = new BigDecimal(d).multiply(MULTIPLY_FACTOR);
+        if (encodeValue.compareTo(MAX_NUMBER) > 0) {
+            throw new IllegalArgumentException(d + " is too large.");
+        }
+        return encodeValue.longValue();
 
     }
 
