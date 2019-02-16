@@ -154,7 +154,6 @@ public class Wallet {
     @Override
     public String toString() {
         return new ToStringBuilder(this, BinanceDexConstants.BINANCE_DEX_TO_STRING_STYLE)
-                .append("privateKey", privateKey)
                 .append("addressBytes", addressBytes)
                 .append("address", address)
                 .append("ecKey", ecKey)
