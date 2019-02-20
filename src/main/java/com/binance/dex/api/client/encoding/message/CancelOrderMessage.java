@@ -46,8 +46,4 @@ public class CancelOrderMessage implements BinanceDexTransactionMessage {
                 .append("refId", refId)
                 .toString();
     }
-
-    public static class CancelBuilder {
-
-    }
 }
