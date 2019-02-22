@@ -5,28 +5,28 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.time.ZonedDateTime;
+import org.joda.time.DateTime;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Time {
     @JsonProperty("ap_time")
-    private ZonedDateTime apTime;
+    private DateTime apTime;
     @JsonProperty("block_time")
-    private ZonedDateTime blockTime;
+    private DateTime blockTime;
 
-    public ZonedDateTime getApTime() {
+    public DateTime getApTime() {
         return apTime;
     }
 
-    public void setApTime(ZonedDateTime apTime) {
+    public void setApTime(DateTime apTime) {
         this.apTime = apTime;
     }
 
-    public ZonedDateTime getBlockTime() {
+    public DateTime getBlockTime() {
         return blockTime;
     }
 
-    public void setBlockTime(ZonedDateTime blockTime) {
+    public void setBlockTime(DateTime blockTime) {
         this.blockTime = blockTime;
     }
 

@@ -1,7 +1,7 @@
 package com.binance.dex.api.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -20,7 +20,7 @@ public class BinanceDexApiClientGenerator {
             .build();
 
     private static final Converter.Factory converterFactory =
-            JacksonConverterFactory.create(new ObjectMapper().registerModule(new JavaTimeModule()));
+            JacksonConverterFactory.create(new ObjectMapper().registerModule(new JodaModule()));
 
     @SuppressWarnings("unchecked")
     private static final Converter<ResponseBody, BinanceDexApiError> errorBodyConverter =

@@ -4,7 +4,7 @@ import com.binance.dex.api.client.BinanceDexConstants;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.time.ZonedDateTime;
+import org.joda.time.DateTime;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Order {
@@ -15,8 +15,8 @@ public class Order {
     private String quantity;
     private String cumulateQuantity;
     private String fee;
-    private ZonedDateTime orderCreateTime;
-    private ZonedDateTime transactionTime;
+    private DateTime orderCreateTime;
+    private DateTime transactionTime;
     private OrderStatus status;
     private TimeInForce timeInForce;
     private OrderSide side;
@@ -82,19 +82,19 @@ public class Order {
         this.fee = fee;
     }
 
-    public ZonedDateTime getOrderCreateTime() {
+    public DateTime getOrderCreateTime() {
         return orderCreateTime;
     }
 
-    public void setOrderCreateTime(ZonedDateTime orderCreateTime) {
+    public void setOrderCreateTime(DateTime orderCreateTime) {
         this.orderCreateTime = orderCreateTime;
     }
 
-    public ZonedDateTime getTransactionTime() {
+    public DateTime getTransactionTime() {
         return transactionTime;
     }
 
-    public void setTransactionTime(ZonedDateTime transactionTime) {
+    public void setTransactionTime(DateTime transactionTime) {
         this.transactionTime = transactionTime;
     }
 

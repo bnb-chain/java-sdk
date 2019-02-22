@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.time.ZonedDateTime;
+import org.joda.time.DateTime;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SyncInfo {
@@ -16,7 +16,7 @@ public class SyncInfo {
     @JsonProperty("latest_block_height")
     private Long latestBlockHeight;
     @JsonProperty("latest_block_time")
-    private ZonedDateTime latestBlockTime;
+    private DateTime latestBlockTime;
     @JsonProperty("catching_up")
     private Boolean catchingUp;
 
@@ -44,11 +44,11 @@ public class SyncInfo {
         this.latestBlockHeight = latestBlockHeight;
     }
 
-    public ZonedDateTime getLatestBlockTime() {
+    public DateTime getLatestBlockTime() {
         return latestBlockTime;
     }
 
-    public void setLatestBlockTime(ZonedDateTime latestBlockTime) {
+    public void setLatestBlockTime(DateTime latestBlockTime) {
         this.latestBlockTime = latestBlockTime;
     }
 
