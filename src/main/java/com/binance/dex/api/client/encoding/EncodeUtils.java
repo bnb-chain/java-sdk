@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.protobuf.CodedOutputStream;
+import org.spongycastle.util.encoders.Hex;
 
-import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
@@ -17,13 +17,12 @@ public class EncodeUtils {
         OBJECT_WRITER = mapper.writer();
     }
 
-    // DatatypeConverter will not be included in java SDK 9
     public static byte[] hexStringToByteArray(String s) {
-        return DatatypeConverter.parseHexBinary(s);
+        return Hex.decode(s);
     }
 
     public static String bytesToHex(byte[] bytes) {
-        return DatatypeConverter.printHexBinary(bytes).toLowerCase();
+        return Hex.toHexString(bytes);
     }
 
     public static String toJsonStringSortKeys(Object object) throws JsonProcessingException {
