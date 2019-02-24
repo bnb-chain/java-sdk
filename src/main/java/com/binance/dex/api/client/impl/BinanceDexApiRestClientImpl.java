@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 
 /**
- * Binance DEX API rest client, supporting synchronous/blocking access Binance DEX's REST API.
+ * Binance dex API rest client, supporting synchronous/blocking access Binance dex's REST API.
  */
 public class BinanceDexApiRestClientImpl implements BinanceDexApiRestClient {
     private BinanceDexApi binanceDexApi;
