@@ -8,7 +8,7 @@ binance-dex-java-api is a lightweight Java library for interacting with the [Bin
 2. Add the following Maven dependency to your project's `pom.xml`:
 ```
 <dependency>
-  <groupId>com.binance.api</groupId>
+  <groupId>com.binance.dex.api</groupId>
   <artifactId>binance-dex-api-client</artifactId>
   <version>1.0.0</version>
 </dependency>
