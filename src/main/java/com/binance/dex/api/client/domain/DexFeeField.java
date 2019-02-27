@@ -17,4 +17,12 @@ public class DexFeeField {
     public void setFeeName(String feeName) {
         this.feeName = feeName;
     }
+
+    public long getFeeValue() {
+        return feeValue;
+    }
+
+    public void setFeeValue(long feeValue) {
+        this.feeValue = feeValue;
+    }
 }

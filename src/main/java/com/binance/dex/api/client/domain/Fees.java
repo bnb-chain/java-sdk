@@ -64,8 +64,23 @@ public class Fees {
         return lowerLimitAsMulti;
     }
 
-//    @JsonProperty("fixed_fee_params")
     public void setLowerLimitAsMulti(String lowerLimitAsMulti) {
         this.lowerLimitAsMulti = lowerLimitAsMulti;
+    }
+
+    public FixedFeeParams getFixedFeeParams() {
+        return fixedFeeParams;
+    }
+
+    public void setFixedFeeParams(FixedFeeParams fixedFeeParams) {
+        this.fixedFeeParams = fixedFeeParams;
+    }
+
+    public List<DexFeeField> getDexFeeFields() {
+        return dexFeeFields;
+    }
+
+    public void setDexFeeFields(List<DexFeeField> dexFeeFields) {
+        this.dexFeeFields = dexFeeFields;
     }
 }
