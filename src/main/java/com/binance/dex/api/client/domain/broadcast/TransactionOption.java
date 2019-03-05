@@ -5,7 +5,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 
 /**
- * Optional fields for Bianace dex standard transaction
+ * Optional fields for Binance DEX standard transaction
  */
 public class TransactionOption {
 
