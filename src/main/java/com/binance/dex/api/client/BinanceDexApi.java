@@ -20,6 +20,9 @@ public interface BinanceDexApi {
     @GET("/api/v1/peers")
     Call<List<Peer>> getPeers();
 
+    @GET("/api/v1/fees")
+    Call<List<Fees>> getFees();
+
     @GET("/api/v1/account/{address}")
     Call<Account> getAccount(@Path("address") String address);
 

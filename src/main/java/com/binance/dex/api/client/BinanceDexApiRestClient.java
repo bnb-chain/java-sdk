@@ -20,6 +20,8 @@ public interface BinanceDexApiRestClient {
 
     List<Peer> getPeers();
 
+    List<Fees> getFees();
+
     List<Market> getMarkets();
 
     Account getAccount(String address);

@@ -119,4 +119,10 @@ public class TestRestClient {
     public void testGetPeers() {
         System.out.println(client.getPeers());
     }
+
+    @Test
+    public void testGetFees() {
+        List<Fees> fees = client.getFees();
+        System.out.println(fees);
+    }
 }
