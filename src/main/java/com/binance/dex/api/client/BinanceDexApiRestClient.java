@@ -22,7 +22,7 @@ public interface BinanceDexApiRestClient {
 
     List<Fees> getFees();
 
-    List<Market> getMarkets();
+    List<Market> getMarkets(Integer limit);
 
     Account getAccount(String address);
 

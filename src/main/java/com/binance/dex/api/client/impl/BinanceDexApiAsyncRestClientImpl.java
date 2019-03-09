@@ -38,8 +38,8 @@ public class BinanceDexApiAsyncRestClientImpl implements BinanceDexApiAsyncRestC
     }
 
     @Override
-    public void getMarkets(BinanceDexApiCallback<List<Market>> callback) {
-        binanceDexApi.getMarkets().enqueue(new BinanceDexApiCallbackAdapter<>(callback));
+    public void getMarkets(Integer limit, BinanceDexApiCallback<List<Market>> callback) {
+        binanceDexApi.getMarkets(limit).enqueue(new BinanceDexApiCallbackAdapter<>(callback));
     }
 
     @Override
