@@ -22,7 +22,7 @@ public class TestRestClient {
 
     @Test
     public void testGetMarkets() {
-        List<Market> mkts = client.getMarkets();
+        List<Market> mkts = client.getMarkets(1000);
         for (Market m : mkts) {
             System.out.println(m);
         }

@@ -17,7 +17,7 @@ public interface BinanceDexApiAsyncRestClient {
 
     void getPeers(BinanceDexApiCallback<List<Peer>> callback);
 
-    void getMarkets(BinanceDexApiCallback<List<Market>> callback);
+    void getMarkets(Integer limit, BinanceDexApiCallback<List<Market>> callback);
 
     void getAccount(String address, BinanceDexApiCallback<Account> callback);
 

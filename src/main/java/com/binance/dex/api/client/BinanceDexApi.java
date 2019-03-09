@@ -36,7 +36,7 @@ public interface BinanceDexApi {
     Call<List<Token>> getTokens();
 
     @GET("/api/v1/markets")
-    Call<List<Market>> getMarkets();
+    Call<List<Market>> getMarkets(@Query("limit") Integer limit);
 
 
     @GET("/api/v1/depth")

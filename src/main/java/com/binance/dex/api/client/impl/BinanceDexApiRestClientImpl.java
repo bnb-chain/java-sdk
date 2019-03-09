@@ -46,8 +46,8 @@ public class BinanceDexApiRestClientImpl implements BinanceDexApiRestClient {
         return BinanceDexApiClientGenerator.executeSync(binanceDexApi.getFees());
     }
 
-    public List<Market> getMarkets() {
-        return BinanceDexApiClientGenerator.executeSync(binanceDexApi.getMarkets());
+    public List<Market> getMarkets(Integer limit) {
+        return BinanceDexApiClientGenerator.executeSync(binanceDexApi.getMarkets(limit));
     }
 
     public Account getAccount(String address) {
