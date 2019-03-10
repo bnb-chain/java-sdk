@@ -62,8 +62,8 @@ public class BinanceDexApiRestClientImpl implements BinanceDexApiRestClient {
         return BinanceDexApiClientGenerator.executeSync(binanceDexApi.getTransactionMetadata(hash));
     }
 
-    public List<Token> getTokens() {
-        return BinanceDexApiClientGenerator.executeSync(binanceDexApi.getTokens());
+    public List<Token> getTokens(Integer limit) {
+        return BinanceDexApiClientGenerator.executeSync(binanceDexApi.getTokens(limit));
     }
 
     public OrderBook getOrderBook(String symbol, Integer limit) {

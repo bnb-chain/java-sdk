@@ -30,7 +30,7 @@ public interface BinanceDexApiRestClient {
 
     TransactionMetadata getTransactionMetadata(String hash);
 
-    List<Token> getTokens();
+    List<Token> getTokens(Integer limit);
 
     OrderBook getOrderBook(String symbol, Integer limit);
 

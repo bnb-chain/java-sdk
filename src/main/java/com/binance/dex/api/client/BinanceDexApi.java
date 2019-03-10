@@ -33,7 +33,7 @@ public interface BinanceDexApi {
     Call<TransactionMetadata> getTransactionMetadata(@Path("hash") String hash);
 
     @GET("/api/v1/tokens")
-    Call<List<Token>> getTokens();
+    Call<List<Token>> getTokens(@Query("limit") Integer limit);
 
     @GET("/api/v1/markets")
     Call<List<Market>> getMarkets(@Query("limit") Integer limit);
