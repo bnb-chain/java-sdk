@@ -1,10 +1,7 @@
 package com.binance.dex.api.client.encoding.message;
 
 import com.binance.dex.api.client.Wallet;
-import com.binance.dex.api.client.domain.broadcast.TokenFreeze;
-import com.binance.dex.api.client.domain.broadcast.TokenUnfreeze;
-import com.binance.dex.api.client.domain.broadcast.TransactionOption;
-import com.binance.dex.api.client.domain.broadcast.Transfer;
+import com.binance.dex.api.client.domain.broadcast.*;
 import com.binance.dex.api.client.encoding.Crypto;
 import com.binance.dex.api.client.encoding.EncodeUtils;
 import com.binance.dex.api.proto.StdSignature;
@@ -17,8 +14,7 @@ import okhttp3.RequestBody;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Assemble a transaction message body.
@@ -39,6 +35,9 @@ public class TransactionRequestAssembler {
 
     public static long doubleToLong(String d) {
         BigDecimal encodeValue = new BigDecimal(d).multiply(MULTIPLY_FACTOR);
+        if (encodeValue.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException(d + " is less or equal to zero.");
+        }
         if (encodeValue.compareTo(MAX_NUMBER) > 0) {
             throw new IllegalArgumentException(d + " is too large.");
         }
@@ -297,5 +296,57 @@ public class TransactionRequestAssembler {
         byte[] signature = encodeSignature(sign(msgBean));
         byte[] stdTx = encodeStdTx(msg, signature);
         return createRequestBody(stdTx);
+    }
+
+    @VisibleForTesting
+    TransferMessage createMultiTransferMessage(MultiTransfer multiTransfer) {
+        Map<String, Long> inputsCoins = new TreeMap<String, Long>();
+        ArrayList<InputOutput> outputs = new ArrayList<>();
+        for (Output o: multiTransfer.getOutputs()) {
+            InputOutput out = new InputOutput();
+            out.setAddress(o.getAddress());
+            List<Token> tokens = new ArrayList<>(o.getTokens().size());
+            for (OutputToken t: o.getTokens()) {
+                Token token = new Token();
+                token.setDenom(t.getCoin());
+                long amount = doubleToLong(t.getAmount());
+                token.setAmount(amount);
+                tokens.add(token);
+
+                long inputSum = inputsCoins.getOrDefault(t.getCoin(), 0L);
+                long newSum = inputSum + amount;
+                if (newSum < 0L) {
+                    throw new IllegalArgumentException("Transfer amount overflow");
+                }
+                inputsCoins.put(t.getCoin(), newSum);
+            }
+            out.setCoins(tokens);
+            outputs.add(out);
+        }
+
+        InputOutput input = new InputOutput();
+        input.setAddress(multiTransfer.getFromAddress());
+        List<Token> inputTokens = new ArrayList<>(inputsCoins.size());
+        for (String coin: inputsCoins.keySet()) {
+            Token token = new Token();
+            token.setDenom(coin);
+            token.setAmount(inputsCoins.get(coin));
+            inputTokens.add(token);
+        }
+        input.setCoins(inputTokens);
+
+        TransferMessage msgBean = new TransferMessage();
+        msgBean.setInputs(Collections.singletonList(input));
+        msgBean.setOutputs(outputs);
+        return msgBean;
+    }
+
+    public RequestBody buildMultiTransfer(MultiTransfer multiTransfer) throws IOException, NoSuchAlgorithmException{
+        TransferMessage msgBean = createMultiTransferMessage(multiTransfer);
+        byte[] msg = encodeTransferMessage(msgBean);
+        byte[] signature = encodeSignature(sign(msgBean));
+        byte[] stdTx = encodeStdTx(msg, signature);
+        return createRequestBody(stdTx);
+
     }
 }

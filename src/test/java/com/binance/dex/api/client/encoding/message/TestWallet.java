@@ -15,7 +15,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
+import java.util.*;
 
 @Ignore("Manual run only")
 public class TestWallet {
@@ -64,6 +64,29 @@ public class TestWallet {
         List<TransactionMetadata> resp = client.transfer(transfer, wallet, options, true);
         System.out.println(resp.get(0));
     }
+
+    @Test
+    public void testMultiTransfer() throws IOException, NoSuchAlgorithmException {
+        List<Output> outputs = new ArrayList<>();
+
+        List<OutputToken> outputTokens1 = new ArrayList<OutputToken>();
+        outputTokens1.add(new OutputToken("BNB", "0.1"));
+        outputTokens1.add(new OutputToken("XRP.B-585", "0.1"));
+        Output o1 = new Output("tbnb1mrslq6lhglm3jp7pxzlk8u4549pmtp9sgvn2rc", outputTokens1);
+
+        List<OutputToken> outputTokens2 = new ArrayList<OutputToken>();
+        outputTokens2.add(new OutputToken("BNB", "0.1"));
+        Output o2 = new Output("tbnb1sadf5e0gdpg757zefd6yru086cknjyttudg532", outputTokens2);
+
+        outputs.add(o1);
+        outputs.add(o2);
+
+        MultiTransfer multiTransfer = new MultiTransfer(wallet.getAddress(), outputs);
+        TransactionOption options = new TransactionOption("test", 1, null);
+        List<TransactionMetadata> resp = client.multiTransfer(multiTransfer, wallet, options, true);
+        System.out.println(resp.get(0));
+    }
+
 
     @Test
     public void testFreeze() throws IOException, NoSuchAlgorithmException {
