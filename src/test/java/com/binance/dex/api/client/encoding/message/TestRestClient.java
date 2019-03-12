@@ -56,7 +56,7 @@ public class TestRestClient {
 
     @Test
     public void testGetToken() {
-        List<Token> tokens = client.getTokens();
+        List<Token> tokens = client.getTokens(100);
         System.out.println(tokens);
     }
 

@@ -58,8 +58,8 @@ public class BinanceDexApiAsyncRestClientImpl implements BinanceDexApiAsyncRestC
     }
 
     @Override
-    public void getTokens(BinanceDexApiCallback<List<Token>> callback) {
-        binanceDexApi.getTokens().enqueue(new BinanceDexApiCallbackAdapter<>(callback));
+    public void getTokens(Integer limit, BinanceDexApiCallback<List<Token>> callback) {
+        binanceDexApi.getTokens(limit).enqueue(new BinanceDexApiCallbackAdapter<>(callback));
     }
 
     @Override

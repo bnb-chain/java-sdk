@@ -25,7 +25,7 @@ public interface BinanceDexApiAsyncRestClient {
 
     void getTransactionMetadata(String hash, BinanceDexApiCallback<TransactionMetadata> callback);
 
-    void getTokens(BinanceDexApiCallback<List<Token>> callback);
+    void getTokens(Integer limit, BinanceDexApiCallback<List<Token>> callback);
 
     void getOrderBook(String symbol, Integer limit, BinanceDexApiCallback<OrderBook> callback);
 
