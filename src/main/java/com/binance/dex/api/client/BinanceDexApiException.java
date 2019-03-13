@@ -24,7 +24,7 @@ public class BinanceDexApiException extends RuntimeException {
     @Override
     public String getMessage() {
         if (error != null) {
-            return error.getMessage();
+            return error.toString();
         }
         return super.getMessage();
     }
