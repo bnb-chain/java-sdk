@@ -1,6 +1,6 @@
 # Java Binance DEX API
 
-binance-dex-java-api is a lightweight Java library for interacting with the [Binance DEX API](https://testnet-dex.binance.org/doc/api-reference/dex-api/paths.html), providing complete API coverage, and supporting synchronous and asynchronous requests.
+binance-dex-java-api is a lightweight Java library for interacting with the [Binance DEX API](https://binance-chain.github.io/api-reference/dex-api/paths.html), providing complete API coverage, and supporting synchronous and asynchronous requests.
 
 
 ## Installation
