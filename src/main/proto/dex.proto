@@ -84,3 +84,11 @@ message Send {
     repeated Input inputs = 1;
     repeated Output outputs = 2;
 }
+
+// please note the field name is the JSON name.
+message Vote {
+  //    0xA1CADD36	    // hardcoded, object type prefix in 4 bytes
+  int64 proposal_id = 1;     // ID of the proposal
+  bytes voter = 2;           // address of the voter
+  uint64 option = 3;         // option from OptionSet chosen by the voter,
+}
