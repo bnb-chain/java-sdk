@@ -7,6 +7,7 @@ import com.binance.dex.api.client.domain.OrderType;
 import com.binance.dex.api.client.domain.TimeInForce;
 import com.binance.dex.api.client.domain.broadcast.*;
 import com.binance.dex.api.client.encoding.EncodeUtils;
+import com.google.common.collect.Lists;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -223,6 +224,43 @@ public class TransactionRequestAssemblerTest {
                 EncodeUtils.bytesToHex(encodedSignature));
         Assert.assertEquals(
                 "9c01f0625dee0a286515ff0d0a14d8e1f06bf747f71907c130bf63f2b4a943b584b012074e4e422d4333461880c2d72f126c0a26eb5ae987210280ec8943329305e43b2e6112728423ef9f9a7e7125621c3545c2f30ce08bf83c12409ceabe0262a75b0da7556303580f56a094486cc9938a728f903a57054061bd833288979fbc8dc5ee07743df5110cb773c25d9974f34158a4f6ed6ac6899740c22009",
+                EncodeUtils.bytesToHex(assembler.encodeStdTx(encodedMsg, encodedSignature)));
+    }
+
+    @Test
+    public void testVote() throws IOException, NoSuchAlgorithmException {
+        List<String> words = Arrays.asList("trial raw kiss bench silent crystal clever cloud chapter obvious error income mechanic attend army outer found cube tribe sort south possible scene fox".split(" "));
+        Wallet wallet = Wallet.createWalletFromMnemonicCode(words, BinanceDexEnvironment.TEST_NET);
+
+        Assert.assertEquals("tbnb1mrslq6lhglm3jp7pxzlk8u4549pmtp9sgvn2rc", wallet.getAddress());
+        wallet.setAccountNumber(0);
+        wallet.setSequence(9L);
+        wallet.setChainId("test-chain-n4b735");
+
+        TransactionOption options = new TransactionOption("", 0, null);
+        TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
+
+        Vote vote = new Vote();
+        vote.setProposalId(347L);
+        vote.setOption(1);
+
+        VoteMessage voteMessage = assembler.createVoteMessage(vote);
+        byte[] encodedMsg = assembler.encodeVoteMessage(voteMessage);
+
+        Assert.assertEquals("a1cadd3608db021214d8e1f06bf747f71907c130bf63f2b4a943b584b01801",
+                EncodeUtils.bytesToHex(encodedMsg));
+
+        byte[] signature = assembler.sign(voteMessage);
+        Assert.assertEquals(
+                "37f4f39cf414461c478f166a2d59705dd8566fd573214c5c002a075d6a6d86c237d6f237c35983d001e4b322b1d0f9cef9328d670f163600e3af2226792c4b16".toLowerCase(),
+                EncodeUtils.bytesToHex(signature));
+
+        byte[] encodedSignature = assembler.encodeSignature(signature);
+        Assert.assertEquals(
+                "0a26eb5ae987210280ec8943329305e43b2e6112728423ef9f9a7e7125621c3545c2f30ce08bf83c124037f4f39cf414461c478f166a2d59705dd8566fd573214c5c002a075d6a6d86c237d6f237c35983d001e4b322b1d0f9cef9328d670f163600e3af2226792c4b162009",
+                EncodeUtils.bytesToHex(encodedSignature));
+        Assert.assertEquals(
+                "9301f0625dee0a1fa1cadd3608db021214d8e1f06bf747f71907c130bf63f2b4a943b584b01801126c0a26eb5ae987210280ec8943329305e43b2e6112728423ef9f9a7e7125621c3545c2f30ce08bf83c124037f4f39cf414461c478f166a2d59705dd8566fd573214c5c002a075d6a6d86c237d6f237c35983d001e4b322b1d0f9cef9328d670f163600e3af2226792c4b162009",
                 EncodeUtils.bytesToHex(assembler.encodeStdTx(encodedMsg, encodedSignature)));
     }
 
