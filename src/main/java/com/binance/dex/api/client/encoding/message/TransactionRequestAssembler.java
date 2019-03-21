@@ -348,6 +348,7 @@ public class TransactionRequestAssembler {
                 }
                 inputsCoins.put(t.getCoin(), newSum);
             }
+            tokens.sort(Comparator.comparing(Token::getDenom));
             out.setCoins(tokens);
             outputs.add(out);
         }
