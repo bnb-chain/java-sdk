@@ -7,7 +7,6 @@ import com.binance.dex.api.client.domain.OrderType;
 import com.binance.dex.api.client.domain.TimeInForce;
 import com.binance.dex.api.client.domain.broadcast.*;
 import com.binance.dex.api.client.encoding.EncodeUtils;
-import com.google.common.collect.Lists;
 import org.junit.Assert;
 import org.junit.Test;
 
