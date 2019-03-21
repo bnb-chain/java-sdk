@@ -114,6 +114,15 @@ public class TransactionRequestAssembler {
     }
 
     @VisibleForTesting
+    VoteMessage createVoteMessage(Vote vote){
+        VoteMessage voteMessage = new VoteMessage();
+        voteMessage.setProposalId(vote.getProposalId());
+        voteMessage.setOption(vote.getOption());
+        voteMessage.setVoter(wallet.getAddress());
+        return voteMessage;
+    }
+
+    @VisibleForTesting
     byte[] encodeNewOrderMessage(NewOrderMessage newOrder)
             throws IOException {
         com.binance.dex.api.proto.NewOrder proto = com.binance.dex.api.proto.NewOrder.newBuilder()
@@ -129,10 +138,29 @@ public class TransactionRequestAssembler {
         return EncodeUtils.aminoWrap(proto.toByteArray(), MessageType.NewOrder.getTypePrefixBytes(), false);
     }
 
+    @VisibleForTesting
+    byte[] encodeVoteMessage(VoteMessage voteMessage)
+            throws IOException {
+        com.binance.dex.api.proto.Vote proto = com.binance.dex.api.proto.Vote.newBuilder()
+                .setVoter(ByteString.copyFrom(wallet.getAddressBytes()))
+                .setProposalId(voteMessage.getProposalId())
+                .setOption(voteMessage.getOption())
+                .build();
+        return EncodeUtils.aminoWrap(proto.toByteArray(), MessageType.Vote.getTypePrefixBytes(), false);
+    }
+
     public RequestBody buildNewOrder(com.binance.dex.api.client.domain.broadcast.NewOrder newOrder)
             throws IOException, NoSuchAlgorithmException {
         NewOrderMessage msgBean = createNewOrderMessage(newOrder);
         byte[] msg = encodeNewOrderMessage(msgBean);
+        byte[] signature = encodeSignature(sign(msgBean));
+        byte[] stdTx = encodeStdTx(msg, signature);
+        return createRequestBody(stdTx);
+    }
+
+    public RequestBody buildVote(Vote vote) throws IOException, NoSuchAlgorithmException {
+        VoteMessage msgBean = createVoteMessage(vote);
+        byte[] msg = encodeVoteMessage(msgBean);
         byte[] signature = encodeSignature(sign(msgBean));
         byte[] stdTx = encodeStdTx(msg, signature);
         return createRequestBody(stdTx);

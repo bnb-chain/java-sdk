@@ -13,7 +13,8 @@ public enum MessageType {
     TokenUnfreeze("6515FF0D"),
     StdSignature(null),
     PubKey("EB5AE987"),
-    StdTx("F0625DEE");
+    StdTx("F0625DEE"),
+    Vote("A1CADD36");
 
     private byte[] typePrefixBytes;
 
