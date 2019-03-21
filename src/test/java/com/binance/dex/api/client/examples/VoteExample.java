@@ -22,16 +22,13 @@ public class VoteExample {
                 "pair","culture","club","soldier","tank","front");
         Wallet wallet = Wallet.createWalletFromMnemonicCode(words,BinanceDexEnvironment.TEST_NET);
 
-//        Wallet wallet =
-//                new Wallet("0f652de68eb8048951c753303f6a3a22114ff7d4418ecbe1711d5d6a02b50522",
-//                        BinanceDexEnvironment.TEST_NET);
         BinanceDexApiRestClient client =
                 BinanceDexApiClientFactory.newInstance().newRestClient(BinanceDexEnvironment.TEST_NET.getBaseUrl());
 
         TransactionOption options = TransactionOption.DEFAULT_INSTANCE;
         Vote vote = new Vote();
-        vote.setOption(3);
-        vote.setProposalId(344L);
+        vote.setOption(1);
+        vote.setProposalId(347L);
         List<TransactionMetadata> resp = client.vote(vote,wallet,options,true);
         System.out.println(resp.get(0));
     }

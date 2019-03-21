@@ -1,9 +1,12 @@
 package com.binance.dex.api.client.encoding.message;
 
 import com.binance.dex.api.client.BinanceDexConstants;
+import com.binance.dex.api.client.encoding.VoteOptionSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -11,8 +14,10 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 public class VoteMessage implements BinanceDexTransactionMessage  {
 
     @JsonProperty("proposal_id")
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long proposalId;
     private String voter;
+    @JsonSerialize(using = VoteOptionSerializer.class)
     private Integer option;
 
     public Long getProposalId() {
