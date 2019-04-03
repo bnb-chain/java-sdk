@@ -90,8 +90,8 @@ public class TransactionRequestAssembler {
         return EncodeUtils.aminoWrap(stdTx.toByteArray(), MessageType.StdTx.getTypePrefixBytes(), true);
     }
 
-    private RequestBody createRequestBody(byte[] stdTx) {
-        return RequestBody.create(MEDIA_TYPE, EncodeUtils.bytesToHex(stdTx));
+    private RequestBody createRequestBody(String payload) {
+        return RequestBody.create(MEDIA_TYPE, payload);
     }
 
     private String generateOrderId() {
@@ -151,19 +151,28 @@ public class TransactionRequestAssembler {
 
     public RequestBody buildNewOrder(com.binance.dex.api.client.domain.broadcast.NewOrder newOrder)
             throws IOException, NoSuchAlgorithmException {
+        return createRequestBody(buildNewOrderPayload(newOrder));
+    }
+
+    public String buildNewOrderPayload(com.binance.dex.api.client.domain.broadcast.NewOrder newOrder)
+        throws IOException, NoSuchAlgorithmException {
         NewOrderMessage msgBean = createNewOrderMessage(newOrder);
         byte[] msg = encodeNewOrderMessage(msgBean);
         byte[] signature = encodeSignature(sign(msgBean));
         byte[] stdTx = encodeStdTx(msg, signature);
-        return createRequestBody(stdTx);
+        return EncodeUtils.bytesToHex(stdTx);
     }
 
     public RequestBody buildVote(Vote vote) throws IOException, NoSuchAlgorithmException {
+        return createRequestBody(buildVotePayload(vote));
+    }
+
+    public String buildVotePayload(Vote vote) throws IOException, NoSuchAlgorithmException {
         VoteMessage msgBean = createVoteMessage(vote);
         byte[] msg = encodeVoteMessage(msgBean);
         byte[] signature = encodeSignature(sign(msgBean));
         byte[] stdTx = encodeStdTx(msg, signature);
-        return createRequestBody(stdTx);
+        return EncodeUtils.bytesToHex(stdTx);
     }
 
     @VisibleForTesting
@@ -190,11 +199,16 @@ public class TransactionRequestAssembler {
 
     public RequestBody buildCancelOrder(com.binance.dex.api.client.domain.broadcast.CancelOrder cancelOrder)
             throws IOException, NoSuchAlgorithmException {
+        return createRequestBody(buildCancelOrderPayload(cancelOrder));
+    }
+
+    public String buildCancelOrderPayload(com.binance.dex.api.client.domain.broadcast.CancelOrder cancelOrder)
+        throws IOException, NoSuchAlgorithmException {
         CancelOrderMessage msgBean = createCancelOrderMessage(cancelOrder);
         byte[] msg = encodeCancelOrderMessage(msgBean);
         byte[] signature = encodeSignature(sign(msgBean));
         byte[] stdTx = encodeStdTx(msg, signature);
-        return createRequestBody(stdTx);
+        return EncodeUtils.bytesToHex(stdTx);
     }
 
     @VisibleForTesting
@@ -261,11 +275,16 @@ public class TransactionRequestAssembler {
 
     public RequestBody buildTransfer(Transfer transfer)
             throws IOException, NoSuchAlgorithmException {
+        return createRequestBody(buildTransferPayload(transfer));
+    }
+
+    public String buildTransferPayload(Transfer transfer)
+        throws IOException, NoSuchAlgorithmException {
         TransferMessage msgBean = createTransferMessage(transfer);
         byte[] msg = encodeTransferMessage(msgBean);
         byte[] signature = encodeSignature(sign(msgBean));
         byte[] stdTx = encodeStdTx(msg, signature);
-        return createRequestBody(stdTx);
+        return EncodeUtils.bytesToHex(stdTx);
     }
 
     @VisibleForTesting
@@ -290,11 +309,16 @@ public class TransactionRequestAssembler {
 
     public RequestBody buildTokenFreeze(TokenFreeze freeze)
             throws IOException, NoSuchAlgorithmException {
+        return createRequestBody(buildTokenFreezePayload(freeze));
+    }
+
+    public String buildTokenFreezePayload(TokenFreeze freeze)
+        throws IOException, NoSuchAlgorithmException {
         TokenFreezeMessage msgBean = createTokenFreezeMessage(freeze);
         byte[] msg = encodeTokenFreezeMessage(msgBean);
         byte[] signature = encodeSignature(sign(msgBean));
         byte[] stdTx = encodeStdTx(msg, signature);
-        return createRequestBody(stdTx);
+        return EncodeUtils.bytesToHex(stdTx);
     }
 
     @VisibleForTesting
@@ -319,11 +343,16 @@ public class TransactionRequestAssembler {
 
     public RequestBody buildTokenUnfreeze(TokenUnfreeze unfreeze)
             throws IOException, NoSuchAlgorithmException {
+        return createRequestBody(buildTokenUnfreezePayload(unfreeze));
+    }
+
+    public String buildTokenUnfreezePayload(TokenUnfreeze unfreeze)
+        throws IOException, NoSuchAlgorithmException {
         TokenUnfreezeMessage msgBean = createTokenUnfreezeMessage(unfreeze);
         byte[] msg = encodeTokenUnfreezeMessage(msgBean);
         byte[] signature = encodeSignature(sign(msgBean));
         byte[] stdTx = encodeStdTx(msg, signature);
-        return createRequestBody(stdTx);
+        return EncodeUtils.bytesToHex(stdTx);
     }
 
     @VisibleForTesting
@@ -371,11 +400,14 @@ public class TransactionRequestAssembler {
     }
 
     public RequestBody buildMultiTransfer(MultiTransfer multiTransfer) throws IOException, NoSuchAlgorithmException{
+        return createRequestBody(buildMultiTransferPayload(multiTransfer));
+    }
+
+    public String buildMultiTransferPayload(MultiTransfer multiTransfer) throws IOException, NoSuchAlgorithmException {
         TransferMessage msgBean = createMultiTransferMessage(multiTransfer);
         byte[] msg = encodeTransferMessage(msgBean);
         byte[] signature = encodeSignature(sign(msgBean));
         byte[] stdTx = encodeStdTx(msg, signature);
-        return createRequestBody(stdTx);
-
+        return EncodeUtils.bytesToHex(stdTx);
     }
 }
