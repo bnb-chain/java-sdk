@@ -61,7 +61,9 @@ public class Wallet {
             this.accountNumber = account.getAccountNumber();
             this.sequence = account.getSequence();
         } else {
-            throw new IllegalStateException("Cannot get account information for address " + this.address);
+            throw new IllegalStateException(
+                "Cannot get account information for address " + this.address +
+                    " (does this account exist on the blockchain yet?)");
         }
     }
 
