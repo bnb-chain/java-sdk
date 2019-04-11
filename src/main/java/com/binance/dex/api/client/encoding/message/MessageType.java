@@ -2,6 +2,8 @@ package com.binance.dex.api.client.encoding.message;
 
 import com.binance.dex.api.client.encoding.EncodeUtils;
 
+import java.util.Arrays;
+
 /**
  * Binance dex standard transactiont types.
  */
@@ -27,6 +29,25 @@ public enum MessageType {
 
     public byte[] getTypePrefixBytes() {
         return typePrefixBytes;
+    }
+
+    public static MessageType getMessageType(byte[] bytes) {
+        if (null == bytes || bytes.length < 4) {
+            return null;
+        }
+        return Arrays.stream(MessageType.values())
+                .filter(type -> {
+                    if(null == type.getTypePrefixBytes() || type.getTypePrefixBytes().length <4){
+                        return false;
+                    }
+                    for (int i = 0; i < 4; i++) {
+                        if (type.getTypePrefixBytes()[i] != bytes[i]) {
+                            return false;
+                        }
+                    }
+                    return true;
+                })
+                .findAny().orElse(null);
     }
 
 }

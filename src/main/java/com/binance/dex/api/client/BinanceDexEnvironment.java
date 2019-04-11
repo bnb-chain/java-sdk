@@ -10,6 +10,11 @@ public enum BinanceDexEnvironment {
             "https://testnet-dex.binance.org",
             "wss://testnet-dex.binance.org/api/",
             "tbnb"
+    ),
+    TEST_NET_NODE (
+            "http://data-seed-pre-0-s3.binance.org",
+            "",
+            "tbnb"
     );
     // Rest API base URL
     private String baseUrl;
