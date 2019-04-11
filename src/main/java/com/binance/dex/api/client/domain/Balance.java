@@ -11,6 +11,16 @@ public class Balance {
     private String locked;
     private String frozen;
 
+    public Balance() {
+    }
+
+    public Balance(String symbol, String free, String locked, String frozen) {
+        this.symbol = symbol;
+        this.free = free;
+        this.locked = locked;
+        this.frozen = frozen;
+    }
+
     public String getSymbol() {
         return symbol;
     }

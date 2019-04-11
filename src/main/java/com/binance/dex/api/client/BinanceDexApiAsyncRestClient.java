@@ -55,5 +55,5 @@ public interface BinanceDexApiAsyncRestClient {
 
     void getTransactions(TransactionsRequest request, BinanceDexApiCallback<TransactionPage> callback);
 
-    // Do not support async broadcast due to account sequence
+    // Do not support async commitBroadcast due to account sequence
 }

@@ -10,6 +10,7 @@ public class TransactionMetadata {
     private String data;
     private String hash;
     private String log;
+    private Long height;
     private boolean ok;
 
     public int getCode() {
@@ -30,6 +31,34 @@ public class TransactionMetadata {
 
     public boolean isOk() {
         return ok;
+    }
+
+    public Long getHeight() {
+        return height;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
+    }
+
+    public void setLog(String log) {
+        this.log = log;
+    }
+
+    public void setHeight(Long height) {
+        this.height = height;
+    }
+
+    public void setOk(boolean ok) {
+        this.ok = ok;
     }
 
     @Override
