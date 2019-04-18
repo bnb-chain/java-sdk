@@ -40,6 +40,11 @@ public class Crypto {
         return convertBits(dec, 0, dec.length, 5, 8, false);
     }
 
+    public static String encodeAddress(String hrp, byte[] code) {
+        byte[] convertedCode = Crypto.convertBits(code, 0, code.length, 8, 5, true);
+        return Bech32.encode(hrp, convertedCode);
+    }
+
     public static String getAddressFromPrivateKey(String privateKey, String hrp) {
         ECKey ecKey = ECKey.fromPrivate(new BigInteger(privateKey, 16));
         return getAddressFromECKey(ecKey, hrp);

@@ -1,10 +1,12 @@
 syntax = "proto3";
 
+
 option java_multiple_files = true;
 option java_package = "com.binance.dex.api.proto";
 option java_outer_classname = "Transaction";
 
 package transaction;
+import "types.proto";
 
 // please note the field name is the JSON name.
 message StdTx {
@@ -30,6 +32,7 @@ message StdSignature {
 }
 
 // please note the field name is the JSON name.
+// msg
 message NewOrder {
     //    0xCE6DC043 // hardcoded, object type prefix in 4 bytes
     bytes sender = 1; // order originating address
@@ -43,6 +46,7 @@ message NewOrder {
 }
 
 // please note the field name is the JSON name.
+// msg
 message CancelOrder {
     //    0x166E681B   // hardcoded, object type prefix in 4 bytes
     bytes sender = 1; // order originating address'
@@ -51,6 +55,7 @@ message CancelOrder {
 }
 
 // please note the field name is the JSON name.
+// msg
 message TokenFreeze {
     //    0xE774B32D   // hardcoded, object type prefix in 4 bytes
     bytes from = 1; // owner address
@@ -59,6 +64,7 @@ message TokenFreeze {
 }
 
 // please note the field name is the JSON name.
+// msg
 message TokenUnfreeze {
     //    0x6515FF0D   // hardcoded, object type prefix in 4 bytes
     bytes from = 1; // owner address
@@ -67,6 +73,7 @@ message TokenUnfreeze {
 }
 
 // please note the field name is the JSON name.
+// msg
 message Send {
     //    0x2A2C87FA   // hardcoded, object type prefix in 4 bytes
     message Token {
@@ -86,9 +93,47 @@ message Send {
 }
 
 // please note the field name is the JSON name.
+// msg
 message Vote {
-  //    0xA1CADD36	    // hardcoded, object type prefix in 4 bytes
-  int64 proposal_id = 1;     // ID of the proposal
-  bytes voter = 2;           // address of the voter
-  int64 option = 3;         // option from OptionSet chosen by the voter,
+    //    0xA1CADD36	    // hardcoded, object type prefix in 4 bytes
+    int64 proposal_id = 1; // ID of the proposal
+    bytes voter = 2; // address of the voter
+    int64 option = 3; // option from OptionSet chosen by the voter,
+}
+
+message Token {
+    string denom = 1;
+    int64 amount = 2;
+}
+
+message AppAccount {
+    //    uint64 SIZE-OF-ENCODED // varint encoded length of the structure after encoding
+    //    0x4BDC4C27   // hardcoded, object type prefix in 4 bytes
+    message baseAccount {
+        bytes address = 1;
+        repeated Token coins = 2;
+        bytes public_key = 3;
+        int64 account_number = 4;
+        int64 sequence = 5;
+    }
+    baseAccount base = 1;
+    string name = 2;
+    repeated Token frozen = 3;
+    repeated Token locked = 4;
+}
+
+// sync/async response
+message ResultBroadcastTx {
+    int32 code = 1; //uint32
+    bytes data = 2;
+    string log = 3;
+    bytes hash = 4;
+}
+
+// commit response
+message ResultBroadcastTxCommit {
+    types.ResponseCheckTx check_tx = 1;
+    types.ResponseDeliverTx deliver_tx = 2;
+    bytes hash = 3;
+    int64 height = 4;
 }
