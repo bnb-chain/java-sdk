@@ -12,6 +12,7 @@ import com.binance.dex.api.client.domain.TransactionMetadata;
 import com.binance.dex.api.client.domain.broadcast.*;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -19,7 +20,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Ignore
 public class NodeClientExample {
 
     private BinanceDexApiNodeClient binanceDexNodeApi = null;
