@@ -2,6 +2,8 @@ package com.binance.dex.api.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import okhttp3.Dispatcher;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -15,10 +17,6 @@ import java.lang.annotation.Annotation;
 import java.util.concurrent.TimeUnit;
 
 public class BinanceDexApiClientGenerator {
-    private static final OkHttpClient sharedClient = new OkHttpClient.Builder()
-            .pingInterval(20, TimeUnit.SECONDS)
-            .build();
-
     private static final Converter.Factory converterFactory =
             JacksonConverterFactory.create(new ObjectMapper().registerModule(new JodaModule()));
 
@@ -26,6 +24,17 @@ public class BinanceDexApiClientGenerator {
     private static final Converter<ResponseBody, BinanceDexApiError> errorBodyConverter =
             (Converter<ResponseBody, BinanceDexApiError>) converterFactory.responseBodyConverter(
                     BinanceDexApiError.class, new Annotation[0], null);
+
+    private static OkHttpClient sharedClient;
+    static {
+        Dispatcher dispatcher = new Dispatcher();
+        dispatcher.setMaxRequestsPerHost(500);
+        dispatcher.setMaxRequests(500);
+        sharedClient = new OkHttpClient.Builder()
+            .dispatcher(dispatcher)
+            .pingInterval(20, TimeUnit.SECONDS)
+            .build();
+    }
 
     public static <S> S createService(Class<S> serviceClass, String baseUrl) {
         Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
@@ -72,5 +81,12 @@ public class BinanceDexApiClientGenerator {
      */
     public static OkHttpClient getSharedClient() {
         return sharedClient;
+    }
+
+    /**
+     * Add interceptor to shared client
+     */
+    public static void addInterceptor(Interceptor interceptor) {
+        sharedClient = sharedClient.newBuilder().addInterceptor(interceptor).build();
     }
 }
