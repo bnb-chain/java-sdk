@@ -197,12 +197,15 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
                     .map(byteString -> {
                         byte[] bytes = byteString.toByteArray();
                         Transaction transaction = convert(bytes);
+                        if (null == transaction) {
+                            return null;
+                        }
                         transaction.setHash(txMessage.getHash());
                         transaction.setHeight(txMessage.getHeight());
                         transaction.setCode(txMessage.getTx_result().getCode());
                         transaction.setMemo(stdTx.getMemo());
                         return transaction;
-                    }).collect(Collectors.toList());
+                    }).filter(t -> null != t).collect(Collectors.toList());
         } catch (InvalidProtocolBufferException e) {
             throw new RuntimeException(e);
         }
