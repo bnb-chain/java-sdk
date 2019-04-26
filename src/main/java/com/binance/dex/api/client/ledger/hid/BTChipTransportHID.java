@@ -10,6 +10,7 @@ import org.usb4java.*;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.Arrays;
 import java.util.Vector;
 
 public class BTChipTransportHID implements BTChipTransport {
@@ -116,7 +117,11 @@ public class BTChipTransportHID implements BTChipTransport {
 				}
 				responseBuffer.get(chunk, 0, HID_BUFFER_SIZE);
 				response.write(chunk, 0, HID_BUFFER_SIZE);				
-			}						
+			}
+			if (responseData[responseData.length-2] != (byte) 0x90 || responseData[responseData.length-1] != (byte) 0x00) {
+				throw new BTChipException("Wrong response");
+			}
+			responseData= Arrays.copyOfRange(responseData, 0, responseData.length-2);
 		}
 		return responseData;		
 	}
