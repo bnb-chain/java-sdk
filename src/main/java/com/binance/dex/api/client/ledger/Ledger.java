@@ -11,5 +11,5 @@ public interface Ledger {
 
     byte[] getPublicKeySECP256K1(int[] bip32Path) throws BTChipException;
 
-    int ShowAddressSECP256K1(int[] bip32Path, boolean isMainnet) throws Exception;
+    int showAddressSECP256K1(int[] bip32Path, boolean isMainnet) throws Exception;
 }
