@@ -63,8 +63,7 @@ public class Utils {
     }
 
     public static byte[] compressedLedgerPubkey(byte[] pubkey) {
-        //TODO investigate why the length is 67, in go-sdk, the length is 65
-        if (pubkey.length != 67) {
+        if (pubkey.length != 65) {
             return null;
         }
         byte[] result = new byte[1];
