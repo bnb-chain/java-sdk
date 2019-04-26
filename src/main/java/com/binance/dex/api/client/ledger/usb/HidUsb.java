@@ -1,0 +1,60 @@
+package com.binance.dex.api.client.ledger.usb;
+
+import com.binance.dex.api.client.ledger.common.BTChipException;
+import org.usb4java.Context;
+import org.usb4java.Device;
+import org.usb4java.DeviceDescriptor;
+import org.usb4java.DeviceList;
+import org.usb4java.LibUsb;
+
+import java.nio.ByteBuffer;
+import java.util.Vector;
+
+public class HidUsb {
+	
+	private static Context context;
+		
+	public static Device[] enumDevices(int vid, int pid) throws BTChipException {
+		Vector<Device> devices = new Vector<Device>();
+		DeviceList list = new DeviceList();
+		int result = LibUsb.getDeviceList(null, list);
+		if (result < 0) {
+			throw new BTChipException("Unable to get device list");
+		}
+		for (Device device : list) {
+			DeviceDescriptor descriptor = new DeviceDescriptor();
+			result = LibUsb.getDeviceDescriptor(device, descriptor);
+			if (result < 0) {
+				continue;
+			}
+			short test1 = descriptor.idVendor();
+			short test2 = descriptor.idProduct();
+			if ((descriptor.idVendor() == vid) && (descriptor.idProduct() == pid)) {
+				devices.add(device);
+			}
+		}
+		return devices.toArray(new Device[0]);
+	}
+	
+	public static String getDeviceId(Device device) {
+		StringBuffer result = new StringBuffer();
+		ByteBuffer deviceListBuffer = ByteBuffer.allocateDirect(7);
+		int size = LibUsb.getPortNumbers(device, deviceListBuffer);
+		for (int i=0; i<size; i++) {
+			result.append(deviceListBuffer.get());
+			if (i != (size - 1)) {
+				result.append('/');
+			}
+		}
+		return result.toString();		
+	}
+	
+	public static void exit() {
+		LibUsb.exit(context);
+	}
+	
+	static {
+		context = new Context();
+		LibUsb.init(context);
+	}
+}
