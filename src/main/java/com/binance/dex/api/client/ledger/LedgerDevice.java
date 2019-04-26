@@ -55,7 +55,7 @@ public class LedgerDevice implements Ledger {
     }
 
     public byte[] getPublicKeySECP256K1(int[] bip32Path) throws BTChipException {
-        byte[] pathBytes = Utils.GetBip32bytes(bip32Path, 3);
+        byte[] pathBytes = Utils.getBip32bytes(bip32Path, 3);
 
         byte[] command = new byte[]{userCLA, userINSPublicKeySECP256K1, 0, 0, (byte)pathBytes.length};
         command = Bytes.concat(command, pathBytes);
@@ -63,8 +63,8 @@ public class LedgerDevice implements Ledger {
         return Utils.compressedLedgerPubkey(pubkey);
     }
 
-    public int ShowAddressSECP256K1(int[] bip32Path, boolean isMainnet) throws BTChipException {
-        byte[] pathBytes = Utils.GetBip32bytes(bip32Path, 3);
+    public int showAddressSECP256K1(int[] bip32Path, boolean isMainnet) throws BTChipException {
+        byte[] pathBytes = Utils.getBip32bytes(bip32Path, 3);
 
         byte[] command = new byte[]{userCLA, userINSPublicKeySECP256K1ShowBech32, 0, 0, 0, 0};
         if (isMainnet) {
@@ -89,7 +89,7 @@ public class LedgerDevice implements Ledger {
         System.out.println(version.toString());
 
         int[] bip44Path = new int[]{44,714,0,0,0};
-        ledgerDevice.ShowAddressSECP256K1(bip44Path, true);
+        ledgerDevice.showAddressSECP256K1(bip44Path, true);
         byte[] pubkey = ledgerDevice.getPublicKeySECP256K1(bip44Path);
         System.out.println(Hex.encodeHexString(pubkey));
     }

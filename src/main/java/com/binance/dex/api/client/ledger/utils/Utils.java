@@ -42,7 +42,7 @@ public class Utils {
         }
         return result.toByteArray();
     }
-    public static byte[] GetBip32bytes(int[] bip32Path, int hardenCount) {
+    public static byte[] getBip32bytes(int[] bip32Path, int hardenCount) {
         byte[] message = new byte[41];
         if (bip32Path.length > 10) {
             return null;
