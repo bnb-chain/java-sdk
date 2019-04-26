@@ -68,6 +68,11 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.usb4java</groupId>
+            <artifactId>usb4java</artifactId>
+            <version>1.2.0</version>
+        </dependency>
     </dependencies>
 
     <build>
