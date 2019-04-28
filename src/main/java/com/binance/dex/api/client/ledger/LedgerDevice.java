@@ -1,10 +1,14 @@
 package com.binance.dex.api.client.ledger;
 
+import com.binance.dex.api.client.encoding.Crypto;
 import com.binance.dex.api.client.ledger.common.BTChipException;
 import com.binance.dex.api.client.ledger.hid.BTChipTransportHID;
 import com.google.common.primitives.Bytes;
 import org.apache.commons.codec.binary.Hex;
+import org.bitcoinj.core.Utils;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+
 
 public class LedgerDevice {
     private static final byte userCLA = (byte)0xBC;
@@ -96,6 +100,10 @@ public class LedgerDevice {
         return LedgerUtils.compressedLedgerPubkey(pubkey);
     }
 
+    public byte[] getAddress(int[] bip32Path) throws BTChipException, NoSuchAlgorithmException {
+        return Utils.sha256hash160(getPublicKeySECP256K1(bip32Path));
+    }
+
     public int showAddressSECP256K1(int[] bip32Path, boolean isMainnet) throws BTChipException {
         byte[] pathBytes = LedgerUtils.getBip32bytes(bip32Path, 3);
 
@@ -122,9 +130,16 @@ public class LedgerDevice {
         System.out.println(version.toString());
 
         int[] bip44Path = new int[]{44,714,0,0,0};
+
+        byte[] address = ledgerDevice.getAddress(bip44Path);
+        System.out.print("Please verify if the displayed address is identical to ");
+        System.out.println(Crypto.encodeAddress(mainnetPrefix, address));
+
         ledgerDevice.showAddressSECP256K1(bip44Path, true);
         byte[] pubkey = ledgerDevice.getPublicKeySECP256K1(bip44Path);
+        System.out.print("Public key: ");
         System.out.println(Hex.encodeHexString(pubkey));
+
         String msgString= "7b226163636f756e745f6e756d626572223a2230222c22636861696e5f6964223a2262696e616e63652d636861696" +
                 "e222c2264617461223a6e756c6c2c226d656d6f223a2274657374206c6564676572207369676e222c226d736773223a5b7b2269" +
                 "6e70757473223a5b7b2261646472657373223a22626e62317979633971353375746d6a3066717833706671376c386338336c727" +
