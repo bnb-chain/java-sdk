@@ -44,7 +44,7 @@ public class LedgerDevice implements Ledger {
         return new LedgerDevice(version, device);
     }
 
-    public void close() throws BTChipException {
+    public void close() {
         this.device.close();
     }
 
@@ -136,5 +136,7 @@ public class LedgerDevice implements Ledger {
                 "3030303030303030303030302c2264656e6f6d223a22424e42227d5d7d5d7d5d2c2273657175656e6365223a2230222c22736f75726365223a2230227d";
         byte[] signature = ledgerDevice.signSECP256K1(bip44Path, Utils.hexToBin(msgString));
         System.out.println(Hex.encodeHexString(signature));
+
+        ledgerDevice.close();
     }
 }

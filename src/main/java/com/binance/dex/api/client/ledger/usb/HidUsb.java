@@ -27,8 +27,6 @@ public class HidUsb {
 			if (result < 0) {
 				continue;
 			}
-			short test1 = descriptor.idVendor();
-			short test2 = descriptor.idProduct();
 			if ((descriptor.idVendor() == vid) && (descriptor.idProduct() == pid)) {
 				devices.add(device);
 			}
