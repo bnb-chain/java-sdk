@@ -117,27 +117,26 @@ public class Crypto {
         return out.toByteArray();
     }
 
-    public static byte[] signatureConvertDERtoBER(byte[] signature) {
-
+    public static byte[] signatureConvertDERtoBER(byte[] signature) throws IOException {
         int minSigLen = 8;
         if (signature.length < minSigLen) {
-            return null;
+            throw new IOException("malformed signature: too short");
         }
         int index = 0;
         if (signature[index] != 0x30) {
-            return null;
+            throw new IOException("malformed signature: no header magic");
         }
         index++;
         int siglen = signature[index];
         index++;
 
         if ((siglen + 2) > signature.length || (siglen + 2) < minSigLen) {
-            return null;
+            throw new IOException("malformed signature: bad length");
         }
         signature = Arrays.copyOfRange(signature, 0, siglen + 2);
 
         if (signature[index] != 0x02) {
-            return null;
+            throw new IOException("malformed signature: no 1st int marker");
         }
         index++;
 
@@ -145,7 +144,7 @@ public class Crypto {
         int rLen = (int) signature[index];
         index++;
         if (rLen <= 0 || rLen > signature.length - index - 3) {
-            return null;
+            throw new IOException("malformed signature: bogus R length");
         }
 
         byte[] rBytes = Arrays.copyOfRange(signature, index, index + rLen);
@@ -154,15 +153,16 @@ public class Crypto {
         index += rLen;
 
         if (signature[index] != 0x02) {
-            return null;
+            throw new IOException("malformed signature: no 2nd int marker");
         }
         index++;
 
+        // Length of signature S.
         int sLen = (int) signature[index];
         index++;
 
         if (sLen <= 0 || sLen > (signature.length - index)) {
-            return null;
+            throw new IOException("malformed signature: bogus S length");
         }
 
         byte[] sBytes = Arrays.copyOfRange(signature, index, index + sLen);
