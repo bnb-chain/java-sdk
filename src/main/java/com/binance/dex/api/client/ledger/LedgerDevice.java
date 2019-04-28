@@ -17,9 +17,6 @@ public class LedgerDevice {
     private static final byte userINSHash = 100;
     private static final int userMessageChunkSize = 250;
 
-    private static final String testnetPrefix = "tbnb";
-    private static final String mainnetPrefix = "bnb";
-
     public LedgerVersion version;
     public BTChipTransportHID device;
 
@@ -42,14 +39,6 @@ public class LedgerDevice {
         }
         LedgerVersion version = new LedgerVersion(result[0], result[1], result[2], result[3]);
         return new LedgerDevice(version, device);
-    }
-
-    public static String getTestnetPrefix() {
-        return testnetPrefix;
-    }
-
-    public static String getMainnetPrefix() {
-        return mainnetPrefix;
     }
 
     public void close() {
@@ -110,17 +99,13 @@ public class LedgerDevice {
         return Utils.sha256hash160(getPublicKeySECP256K1(bip32Path));
     }
 
-    public int showAddressSECP256K1(int[] bip32Path, boolean isMainnet) throws BTChipException {
+    public int showAddressSECP256K1(int[] bip32Path, String hrp) throws BTChipException {
         byte[] pathBytes = LedgerUtils.getBip32bytes(bip32Path, 3);
 
         byte[] command = new byte[]{userCLA, userINSPublicKeySECP256K1ShowBech32, 0, 0, 0, 0};
-        if (isMainnet) {
-            command[5] = (byte)mainnetPrefix.length();
-            command = Bytes.concat(command, mainnetPrefix.getBytes());
-        } else {
-            command[5] = (byte)testnetPrefix.length();
-            command = Bytes.concat(command, testnetPrefix.getBytes());
-        }
+        command[5] = (byte)hrp.length();
+        command = Bytes.concat(command, hrp.getBytes());
+
         command = Bytes.concat(command, pathBytes);
         command[4] = (byte)(command.length-5);
         byte[] result = device.exchange(command);
