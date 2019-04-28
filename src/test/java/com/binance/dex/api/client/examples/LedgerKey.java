@@ -22,9 +22,9 @@ public class LedgerKey {
 
         byte[] address = ledgerDevice.getAddress(bip44Path);
         System.out.print("Please verify if the displayed address is identical to ");
-        System.out.println(Crypto.encodeAddress(getMainnetPrefix(), address));
+        System.out.println(Crypto.encodeAddress("bnb", address));
 
-        ledgerDevice.showAddressSECP256K1(bip44Path, true);
+        ledgerDevice.showAddressSECP256K1(bip44Path, "bnb");
         byte[] pubkey = ledgerDevice.getPublicKeySECP256K1(bip44Path);
         System.out.print("Public key: ");
         System.out.println(Hex.encodeHexString(pubkey));
