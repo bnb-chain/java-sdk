@@ -15,6 +15,11 @@ public enum BinanceDexEnvironment {
             "http://data-seed-pre-0-s3.binance.org",
             "",
             "tbnb"
+    ),
+    TEST_LOCAL_NODE (
+            "http://localhost:26657",
+            "",
+            "bnb"
     );
     // Rest API base URL
     private String baseUrl;

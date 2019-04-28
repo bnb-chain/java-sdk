@@ -1,12 +1,12 @@
 package com.binance.dex.api.client.ledger.hid;
 
-import com.binance.dex.api.client.ledger.common.BTChipException;
 import com.binance.dex.api.client.ledger.common.BTChipTransport;
 import com.binance.dex.api.client.ledger.common.LedgerHelper;
 import com.binance.dex.api.client.ledger.usb.HidUsb;
 import org.usb4java.*;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.Arrays;
@@ -36,8 +36,7 @@ public class BTChipTransportHID implements BTChipTransport {
 		sizeBuffer = BufferUtils.allocateIntBuffer();
 	}
 
-	@Override
-	public byte[] exchange(byte[] command) throws BTChipException {
+	public byte[] exchange(byte[] command) throws IOException {
 		ByteArrayOutputStream response = new ByteArrayOutputStream();
 		byte[] responseData;
 		int offset = 0;
@@ -54,7 +53,7 @@ public class BTChipTransportHID implements BTChipTransport {
 			commandBuffer.put(chunk);
 			result = LibUsb.interruptTransfer(handle, outEndpoint, commandBuffer, sizeBuffer, timeout);
 			if (result != LibUsb.SUCCESS) {
-				throw new BTChipException("Write failed");
+				throw new IOException("Write failed");
 			}
 			offset += blockSize;
 			commandBuffer.clear();
@@ -66,20 +65,19 @@ public class BTChipTransportHID implements BTChipTransport {
 			sizeBuffer.clear();
 			result = LibUsb.interruptTransfer(handle, inEndpoint, responseBuffer, sizeBuffer, timeout);
 			if (result != LibUsb.SUCCESS) {
-				throw new BTChipException("Read failed");
+				throw new IOException("Read failed");
 			}
 			responseBuffer.get(chunk, 0, HID_BUFFER_SIZE);
 			response.write(chunk, 0, HID_BUFFER_SIZE);
 		}
 		if (responseData[responseData.length-2] != (byte) 0x90 || responseData[responseData.length-1] != (byte) 0x00) {
-			throw new BTChipException("Get invalid response");
+			throw new IOException("Get invalid response");
 		}
 		responseData= Arrays.copyOfRange(responseData, 0, responseData.length-2);
 
 		return responseData;		
 	}
 
-	@Override
 	public void close() {
 		LibUsb.releaseInterface(handle, 0);
 		LibUsb.attachKernelDriver(handle, 0);		
@@ -87,12 +85,12 @@ public class BTChipTransportHID implements BTChipTransport {
 		HidUsb.exit();
 	}
 
-	public static int discoverLedgerDevice() throws BTChipException {
+	public static int discoverLedgerDevice() throws IOException {
 		Device[] devices = HidUsb.enumDevices(VID, PID);
 		return devices.length;
 	}
 
-	public static Device matchDevice(String deviceName, int vid, int pid) throws BTChipException {
+	public static Device matchDevice(String deviceName, int vid, int pid) throws IOException {
 		Device[] devices = HidUsb.enumDevices(vid, pid);
 		Device targetDevice = null;
                 for (Device device : devices) {
@@ -104,18 +102,18 @@ public class BTChipTransportHID implements BTChipTransport {
 		return targetDevice;
 	}
 	
-	public static BTChipTransportHID openDevice(String deviceName) throws BTChipException {
+	public static BTChipTransportHID openDevice(String deviceName) throws IOException {
 		byte inEndpoint = (byte)0xff;
 		byte outEndpoint = (byte)0xff;
 		boolean ledger = true;
 		Device targetDevice = matchDevice(deviceName, VID, PID);
 		if (targetDevice == null) {
-			throw new BTChipException("Device not found");
+			throw new IOException("Device not found");
 		}
 		ConfigDescriptor configDescriptor = new ConfigDescriptor();
 		int result = LibUsb.getActiveConfigDescriptor(targetDevice, configDescriptor);
 		if (result != LibUsb.SUCCESS) {
-			throw new BTChipException("Failed to get config descriptor");
+			throw new IOException("Failed to get config descriptor");
 		}
 		Interface[] interfaces = configDescriptor.iface();
 		for (Interface deviceInterface : interfaces) {
@@ -134,16 +132,16 @@ public class BTChipTransportHID implements BTChipTransport {
 			}
 		}
 		if (inEndpoint == (byte)0xff) {
-			throw new BTChipException("Couldn't find IN endpoint");
+			throw new IOException("Couldn't find IN endpoint");
 		}
 		if (outEndpoint == (byte)0xff) {
-			throw new BTChipException("Couldn't find OUT endpoint");
+			throw new IOException("Couldn't find OUT endpoint");
 		}
 		
 		DeviceHandle handle = new DeviceHandle();
 		result = LibUsb.open(targetDevice, handle);
 		if (result != LibUsb.SUCCESS) {
-			throw new BTChipException("Failed to open device");
+			throw new IOException("Failed to open device");
 		}
 		LibUsb.detachKernelDriver(handle, 0);
 		LibUsb.claimInterface(handle, 0);					

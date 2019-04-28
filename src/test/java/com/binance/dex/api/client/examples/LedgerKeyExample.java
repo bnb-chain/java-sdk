@@ -1,14 +1,14 @@
 package com.binance.dex.api.client.examples;
 
-import com.binance.dex.api.client.encoding.Crypto;
 import com.binance.dex.api.client.ledger.LedgerDevice;
+import com.binance.dex.api.client.ledger.LedgerKey;
 import com.binance.dex.api.client.ledger.LedgerUtils;
 import com.binance.dex.api.client.ledger.LedgerVersion;
 import org.apache.commons.codec.binary.Hex;
 
 import static com.binance.dex.api.client.ledger.LedgerDevice.*;
 
-public class LedgerKey {
+public class LedgerKeyExample {
 
     public static void main(String[] args) throws Exception {
         if (!hasLedgerConnected()) {
@@ -18,11 +18,12 @@ public class LedgerKey {
         LedgerVersion version = ledgerDevice.getVersion();
         System.out.println(version.toString());
 
-        int[] bip44Path = new int[]{44,714,0,0,0};
+        int[] bip44Path = LedgerUtils.createBIP44Path(0, 0);
 
-        byte[] address = ledgerDevice.getAddress(bip44Path);
+        LedgerKey ledgerKey = new LedgerKey(ledgerDevice, bip44Path, "bnb");
+
         System.out.print("Please verify if the displayed address is identical to ");
-        System.out.println(Crypto.encodeAddress("bnb", address));
+        System.out.println(ledgerKey.getAddress());
 
         ledgerDevice.showAddressSECP256K1(bip44Path, "bnb");
         byte[] pubkey = ledgerDevice.getPublicKeySECP256K1(bip44Path);

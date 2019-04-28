@@ -1,10 +1,9 @@
 package com.binance.dex.api.client.ledger;
 
-import com.binance.dex.api.client.ledger.common.BTChipException;
 import com.binance.dex.api.client.ledger.hid.BTChipTransportHID;
 import com.google.common.primitives.Bytes;
-import org.bitcoinj.core.Utils;
-import java.security.NoSuchAlgorithmException;
+
+import java.io.IOException;
 import java.util.Arrays;
 
 
@@ -25,17 +24,17 @@ public class LedgerDevice {
         this.device = device;
     }
 
-    static public boolean hasLedgerConnected() throws BTChipException {
+    static public boolean hasLedgerConnected() throws IOException {
         return BTChipTransportHID.discoverLedgerDevice() > 0;
     }
 
-    static public LedgerDevice findLedgerDevice() throws BTChipException {
+    static public LedgerDevice findLedgerDevice() throws IOException {
         BTChipTransportHID device = BTChipTransportHID.openDevice(null);
         byte[] command = new byte[]{userCLA, userINSGetVersion, 0, 0, 0};
         byte[] result = device.exchange(command);
 
         if (result.length < 4) {
-            throw new BTChipException("Failed to get ledger app version");
+            throw new IOException("Failed to get ledger app version");
         }
         LedgerVersion version = new LedgerVersion(result[0], result[1], result[2], result[3]);
         return new LedgerDevice(version, device);
@@ -49,7 +48,7 @@ public class LedgerDevice {
         return version;
     }
 
-    public byte[] signSECP256K1(int[] bip32Path, byte[] transaction) throws BTChipException {
+    public byte[] signSECP256K1(int[] bip32Path, byte[] transaction) throws IOException {
         byte packetIndex = 1;
         int count = (int) Math.ceil((double) transaction.length / (double)userMessageChunkSize);
         byte packetCount = (byte)(count);
@@ -86,7 +85,7 @@ public class LedgerDevice {
         return finalResponse;
     }
 
-    public byte[] getPublicKeySECP256K1(int[] bip32Path) throws BTChipException {
+    public byte[] getPublicKeySECP256K1(int[] bip32Path) throws IOException {
         byte[] pathBytes = LedgerUtils.getBip32bytes(bip32Path, 3);
 
         byte[] command = new byte[]{userCLA, userINSPublicKeySECP256K1, 0, 0, (byte)pathBytes.length};
@@ -95,11 +94,7 @@ public class LedgerDevice {
         return LedgerUtils.compressedLedgerPubkey(pubkey);
     }
 
-    public byte[] getAddress(int[] bip32Path) throws BTChipException, NoSuchAlgorithmException {
-        return Utils.sha256hash160(getPublicKeySECP256K1(bip32Path));
-    }
-
-    public int showAddressSECP256K1(int[] bip32Path, String hrp) throws BTChipException {
+    public int showAddressSECP256K1(int[] bip32Path, String hrp) throws IOException {
         byte[] pathBytes = LedgerUtils.getBip32bytes(bip32Path, 3);
 
         byte[] command = new byte[]{userCLA, userINSPublicKeySECP256K1ShowBech32, 0, 0, 0, 0};

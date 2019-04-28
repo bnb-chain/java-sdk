@@ -51,7 +51,7 @@ public class TransactionRequestAssembler {
 
     @VisibleForTesting
     byte[] sign(BinanceDexTransactionMessage msg)
-            throws JsonProcessingException, NoSuchAlgorithmException {
+            throws NoSuchAlgorithmException, IOException {
         SignData sd = new SignData();
         sd.setChainId(wallet.getChainId());
         sd.setAccountNumber(String.valueOf(wallet.getAccountNumber()));
@@ -61,6 +61,9 @@ public class TransactionRequestAssembler {
         sd.setMemo(options.getMemo());
         sd.setSource(String.valueOf(options.getSource()));
         sd.setData(options.getData());
+        if (wallet.getEcKey() == null && wallet.getLedgerKey() != null) {
+            return Crypto.sign(EncodeUtils.toJsonEncodeBytes(sd), wallet.getLedgerKey());
+        }
         return Crypto.sign(EncodeUtils.toJsonEncodeBytes(sd), wallet.getEcKey());
     }
 

@@ -83,4 +83,17 @@ public class LedgerUtils {
         }
         return new int[]{44,714,account,0,index};
     }
+
+    public static boolean verifyBIP44Path(int[] bip44Path) {
+        if (bip44Path.length != 5) {
+            return false;
+        }
+        if (bip44Path[0] != 44 || bip44Path[1] != 714 || bip44Path[3] != 0) {
+            return false;
+        }
+        if (bip44Path[2] < 0 || bip44Path[4] < 0) {
+            return false;
+        }
+        return true;
+    }
 }
