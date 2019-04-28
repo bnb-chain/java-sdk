@@ -1,12 +1,12 @@
 package com.binance.dex.api.client.ledger.usb;
 
-import com.binance.dex.api.client.ledger.common.BTChipException;
 import org.usb4java.Context;
 import org.usb4java.Device;
 import org.usb4java.DeviceDescriptor;
 import org.usb4java.DeviceList;
 import org.usb4java.LibUsb;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Vector;
 
@@ -14,12 +14,12 @@ public class HidUsb {
 	
 	private static Context context;
 		
-	public static Device[] enumDevices(int vid, int pid) throws BTChipException {
+	public static Device[] enumDevices(int vid, int pid) throws IOException {
 		Vector<Device> devices = new Vector<Device>();
 		DeviceList list = new DeviceList();
 		int result = LibUsb.getDeviceList(null, list);
 		if (result < 0) {
-			throw new BTChipException("Unable to get device list");
+			throw new IOException("Unable to get device list");
 		}
 		for (Device device : list) {
 			DeviceDescriptor descriptor = new DeviceDescriptor();

@@ -1,15 +1,16 @@
 package com.binance.dex.api.client.ledger.common;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 public class LedgerHelper {
 	
 	private static final int TAG_APDU = 0x05;
 	
-	public static byte[] wrapCommandAPDU(int channel, byte[] command, int packetSize) throws BTChipException {
+	public static byte[] wrapCommandAPDU(int channel, byte[] command, int packetSize) throws IOException {
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		if (packetSize < 3) {
-			throw new BTChipException("Can't handle Ledger framing with less than 3 bytes for the report");
+			throw new IOException("Can't handle Ledger framing with less than 3 bytes for the report");
 		}
 		int sequenceIdx = 0;
 		int offset = 0;
@@ -42,7 +43,7 @@ public class LedgerHelper {
 		return output.toByteArray();		
 	}
 	
-	public static byte[] unwrapResponseAPDU(int channel, byte[] data, int packetSize) throws BTChipException {
+	public static byte[] unwrapResponseAPDU(int channel, byte[] data, int packetSize) throws IOException {
 		ByteArrayOutputStream response = new ByteArrayOutputStream();
 		int offset = 0;
 		int responseLength;
@@ -51,19 +52,19 @@ public class LedgerHelper {
 			return null;
 		}
 		if (data[offset++] != (channel >> 8)) {
-			throw new BTChipException("Invalid channel");
+			throw new IOException("Invalid channel");
 		}
 		if (data[offset++] != (channel & 0xff)) {
-			throw new BTChipException("Invalid channel");
+			throw new IOException("Invalid channel");
 		}
 		if (data[offset++] != TAG_APDU) {
-			throw new BTChipException("Invalid tag");			
+			throw new IOException("Invalid tag");
 		}
 		if (data[offset++] != 0x00) {
-			throw new BTChipException("Invalid sequence");
+			throw new IOException("Invalid sequence");
 		}
 		if (data[offset++] != 0x00) {
-			throw new BTChipException("Invalid sequence");
+			throw new IOException("Invalid sequence");
 		}
 		responseLength = ((data[offset++] & 0xff) << 8);
 		responseLength |= (data[offset++] & 0xff);
@@ -79,19 +80,19 @@ public class LedgerHelper {
 				return null;
 			}
 			if (data[offset++] != (channel >> 8)) {
-				throw new BTChipException("Invalid channel");
+				throw new IOException("Invalid channel");
 			}
 			if (data[offset++] != (channel & 0xff)) {
-				throw new BTChipException("Invalid channel");
+				throw new IOException("Invalid channel");
 			}
 			if (data[offset++] != TAG_APDU) {
-				throw new BTChipException("Invalid tag");			
+				throw new IOException("Invalid tag");
 			}
 			if (data[offset++] != (sequenceIdx >> 8)) {
-				throw new BTChipException("Invalid sequence");
+				throw new IOException("Invalid sequence");
 			}
 			if (data[offset++] != (sequenceIdx & 0xff)) {
-				throw new BTChipException("Invalid sequence");
+				throw new IOException("Invalid sequence");
 			}
 			blockSize = (responseLength - response.size() > packetSize - 5 ? packetSize - 5 : responseLength - response.size());
 			if (blockSize > data.length - offset) {

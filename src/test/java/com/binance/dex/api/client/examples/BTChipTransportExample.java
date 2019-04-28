@@ -3,7 +3,7 @@ package com.binance.dex.api.client.examples;
 import com.binance.dex.api.client.ledger.LedgerUtils;
 import com.binance.dex.api.client.ledger.hid.BTChipTransportHID;
 
-public class BTChipTransport {
+public class BTChipTransportExample {
     public static void main(String args[]) throws Exception {
         BTChipTransportHID device = BTChipTransportHID.openDevice(null);
         byte[] result = device.exchange(LedgerUtils.hexToBin("BC00000000"));

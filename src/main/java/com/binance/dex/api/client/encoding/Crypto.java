@@ -1,15 +1,18 @@
 package com.binance.dex.api.client.encoding;
 
+import com.binance.dex.api.client.ledger.LedgerKey;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Utils;
 import org.bitcoinj.crypto.*;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.List;
 
 public class Crypto {
@@ -33,6 +36,12 @@ public class Crypto {
         System.arraycopy(Utils.bigIntegerToBytes(signature.r, 32), 0, result, 0, 32);
         System.arraycopy(Utils.bigIntegerToBytes(signature.s, 32), 0, result, 32, 32);
         return result;
+    }
+
+    public static byte[] sign(byte[] msg, LedgerKey ledgerKey) throws IOException {
+        ledgerKey.getLedgerDevice().showAddressSECP256K1(ledgerKey.getBip44Path(), ledgerKey.getHrp());
+        byte[] signature = ledgerKey.getLedgerDevice().signSECP256K1(ledgerKey.getBip44Path(), msg);
+        return signatureConvertDERtoBER(signature);
     }
 
     public static byte[] decodeAddress(String address) throws SegwitAddressException {
@@ -76,16 +85,6 @@ public class Crypto {
         }
     }
 
-    public static class SegwitAddressException extends IllegalArgumentException {
-        SegwitAddressException(Exception e) {
-            super(e);
-        }
-
-        SegwitAddressException(String s) {
-            super(s);
-        }
-    }
-
     /**
      * see https://github.com/sipa/bech32/pull/40/files
      */
@@ -116,5 +115,72 @@ public class Crypto {
             throw new SegwitAddressException("Could not convert bits, invalid padding");
         }
         return out.toByteArray();
+    }
+
+    public static byte[] signatureConvertDERtoBER(byte[] signature) {
+
+        int minSigLen = 8;
+        if (signature.length < minSigLen) {
+            return null;
+        }
+        int index = 0;
+        if (signature[index] != 0x30) {
+            return null;
+        }
+        index++;
+        int siglen = signature[index];
+        index++;
+
+        if ((siglen + 2) > signature.length || (siglen + 2) < minSigLen) {
+            return null;
+        }
+        signature = Arrays.copyOfRange(signature, 0, siglen + 2);
+
+        if (signature[index] != 0x02) {
+            return null;
+        }
+        index++;
+
+        // Length of signature R.
+        int rLen = (int) signature[index];
+        index++;
+        if (rLen <= 0 || rLen > signature.length - index - 3) {
+            return null;
+        }
+
+        byte[] rBytes = Arrays.copyOfRange(signature, index, index + rLen);
+        BigInteger signatureR = new BigInteger(rBytes);
+
+        index += rLen;
+
+        if (signature[index] != 0x02) {
+            return null;
+        }
+        index++;
+
+        int sLen = (int) signature[index];
+        index++;
+
+        if (sLen <= 0 || sLen > (signature.length - index)) {
+            return null;
+        }
+
+        byte[] sBytes = Arrays.copyOfRange(signature, index, index + sLen);
+        BigInteger signatureS = new BigInteger(sBytes);
+
+        byte[] result = new byte[64];
+        System.arraycopy(Utils.bigIntegerToBytes(signatureR, 32), 0, result, 0, 32);
+        System.arraycopy(Utils.bigIntegerToBytes(signatureS, 32), 0, result, 32, 32);
+        return result;
+    }
+
+    public static class SegwitAddressException extends IllegalArgumentException {
+        SegwitAddressException(Exception e) {
+            super(e);
+        }
+
+        SegwitAddressException(String s) {
+            super(s);
+        }
     }
 }
