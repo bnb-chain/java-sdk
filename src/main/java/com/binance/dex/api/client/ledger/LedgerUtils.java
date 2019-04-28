@@ -1,4 +1,4 @@
-package com.binance.dex.api.client.ledger.utils;
+package com.binance.dex.api.client.ledger;
 
 import com.google.common.primitives.Bytes;
 
@@ -6,7 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-public class Utils {
+public class LedgerUtils {
     public static String dump(byte[] buffer, int offset, int length) {
         String result = "";
         for (int i=0; i<length; i++) {
@@ -75,5 +75,12 @@ public class Utils {
             result[0] = (byte)(result[0] | 0x1);
         }
         return Bytes.concat(result, bigX.toByteArray());
+    }
+
+    public static int[] createBIP44Path(int account, int index) {
+        if (account < 0 || index < 0) {
+            return null;
+        }
+        return new int[]{44,714,account,0,index};
     }
 }

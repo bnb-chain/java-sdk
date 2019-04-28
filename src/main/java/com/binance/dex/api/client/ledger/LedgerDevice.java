@@ -2,13 +2,11 @@ package com.binance.dex.api.client.ledger;
 
 import com.binance.dex.api.client.ledger.common.BTChipException;
 import com.binance.dex.api.client.ledger.hid.BTChipTransportHID;
-import com.binance.dex.api.client.ledger.utils.Utils;
 import com.google.common.primitives.Bytes;
 import org.apache.commons.codec.binary.Hex;
-
 import java.util.Arrays;
 
-public class LedgerDevice implements Ledger {
+public class LedgerDevice {
     private static final byte userCLA = (byte)0xBC;
     private static final byte userINSGetVersion = 0;
     private static final byte userINSPublicKeySECP256K1 = 1;
@@ -65,7 +63,7 @@ public class LedgerDevice implements Ledger {
         while (packetIndex <= packetCount)  {
             int chunk = userMessageChunkSize;
             if (packetIndex == 1) {
-                byte[] pathBytes = Utils.getBip32bytes(bip32Path, 3);
+                byte[] pathBytes = LedgerUtils.getBip32bytes(bip32Path, 3);
                 if (pathBytes == null) {
                     return null;
                 }
@@ -90,16 +88,16 @@ public class LedgerDevice implements Ledger {
     }
 
     public byte[] getPublicKeySECP256K1(int[] bip32Path) throws BTChipException {
-        byte[] pathBytes = Utils.getBip32bytes(bip32Path, 3);
+        byte[] pathBytes = LedgerUtils.getBip32bytes(bip32Path, 3);
 
         byte[] command = new byte[]{userCLA, userINSPublicKeySECP256K1, 0, 0, (byte)pathBytes.length};
         command = Bytes.concat(command, pathBytes);
         byte[] pubkey = device.exchange(command);
-        return Utils.compressedLedgerPubkey(pubkey);
+        return LedgerUtils.compressedLedgerPubkey(pubkey);
     }
 
     public int showAddressSECP256K1(int[] bip32Path, boolean isMainnet) throws BTChipException {
-        byte[] pathBytes = Utils.getBip32bytes(bip32Path, 3);
+        byte[] pathBytes = LedgerUtils.getBip32bytes(bip32Path, 3);
 
         byte[] command = new byte[]{userCLA, userINSPublicKeySECP256K1ShowBech32, 0, 0, 0, 0};
         if (isMainnet) {
@@ -134,7 +132,7 @@ public class LedgerDevice implements Ledger {
                 "6f6d223a22424e42227d5d7d5d2c226f757470757473223a5b7b2261646472657373223a22626e6231706b70706632617233776" +
                 "a333863753779386b68796730636c6d6876663266326e7a74347736222c22636f696e73223a5b7b22616d6f756e74223a313030" +
                 "3030303030303030303030302c2264656e6f6d223a22424e42227d5d7d5d7d5d2c2273657175656e6365223a2230222c22736f75726365223a2230227d";
-        byte[] signature = ledgerDevice.signSECP256K1(bip44Path, Utils.hexToBin(msgString));
+        byte[] signature = ledgerDevice.signSECP256K1(bip44Path, LedgerUtils.hexToBin(msgString));
         System.out.println(Hex.encodeHexString(signature));
 
         ledgerDevice.close();

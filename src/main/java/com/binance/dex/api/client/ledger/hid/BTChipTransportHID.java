@@ -4,7 +4,7 @@ import com.binance.dex.api.client.ledger.common.BTChipException;
 import com.binance.dex.api.client.ledger.common.BTChipTransport;
 import com.binance.dex.api.client.ledger.common.LedgerHelper;
 import com.binance.dex.api.client.ledger.usb.HidUsb;
-import com.binance.dex.api.client.ledger.utils.Utils;
+import com.binance.dex.api.client.ledger.LedgerUtils;
 import org.usb4java.*;
 
 import java.io.ByteArrayOutputStream;
@@ -153,13 +153,13 @@ public class BTChipTransportHID implements BTChipTransport {
 	
 	public static void main(String args[]) throws Exception {
 		BTChipTransportHID device = openDevice(null);
-		byte[] result = device.exchange(Utils.hexToBin("BC00000000"));
+		byte[] result = device.exchange(LedgerUtils.hexToBin("BC00000000"));
 		System.out.print("Get ledger app version: ");
-		System.out.println(Utils.dump(result));
+		System.out.println(LedgerUtils.dump(result));
 
-		result = device.exchange(Utils.hexToBin("BC01000029052c000080CA0200800000008000000000000000000000000000000000000000000000000000000000"));
+		result = device.exchange(LedgerUtils.hexToBin("BC01000029052c000080CA0200800000008000000000000000000000000000000000000000000000000000000000"));
 		System.out.print("Get a public key from ledger: ");
-		System.out.println(Utils.dump(result));
+		System.out.println(LedgerUtils.dump(result));
 		device.close();
 	}
 }
