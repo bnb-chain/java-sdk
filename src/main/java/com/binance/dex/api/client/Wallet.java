@@ -5,6 +5,8 @@ import com.binance.dex.api.client.domain.AccountSequence;
 import com.binance.dex.api.client.domain.Infos;
 import com.binance.dex.api.client.encoding.Crypto;
 import com.binance.dex.api.client.encoding.message.MessageType;
+import com.binance.dex.api.client.ledger.LedgerDevice;
+import com.binance.dex.api.client.ledger.LedgerKey;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.bitcoinj.core.ECKey;
@@ -18,6 +20,7 @@ import java.util.Map;
 public class Wallet {
     private final static Map<BinanceDexEnvironment, String> CHAIN_IDS = new HashMap<>();
     private String privateKey;
+    private LedgerKey ledgerKey;
     private String address;
     private ECKey ecKey;
     private byte[] addressBytes;
@@ -44,6 +47,21 @@ public class Wallet {
         } else {
             throw new IllegalArgumentException("Private key cannot be empty.");
         }
+    }
+
+    public Wallet(int[]bip44Path, LedgerDevice ledgerDevice, BinanceDexEnvironment env) throws IOException {
+        this.ledgerKey = new LedgerKey(ledgerDevice, bip44Path, env.getHrp());
+        this.env = env;
+        this.address = this.ledgerKey.getAddress();
+        this.addressBytes = Crypto.decodeAddress(this.address);
+        byte[] pubKey = this.ledgerKey.getPubKey();
+        byte[] pubKeyPrefix = MessageType.PubKey.getTypePrefixBytes();
+        this.pubKeyForSign = new byte[pubKey.length + pubKeyPrefix.length + 1];
+        System.arraycopy(pubKeyPrefix, 0, this.pubKeyForSign, 0, pubKeyPrefix.length);
+        pubKeyForSign[pubKeyPrefix.length] = (byte) 33;
+        System.arraycopy(pubKey, 0, this.pubKeyForSign, pubKeyPrefix.length + 1, pubKey.length);
+        this.accountNumber = new Integer(0);
+        this.sequence = new Long(0);
     }
 
     public static Wallet createRandomWallet(BinanceDexEnvironment env) throws IOException {
@@ -135,6 +153,10 @@ public class Wallet {
 
     public ECKey getEcKey() {
         return ecKey;
+    }
+
+    public LedgerKey getLedgerKey() {
+        return ledgerKey;
     }
 
     public byte[] getPubKeyForSign() {
