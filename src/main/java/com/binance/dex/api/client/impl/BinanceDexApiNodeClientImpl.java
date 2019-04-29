@@ -7,6 +7,7 @@ import com.binance.dex.api.client.domain.broadcast.*;
 import com.binance.dex.api.client.domain.jsonrpc.*;
 import com.binance.dex.api.client.encoding.Crypto;
 import com.binance.dex.api.client.encoding.message.MessageType;
+import com.binance.dex.api.client.encoding.message.NewOrderMessage;
 import com.binance.dex.api.client.encoding.message.TransactionRequestAssembler;
 import com.binance.dex.api.proto.AppAccount;
 import com.binance.dex.api.proto.Send;
@@ -220,6 +221,16 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
             switch (messageType) {
                 case Send:
                     return convertTransfer(bytes);
+                case NewOrder:
+                    return convertNewOrder(bytes);
+                case CancelOrder:
+                    return convertCancelOrder(bytes);
+                case TokenFreeze:
+                    return convertTokenFreeze(bytes);
+                case TokenUnfreeze:
+                    return convertTokenUnfreeze(bytes);
+                case Vote:
+                    return convertVote(bytes);
             }
             return null;
         } catch (Exception e) {
@@ -246,6 +257,85 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         transaction.setRealTx(transfer);
         return transaction;
     }
+
+    protected Transaction convertNewOrder(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.NewOrder newOrderMessage = com.binance.dex.api.proto.NewOrder.parseFrom(array);
+        NewOrder newOrder = new NewOrder();
+        newOrder.setSymbol(newOrderMessage.getSymbol());
+        newOrder.setOrderType(OrderType.fromValue(newOrderMessage.getOrdertype()));
+        newOrder.setPrice("" + newOrderMessage.getPrice());
+        newOrder.setQuantity("" + newOrderMessage.getQuantity());
+        newOrder.setSide(OrderSide.fromValue(newOrderMessage.getSide()));
+        newOrder.setTimeInForce(TimeInForce.fromValue(newOrderMessage.getTimeinforce()));
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.NEW_ORDER);
+        transaction.setRealTx(newOrder);
+        return transaction;
+    }
+
+    protected Transaction convertCancelOrder(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.CancelOrder cancelOrderOrderMessage = com.binance.dex.api.proto.CancelOrder.parseFrom(array);
+
+        CancelOrder cancelOrder = new CancelOrder();
+        cancelOrder.setRefId(cancelOrderOrderMessage.getRefid());
+        cancelOrder.setSymbol(cancelOrderOrderMessage.getSymbol());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.CANCEL_ORDER);
+        transaction.setRealTx(cancelOrder);
+        return transaction;
+    }
+
+    protected Transaction convertTokenFreeze(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.TokenFreeze tokenFreezeMessage = com.binance.dex.api.proto.TokenFreeze.parseFrom(array);
+
+        TokenFreeze tokenFreeze = new TokenFreeze();
+        tokenFreeze.setAmount("" + tokenFreezeMessage.getAmount());
+        tokenFreeze.setSymbol(tokenFreezeMessage.getSymbol());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.FREEZE_TOKEN);
+        transaction.setRealTx(tokenFreeze);
+        return transaction;
+    }
+
+    protected Transaction convertTokenUnfreeze(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.TokenUnfreeze tokenUnfreezeMessage = com.binance.dex.api.proto.TokenUnfreeze.parseFrom(array);
+
+        TokenUnfreeze tokenUnfreeze = new TokenUnfreeze();
+        tokenUnfreeze.setSymbol(tokenUnfreezeMessage.getSymbol());
+        tokenUnfreeze.setAmount("" + tokenUnfreezeMessage.getAmount());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.UNFREEZE_TOKEN);
+        transaction.setRealTx(tokenUnfreeze);
+        return transaction;
+    }
+
+    protected Transaction convertVote(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.Vote voteMessage = com.binance.dex.api.proto.Vote.parseFrom(array);
+
+        Vote vote = new Vote();
+
+        vote.setOption((int) voteMessage.getOption());
+        vote.setProposalId(voteMessage.getProposalId());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.VOTE);
+        transaction.setRealTx(vote);
+        return transaction;
+    }
+
 
     protected Account convert(AppAccount appAccount) {
         Account account = new Account();
