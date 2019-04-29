@@ -1,13 +1,12 @@
 package com.binance.dex.api.client.domain.broadcast;
 
-import com.binance.dex.api.client.BinanceDexConstants;
 import com.binance.dex.api.client.domain.OrderSide;
 import com.binance.dex.api.client.domain.OrderType;
 import com.binance.dex.api.client.domain.TimeInForce;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class NewOrder {
     private String symbol;
+    private String sender;
     private OrderType orderType;
     private OrderSide side;
     private String price;
@@ -62,15 +61,24 @@ public class NewOrder {
         this.timeInForce = timeInForce;
     }
 
+    public String getSender() {
+        return sender;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
+
     @Override
     public String toString() {
-        return new ToStringBuilder(this, BinanceDexConstants.BINANCE_DEX_TO_STRING_STYLE)
-                .append("symbol", symbol)
-                .append("orderType", orderType)
-                .append("side", side)
-                .append("price", price)
-                .append("quantity", quantity)
-                .append("timeInForce", timeInForce)
-                .toString();
+        return "NewOrder{" +
+                "symbol='" + symbol + '\'' +
+                ", sender='" + sender + '\'' +
+                ", orderType=" + orderType +
+                ", side=" + side +
+                ", price='" + price + '\'' +
+                ", quantity='" + quantity + '\'' +
+                ", timeInForce=" + timeInForce +
+                '}';
     }
 }

@@ -16,7 +16,11 @@ public enum MessageType {
     StdSignature(null),
     PubKey("EB5AE987"),
     StdTx("F0625DEE"),
-    Vote("A1CADD36");
+    Vote("A1CADD36"),
+    Issue("17EFAB80"),
+    Burn("7ED2D2A0"),
+    Mint("467E0829"),
+    SubmitProposal("B42D614E");
 
     private byte[] typePrefixBytes;
 
@@ -37,7 +41,7 @@ public enum MessageType {
         }
         return Arrays.stream(MessageType.values())
                 .filter(type -> {
-                    if(null == type.getTypePrefixBytes() || type.getTypePrefixBytes().length <4){
+                    if (null == type.getTypePrefixBytes() || type.getTypePrefixBytes().length < 4) {
                         return false;
                     }
                     for (int i = 0; i < 4; i++) {

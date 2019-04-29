@@ -11,6 +11,13 @@ public class Token {
     private String denom;
     private Long amount;
 
+    public static Token of(com.binance.dex.api.proto.Token source) {
+        Token token = new Token();
+        token.setDenom(source.getDenom());
+        token.setAmount(source.getAmount());
+        return token;
+    }
+
     public String getDenom() {
         return denom;
     }

@@ -1,13 +1,12 @@
 package com.binance.dex.api.client.domain.broadcast;
 
-import com.binance.dex.api.client.BinanceDexConstants;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
 public class Vote {
 
     private Long proposalId;
 
     private Integer option;
+
+    private String voter;
 
     public Long getProposalId() {
         return proposalId;
@@ -25,11 +24,20 @@ public class Vote {
         this.option = option;
     }
 
+    public String getVoter() {
+        return voter;
+    }
+
+    public void setVoter(String voter) {
+        this.voter = voter;
+    }
+
     @Override
     public String toString() {
-        return new ToStringBuilder(this, BinanceDexConstants.BINANCE_DEX_TO_STRING_STYLE)
-                .append("proposalId", proposalId)
-                .append("option", option)
-                .toString();
+        return "Vote{" +
+                "proposalId=" + proposalId +
+                ", option=" + option +
+                ", voter='" + voter + '\'' +
+                '}';
     }
 }

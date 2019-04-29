@@ -6,6 +6,9 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class CancelOrder {
     private String symbol;
+
+    private String sender;
+
     @JsonProperty("refid")
     private String refId;
 
@@ -25,11 +28,20 @@ public class CancelOrder {
         this.refId = refId;
     }
 
+    public String getSender() {
+        return sender;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
+
     @Override
     public String toString() {
-        return new ToStringBuilder(this, BinanceDexConstants.BINANCE_DEX_TO_STRING_STYLE)
-                .append("symbol", symbol)
-                .append("refId", refId)
-                .toString();
+        return "CancelOrder{" +
+                "symbol='" + symbol + '\'' +
+                ", sender='" + sender + '\'' +
+                ", refId='" + refId + '\'' +
+                '}';
     }
 }

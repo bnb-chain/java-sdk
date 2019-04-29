@@ -1,9 +1,7 @@
 package com.binance.dex.api.client.domain.broadcast;
 
-import com.binance.dex.api.client.BinanceDexConstants;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
 public class TokenUnfreeze {
+    private String from;
     private String symbol;
     private String amount;
 
@@ -23,11 +21,20 @@ public class TokenUnfreeze {
         this.amount = amount;
     }
 
+    public String getFrom() {
+        return from;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
+    }
+
     @Override
     public String toString() {
-        return new ToStringBuilder(this, BinanceDexConstants.BINANCE_DEX_TO_STRING_STYLE)
-                .append("symbol", symbol)
-                .append("amount", amount)
-                .toString();
+        return "TokenUnfreeze{" +
+                "from='" + from + '\'' +
+                ", symbol='" + symbol + '\'' +
+                ", amount='" + amount + '\'' +
+                '}';
     }
 }
