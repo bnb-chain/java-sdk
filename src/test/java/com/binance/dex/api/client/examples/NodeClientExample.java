@@ -42,10 +42,48 @@ public class NodeClientExample {
 
     @Test
     public void testBlockTransactions() {
+
+        //Transfer
         Long height = 7794210L;
         List<Transaction> transactions = binanceDexNodeApi.getBlockTransactions(height);
         Assert.assertNotNull(transactions);
         Assert.assertTrue(transactions.size() == 1);
+        Assert.assertEquals(transactions.get(0).getTxType(), TxType.TRANSFER);
+
+        //New Order
+        height = 11397093L;
+        transactions = binanceDexNodeApi.getBlockTransactions(height);
+        Assert.assertNotNull(transactions);
+        Assert.assertTrue(transactions.size() == 1);
+        Assert.assertEquals(transactions.get(0).getTxType(), TxType.NEW_ORDER);
+
+        //Cancel Order
+        height = 11397088L;
+        transactions = binanceDexNodeApi.getBlockTransactions(height);
+        Assert.assertNotNull(transactions);
+        Assert.assertTrue(transactions.size() == 1);
+        Assert.assertEquals(transactions.get(0).getTxType(), TxType.CANCEL_ORDER);
+
+        //Token freeze
+        height = 11381267L;
+        transactions = binanceDexNodeApi.getBlockTransactions(height);
+        Assert.assertNotNull(transactions);
+        Assert.assertTrue(transactions.size() == 1);
+        Assert.assertEquals(transactions.get(0).getTxType(), TxType.FREEZE_TOKEN);
+
+        //Token unfreeze
+        height = 11381269L;
+        transactions = binanceDexNodeApi.getBlockTransactions(height);
+        Assert.assertNotNull(transactions);
+        Assert.assertTrue(transactions.size() == 1);
+        Assert.assertEquals(transactions.get(0).getTxType(), TxType.UNFREEZE_TOKEN);
+
+        //vote
+        height = 11393637L;
+        transactions = binanceDexNodeApi.getBlockTransactions(height);
+        Assert.assertNotNull(transactions);
+        Assert.assertTrue(transactions.size() == 1);
+        Assert.assertEquals(transactions.get(0).getTxType(), TxType.VOTE);
     }
 
     @Test
