@@ -64,7 +64,7 @@ public class LedgerDevice {
         while (packetIndex <= packetCount) {
             int chunk = userMessageChunkSize;
             if (packetIndex == 1) {
-                byte[] pathBytes = LedgerUtils.getBip32bytes(bip32Path, 3);
+                byte[] pathBytes = LedgerUtils.bipPathToBytes(bip32Path, 3);
                 if (pathBytes == null) {
                     return null;
                 }
@@ -89,7 +89,7 @@ public class LedgerDevice {
     }
 
     public byte[] getPublicKeySECP256K1(int[] bip32Path) throws IOException {
-        byte[] pathBytes = LedgerUtils.getBip32bytes(bip32Path, 3);
+        byte[] pathBytes = LedgerUtils.bipPathToBytes(bip32Path, 3);
 
         byte[] command = new byte[]{userCLA, userINSPublicKeySECP256K1, 0, 0, (byte) pathBytes.length};
         command = Bytes.concat(command, pathBytes);
@@ -98,7 +98,7 @@ public class LedgerDevice {
     }
 
     public int showAddressSECP256K1(int[] bip32Path, String hrp) throws IOException {
-        byte[] pathBytes = LedgerUtils.getBip32bytes(bip32Path, 3);
+        byte[] pathBytes = LedgerUtils.bipPathToBytes(bip32Path, 3);
 
         byte[] command = new byte[]{userCLA, userINSPublicKeySECP256K1ShowBech32, 0, 0, 0, 0};
         command[5] = (byte) hrp.length();
