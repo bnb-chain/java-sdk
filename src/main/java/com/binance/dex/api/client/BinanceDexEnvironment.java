@@ -27,7 +27,7 @@ public class BinanceDexEnvironment {
     // Address human readable part prefix
     private String hrp;
 
-    private BinanceDexEnvironment(String baseUrl, String wsBaseUrl, String hrp) {
+    public BinanceDexEnvironment(String baseUrl, String wsBaseUrl, String hrp) {
         this.baseUrl = baseUrl;
         this.wsBaseUrl = wsBaseUrl;
         this.hrp = hrp;
