@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 
 public class LedgerDevice {
-    private static final byte userCLA = (byte)0xBC;
+    private static final byte userCLA = (byte) 0xBC;
     private static final byte userINSGetVersion = 0;
     private static final byte userINSPublicKeySECP256K1 = 1;
     private static final byte userINSSignSECP256K1 = 2;
@@ -25,7 +25,10 @@ public class LedgerDevice {
     }
 
     static public boolean hasLedgerConnected() throws IOException {
-        return BTChipTransportHID.discoverLedgerDevice() > 0;
+        if (BTChipTransportHID.discoverLedgerDevice() == 1) {
+            return true;
+        }
+        throw new IOException("More one one ledger devices are found. You must connect only one ledger device");
     }
 
     static public LedgerDevice findLedgerDevice() throws IOException {
@@ -50,35 +53,35 @@ public class LedgerDevice {
 
     public byte[] signSECP256K1(int[] bip32Path, byte[] transaction) throws IOException {
         byte packetIndex = 1;
-        int count = (int) Math.ceil((double) transaction.length / (double)userMessageChunkSize);
-        byte packetCount = (byte)(count);
+        int count = (int) Math.ceil((double) transaction.length / (double) userMessageChunkSize);
+        byte packetCount = (byte) (count);
         packetCount++;
 
         byte[] finalResponse = null;
 
         byte[] message;
 
-        while (packetIndex <= packetCount)  {
+        while (packetIndex <= packetCount) {
             int chunk = userMessageChunkSize;
             if (packetIndex == 1) {
                 byte[] pathBytes = LedgerUtils.getBip32bytes(bip32Path, 3);
                 if (pathBytes == null) {
                     return null;
                 }
-                byte[] header = new byte[]{userCLA, userINSSignSECP256K1, packetIndex, packetCount, (byte)pathBytes.length};
+                byte[] header = new byte[]{userCLA, userINSSignSECP256K1, packetIndex, packetCount, (byte) pathBytes.length};
                 message = Bytes.concat(header, pathBytes);
             } else {
                 if (transaction.length < userMessageChunkSize) {
                     chunk = transaction.length;
                 }
-                byte[] header = new byte[]{userCLA, userINSSignSECP256K1, packetIndex, packetCount, (byte)chunk};
+                byte[] header = new byte[]{userCLA, userINSSignSECP256K1, packetIndex, packetCount, (byte) chunk};
                 message = Bytes.concat(header, Arrays.copyOfRange(transaction, 0, chunk));
             }
 
             finalResponse = this.device.exchange(message);
 
             if (packetIndex > 1) {
-                transaction = Arrays.copyOfRange(transaction,chunk,transaction.length);
+                transaction = Arrays.copyOfRange(transaction, chunk, transaction.length);
             }
             packetIndex++;
         }
@@ -88,7 +91,7 @@ public class LedgerDevice {
     public byte[] getPublicKeySECP256K1(int[] bip32Path) throws IOException {
         byte[] pathBytes = LedgerUtils.getBip32bytes(bip32Path, 3);
 
-        byte[] command = new byte[]{userCLA, userINSPublicKeySECP256K1, 0, 0, (byte)pathBytes.length};
+        byte[] command = new byte[]{userCLA, userINSPublicKeySECP256K1, 0, 0, (byte) pathBytes.length};
         command = Bytes.concat(command, pathBytes);
         byte[] pubkey = device.exchange(command);
         return LedgerUtils.compressedLedgerPubkey(pubkey);
@@ -98,11 +101,11 @@ public class LedgerDevice {
         byte[] pathBytes = LedgerUtils.getBip32bytes(bip32Path, 3);
 
         byte[] command = new byte[]{userCLA, userINSPublicKeySECP256K1ShowBech32, 0, 0, 0, 0};
-        command[5] = (byte)hrp.length();
+        command[5] = (byte) hrp.length();
         command = Bytes.concat(command, hrp.getBytes());
 
         command = Bytes.concat(command, pathBytes);
-        command[4] = (byte)(command.length-5);
+        command[4] = (byte) (command.length - 5);
         byte[] result = device.exchange(command);
         return result.length;
     }

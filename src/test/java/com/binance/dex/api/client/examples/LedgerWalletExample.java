@@ -47,5 +47,7 @@ public class LedgerWalletExample {
         walletSender.initAccount(client);
         List<TransactionMetadata> resp = client.transfer(transfer, walletSender, options, true);
         System.out.println(resp.get(0));
+
+        ledgerDevice.close();
     }
 }
