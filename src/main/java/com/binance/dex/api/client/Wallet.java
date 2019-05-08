@@ -125,7 +125,8 @@ public class Wallet {
     public synchronized void ensureWalletIsReady(BinanceDexApiRestClient client) {
         if (accountNumber == null) {
             initAccount(client);
-        } else if (sequence == null) {
+        }
+        if (sequence == null) {
             reloadAccountSequence(client);
         }
 
