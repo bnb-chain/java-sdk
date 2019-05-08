@@ -6,5 +6,9 @@ public enum TxType {
     FREEZE_TOKEN,
     UNFREEZE_TOKEN,
     TRANSFER,
-    VOTE
+    VOTE,
+    ISSUE,
+    BURN,
+    MINT,
+    SUBMIT_PROPOSAL
 }

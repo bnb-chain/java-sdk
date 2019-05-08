@@ -1,26 +1,9 @@
 package com.binance.dex.api.client.domain.broadcast;
 
-public class TokenFreeze {
-
+public class Mint {
     private String from;
     private String symbol;
-    private String amount;
-
-    public String getSymbol() {
-        return symbol;
-    }
-
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
-    }
-
-    public String getAmount() {
-        return amount;
-    }
-
-    public void setAmount(String amount) {
-        this.amount = amount;
-    }
+    private Long amount;
 
     public String getFrom() {
         return from;
@@ -30,12 +13,28 @@ public class TokenFreeze {
         this.from = from;
     }
 
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+
+    public Long getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Long amount) {
+        this.amount = amount;
+    }
+
     @Override
     public String toString() {
-        return "TokenFreeze{" +
+        return "Mint{" +
                 "from='" + from + '\'' +
                 ", symbol='" + symbol + '\'' +
-                ", amount='" + amount + '\'' +
+                ", amount=" + amount +
                 '}';
     }
 }

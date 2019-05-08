@@ -84,6 +84,34 @@ public class NodeClientExample {
         Assert.assertNotNull(transactions);
         Assert.assertTrue(transactions.size() == 1);
         Assert.assertEquals(transactions.get(0).getTxType(), TxType.VOTE);
+
+        //issue
+        height = 11397504L;
+        transactions = binanceDexNodeApi.getBlockTransactions(height);
+        Assert.assertNotNull(transactions);
+        Assert.assertTrue(transactions.size() == 1);
+        Assert.assertEquals(transactions.get(0).getTxType(), TxType.ISSUE);
+
+        //burn
+        height = 11408891L;
+        transactions = binanceDexNodeApi.getBlockTransactions(height);
+        Assert.assertNotNull(transactions);
+        Assert.assertTrue(transactions.size() == 1);
+        Assert.assertEquals(transactions.get(0).getTxType(), TxType.BURN);
+
+        //mint
+        height = 10449208L;
+        transactions = binanceDexNodeApi.getBlockTransactions(height);
+        Assert.assertNotNull(transactions);
+        Assert.assertTrue(transactions.size() == 1);
+        Assert.assertEquals(transactions.get(0).getTxType(), TxType.MINT);
+
+        //proposal
+        height = 11393353L;
+        transactions = binanceDexNodeApi.getBlockTransactions(height);
+        Assert.assertNotNull(transactions);
+        Assert.assertTrue(transactions.size() == 1);
+        Assert.assertEquals(transactions.get(0).getTxType(), TxType.SUBMIT_PROPOSAL);
     }
 
     @Test

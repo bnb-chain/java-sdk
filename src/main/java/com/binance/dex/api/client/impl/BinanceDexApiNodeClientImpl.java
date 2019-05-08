@@ -7,7 +7,6 @@ import com.binance.dex.api.client.domain.broadcast.*;
 import com.binance.dex.api.client.domain.jsonrpc.*;
 import com.binance.dex.api.client.encoding.Crypto;
 import com.binance.dex.api.client.encoding.message.MessageType;
-import com.binance.dex.api.client.encoding.message.NewOrderMessage;
 import com.binance.dex.api.client.encoding.message.TransactionRequestAssembler;
 import com.binance.dex.api.proto.AppAccount;
 import com.binance.dex.api.proto.Send;
@@ -231,6 +230,14 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
                     return convertTokenUnfreeze(bytes);
                 case Vote:
                     return convertVote(bytes);
+                case Issue:
+                    return convertIssue(bytes);
+                case Burn:
+                    return convertBurn(bytes);
+                case Mint:
+                    return convertMint(bytes);
+                case SubmitProposal:
+                    return convertSubmitProposal(bytes);
             }
             return null;
         } catch (Exception e) {
@@ -262,7 +269,9 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         byte[] array = new byte[value.length - 4];
         System.arraycopy(value, 4, array, 0, array.length);
         com.binance.dex.api.proto.NewOrder newOrderMessage = com.binance.dex.api.proto.NewOrder.parseFrom(array);
+
         NewOrder newOrder = new NewOrder();
+        newOrder.setSender(Crypto.encodeAddress(hrp, newOrderMessage.getSender().toByteArray()));
         newOrder.setSymbol(newOrderMessage.getSymbol());
         newOrder.setOrderType(OrderType.fromValue(newOrderMessage.getOrdertype()));
         newOrder.setPrice("" + newOrderMessage.getPrice());
@@ -281,6 +290,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         com.binance.dex.api.proto.CancelOrder cancelOrderOrderMessage = com.binance.dex.api.proto.CancelOrder.parseFrom(array);
 
         CancelOrder cancelOrder = new CancelOrder();
+        cancelOrder.setSender(Crypto.encodeAddress(hrp, cancelOrderOrderMessage.getSender().toByteArray()));
         cancelOrder.setRefId(cancelOrderOrderMessage.getRefid());
         cancelOrder.setSymbol(cancelOrderOrderMessage.getSymbol());
 
@@ -296,6 +306,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         com.binance.dex.api.proto.TokenFreeze tokenFreezeMessage = com.binance.dex.api.proto.TokenFreeze.parseFrom(array);
 
         TokenFreeze tokenFreeze = new TokenFreeze();
+        tokenFreeze.setFrom(Crypto.encodeAddress(hrp, tokenFreezeMessage.getFrom().toByteArray()));
         tokenFreeze.setAmount("" + tokenFreezeMessage.getAmount());
         tokenFreeze.setSymbol(tokenFreezeMessage.getSymbol());
 
@@ -311,6 +322,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         com.binance.dex.api.proto.TokenUnfreeze tokenUnfreezeMessage = com.binance.dex.api.proto.TokenUnfreeze.parseFrom(array);
 
         TokenUnfreeze tokenUnfreeze = new TokenUnfreeze();
+        tokenUnfreeze.setFrom(Crypto.encodeAddress(hrp, tokenUnfreezeMessage.getFrom().toByteArray()));
         tokenUnfreeze.setSymbol(tokenUnfreezeMessage.getSymbol());
         tokenUnfreeze.setAmount("" + tokenUnfreezeMessage.getAmount());
 
@@ -327,12 +339,86 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
 
         Vote vote = new Vote();
 
+        vote.setVoter(Crypto.encodeAddress(hrp, voteMessage.getVoter().toByteArray()));
         vote.setOption((int) voteMessage.getOption());
         vote.setProposalId(voteMessage.getProposalId());
 
         Transaction transaction = new Transaction();
         transaction.setTxType(TxType.VOTE);
         transaction.setRealTx(vote);
+        return transaction;
+    }
+
+    protected Transaction convertIssue(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.Issue issueMessage = com.binance.dex.api.proto.Issue.parseFrom(array);
+
+        Issue issue = new Issue();
+        issue.setFrom(Crypto.encodeAddress(hrp, issueMessage.getFrom().toByteArray()));
+        issue.setName(issueMessage.getName());
+        issue.setSymbol(issueMessage.getSymbol());
+        issue.setTotalSupply(issueMessage.getTotalSupply());
+        issue.setMintable(issueMessage.getMintable());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.ISSUE);
+        transaction.setRealTx(issue);
+        return transaction;
+    }
+
+    protected Transaction convertBurn(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.Burn burnMessage = com.binance.dex.api.proto.Burn.parseFrom(array);
+
+        Burn burn = new Burn();
+        burn.setFrom(Crypto.encodeAddress(hrp, burnMessage.getFrom().toByteArray()));
+        burn.setSymbol(burnMessage.getSymbol());
+        burn.setAmount(burnMessage.getAmount());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.BURN);
+        transaction.setRealTx(burn);
+        return transaction;
+    }
+
+    protected Transaction convertMint(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.Mint mintMessage = com.binance.dex.api.proto.Mint.parseFrom(array);
+
+        Mint mint = new Mint();
+        mint.setFrom(Crypto.encodeAddress(hrp, mintMessage.getFrom().toByteArray()));
+        mint.setSymbol(mintMessage.getSymbol());
+        mint.setAmount(mintMessage.getAmount());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.MINT);
+        transaction.setRealTx(mint);
+        return transaction;
+    }
+
+    protected Transaction convertSubmitProposal(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.SubmitProposal proposalMessage = com.binance.dex.api.proto.SubmitProposal.parseFrom(array);
+
+        SubmitProposal proposal = new SubmitProposal();
+        proposal.setTitle(proposalMessage.getTitle());
+        proposal.setDescription(proposalMessage.getDescription());
+        proposal.setProposalType(ProposalType.fromValue(proposalMessage.getProposalType()));
+        proposal.setProposer(Crypto.encodeAddress(hrp, proposalMessage.getProposer().toByteArray()));
+
+        if (null != proposalMessage.getInitialDepositList()) {
+            proposal.setInitDeposit(proposalMessage.getInitialDepositList().stream()
+                    .map(com.binance.dex.api.client.encoding.message.Token::of).collect(Collectors.toList()));
+        }
+        proposal.setVotingPeriod(proposalMessage.getVotingPeriod());
+        
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.SUBMIT_PROPOSAL);
+        transaction.setRealTx(proposal);
         return transaction;
     }
 

@@ -137,3 +137,37 @@ message ResultBroadcastTxCommit {
     bytes hash = 3;
     int64 height = 4;
 }
+
+
+message Issue {
+    //    0x17EFAB80 // hardcoded, object type prefix in 4 bytes
+    bytes  from = 1; // issue token owner
+    string name = 2;
+    string symbol = 3;
+    int64 total_supply = 4;
+    bool  mintable = 5;
+}
+
+message Burn {
+    //    0x7ED2D2A0 // hardcoded, object type prefix in 4 bytes
+    bytes  from = 1; // issue token owner
+    string symbol = 2;
+    int64 amount = 3;
+}
+
+message Mint {
+    // 0x467E0829
+    bytes  from = 1; // issue token owner
+    string symbol = 2;
+    int64 amount = 3;
+}
+
+message SubmitProposal {
+    // 0xB42D614E
+    string title = 1;
+    string description = 2;
+    int64 proposal_type = 3;
+    bytes proposer = 4;
+    repeated Token initial_deposit = 5;
+    int64  voting_period = 6;
+}
