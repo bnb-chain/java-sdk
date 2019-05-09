@@ -8,6 +8,8 @@ public class JsonRpcResponse<R> {
 
     private Error error;
 
+    private String id;
+
     public R getResult() {
         return result;
     }
@@ -22,5 +24,13 @@ public class JsonRpcResponse<R> {
 
     public void setError(Error error) {
         this.error = error;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

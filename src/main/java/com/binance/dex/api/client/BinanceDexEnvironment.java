@@ -16,7 +16,7 @@ public class BinanceDexEnvironment {
     );
     public static final BinanceDexEnvironment TEST_NET_NODE = new BinanceDexEnvironment(
             "http://data-seed-pre-0-s3.binance.org",
-            "",
+            "wss://data-seed-pre-0-s3.binance.org/websocket",
             "tbnb"
     );
 
