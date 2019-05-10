@@ -1,38 +1,63 @@
 package com.binance.dex.api.client.websocket;
 
+import com.binance.dex.api.client.TransactionConverter;
+import com.binance.dex.api.client.domain.broadcast.Transaction;
+import com.binance.dex.api.client.domain.jsonrpc.BlockInfoResult;
+import com.binance.dex.api.client.domain.jsonrpc.JsonRpcResponse;
 import com.binance.dex.api.client.domain.websocket.CommonRequest;
 import com.binance.dex.api.client.domain.websocket.TxSearchRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class BinanceDexWSApiImpl implements BinanceDexWSApi {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private BinanceDexClientEndpoint endpoint;
+    private BinanceDexClientEndpoint<JsonRpcResponse> endpoint;
+    private TransactionConverter transactionConverter;
 
-    public BinanceDexWSApiImpl(BinanceDexClientEndpoint endpoint){
+    public BinanceDexWSApiImpl(BinanceDexClientEndpoint<JsonRpcResponse> endpoint,String hrp){
         this.endpoint = endpoint;
+        this.transactionConverter = new TransactionConverter(hrp);
     }
+
 
     @Override
     public void netInfo(String id) {
-        endpoint.sendMessage(buildWSRequest("net_info",id,null));
+        endpoint.sendMessage(id,buildWSRequest("net_info",id,null));
     }
 
     @Override
     public void blockByHeight(Long height,String id) {
         Object params = objectMapper.createObjectNode().putPOJO("height",String.valueOf(height));
-        endpoint.sendMessage(buildWSRequest("block",id,params));
+        endpoint.sendMessage(id,buildWSRequest("block",id,params));
     }
 
     @Override
-    public void txSearch(Long height,String id){
+    public List<Transaction> txSearch(Long height,String id){
+        List<Transaction> transactions = null;
         TxSearchRequest txSearchRequest = new TxSearchRequest();
         txSearchRequest.setPage("1");
         txSearchRequest.setPerPage("10000");
         txSearchRequest.setProve(false);
         txSearchRequest.setQuery("tx.height="+height);
-        endpoint.sendMessage(buildWSRequest("tx_search",id,txSearchRequest));
+        JsonRpcResponse response = endpoint.sendMessage(id,buildWSRequest("tx_search",id,txSearchRequest));
+        try {
+            if(response != null){
+                BlockInfoResult blockInfoResult =  objectMapper.readValue(objectMapper.writeValueAsString(response.getResult()),BlockInfoResult.class);
+                transactions = blockInfoResult.getTxs().stream()
+                        .map(transactionConverter::convert)
+                        .flatMap(List::stream)
+                        .collect(Collectors.toList());
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return transactions;
     }
 
 

@@ -1,15 +1,17 @@
 package com.binance.dex.api.client.websocket;
 
+import com.binance.dex.api.client.domain.jsonrpc.JsonRpcResponse;
+
 import javax.websocket.*;
 
-@ClientEndpoint
-public class BinanceDexClientEndpoint {
+@ClientEndpoint(decoders = {MessageDecoder.class})
+public class BinanceDexClientEndpoint<T> {
 
     private Session userSession;
 
-    private MessageHandler.Whole<String> messageHandler;
+    private BinanceDexMessageHandler<T> messageHandler;
 
-    public BinanceDexClientEndpoint(MessageHandler.Whole<String> messageHandler){
+    public BinanceDexClientEndpoint(BinanceDexMessageHandler<T> messageHandler){
         this.messageHandler = messageHandler;
     }
 
@@ -36,21 +38,15 @@ public class BinanceDexClientEndpoint {
     }
 
     @OnMessage
-    public void onMessage(String response){
+    public void onMessage(JsonRpcResponse response){
         if(messageHandler != null){
             messageHandler.onMessage(response);
         }
     }
 
-    public void sendMessage(String message){
-        if(null != userSession){
-            userSession.getAsyncRemote().sendText(message);
-        }
+    public T sendMessage(String id,String message){
+        return messageHandler.send(userSession,id,message);
     }
-
-
-
-
 
 
 }

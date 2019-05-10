@@ -1,45 +1,60 @@
 package com.binance.dex.api.client.websocket;
 
-import com.binance.dex.api.client.TransactionConverter;
-import com.binance.dex.api.client.domain.broadcast.*;
-import com.binance.dex.api.client.domain.jsonrpc.BlockInfoResult;
 import com.binance.dex.api.client.domain.jsonrpc.JsonRpcResponse;
-import com.binance.dex.api.client.encoding.Crypto;
-import com.binance.dex.api.client.encoding.message.MessageType;
-import com.binance.dex.api.proto.Send;
-import com.binance.dex.api.proto.StdTx;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 
-import javax.websocket.MessageHandler;
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
+import javax.websocket.Session;
 
-public class DefaultMessageHandler implements MessageHandler.Whole<String> {
+/**
+ * the default implementation of {@link BinanceDexMessageHandler},it is must when {@link BinanceDexWSApiImpl} is needed.
+ *
+ */
+public class DefaultMessageHandler implements BinanceDexMessageHandler<JsonRpcResponse> {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-    private TransactionConverter transactionConverter;
-    DefaultMessageHandler(String hrp){
-        this.transactionConverter = new TransactionConverter(hrp);
+    private long callBackTimeout;
+    private static final long DEFAULT_CALLBACK_TIMEOUT = 30_000L;
+    DefaultMessageHandler(long callBackTimeout){
+        this.callBackTimeout = callBackTimeout;
+    }
+    DefaultMessageHandler(){
+        this.callBackTimeout = DEFAULT_CALLBACK_TIMEOUT;
     }
 
+    /**
+     * send a message to websocket server,then wait synchronously for the result to be returned
+     * @param userSession session of a websocket connection
+     * @param id unique id of a message
+     * @param message body of message
+     * @return response by websocket server
+     */
     @Override
-    public void onMessage(String message) {
-        try {
-            JsonRpcResponse response = objectMapper.readValue(message, JsonRpcResponse.class);
-            if(response.getId().startsWith("TX")){
-                BlockInfoResult blockInfoResult =  objectMapper.readValue(objectMapper.writeValueAsString(response.getResult()),BlockInfoResult.class);
-                List<Transaction> transactions = blockInfoResult.getTxs().stream()
-                        .map(transactionConverter::convert)
-                        .flatMap(List::stream)
-                        .collect(Collectors.toList());
-            }else{
-                System.out.println(message);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public JsonRpcResponse send(Session userSession,String id,String message) {
+        if(null != userSession){
+            userSession.getAsyncRemote().sendText(message);
         }
+        JsonRpcResponse response;
+        boolean isTimeout = false;
+        long time = System.currentTimeMillis();
+        long waitTime = 0L;
+        while ( null == (response = WSResponseCache.instance().get(id)) && !(isTimeout = waitTime > callBackTimeout)){
+            waitTime = System.currentTimeMillis() - time;
+        }
+        if(isTimeout){
+            throw new RuntimeException("timeout");
+        }
+        return response;
     }
 
+    /**
+     * receive response from websocket server,and put it to cache {@link WSResponseCache}
+     * @param response response from websocket server
+     */
+    @Override
+    public void onMessage(JsonRpcResponse response){
+        if(response == null || StringUtils.isEmpty(response.getId())){
+            throw new RuntimeException("invalid response");
+        }
+        WSResponseCache.instance().add(response);
+    }
 
 }

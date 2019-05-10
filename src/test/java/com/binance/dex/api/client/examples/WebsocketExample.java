@@ -1,33 +1,49 @@
 package com.binance.dex.api.client.examples;
 
 import com.binance.dex.api.client.BinanceDexEnvironment;
-import com.binance.dex.api.client.websocket.*;
+import com.binance.dex.api.client.domain.jsonrpc.JsonRpcResponse;
+import com.binance.dex.api.client.websocket.BinanceDexClientEndpoint;
+import com.binance.dex.api.client.websocket.BinanceDexClientWSFactory;
+import com.binance.dex.api.client.websocket.BinanceDexMessageHandler;
+import com.binance.dex.api.client.websocket.WebsocketLauncher;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.websocket.Session;
 import java.util.concurrent.CountDownLatch;
 
 public class WebsocketExample {
 
-    private BinanceDexWSApi binanceDexWSApi;
-    private CountDownLatch countDownLatch;
-
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    BinanceDexClientEndpoint endpoint;
+    CountDownLatch countDownLatch = new CountDownLatch(1);
     @Before
     public void before(){
-        countDownLatch = new CountDownLatch(3);
-        BinanceDexClientEndpoint endpoint = BinanceDexClientWSFactory.getInstance().newClientEndpoint(message -> {
-            System.out.println(message);
-            countDownLatch.countDown();
+        endpoint = BinanceDexClientWSFactory.newClientEndpoint(new BinanceDexMessageHandler<String>() {
+            @Override
+            public String send(Session userSession, String id, String message) {
+                userSession.getAsyncRemote().sendText(message);
+                return null;
+            }
+
+            @Override
+            public void onMessage(JsonRpcResponse response) {
+                try {
+                    System.out.println(objectMapper.writeValueAsString(response));
+                    countDownLatch.countDown();
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         });
         WebsocketLauncher.startUp(endpoint, BinanceDexEnvironment.TEST_NET_NODE.getWsBaseUrl());
-        binanceDexWSApi = new BinanceDexWSApiImpl(endpoint);
     }
 
     @Test
     public void test(){
-        binanceDexWSApi.netInfo("test_0");
-        binanceDexWSApi.blockByHeight(13513018L,"test_1");
-        binanceDexWSApi.txSearch(13513018L,"test_2");
+        endpoint.sendMessage("test_1","{\"id\":\"test_1\",\"method\":\"net_info\",\"jsonrpc\":\"2.0\"}");
         try {
             countDownLatch.await();
         } catch (InterruptedException e) {
