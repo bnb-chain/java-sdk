@@ -1,5 +1,6 @@
 package com.binance.dex.api.client.websocket;
 
+import com.binance.dex.api.client.BinanceDexEnvironment;
 import com.binance.dex.api.client.TransactionConverter;
 import com.binance.dex.api.client.domain.broadcast.Transaction;
 import com.binance.dex.api.client.domain.jsonrpc.BlockInfoResult;
@@ -13,13 +14,22 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Binance Dex Websocket API implementation.
+ *
+ */
 public class BinanceDexWSApiImpl implements BinanceDexWSApi {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private BinanceDexClientEndpoint<JsonRpcResponse> endpoint;
     private TransactionConverter transactionConverter;
 
-    public BinanceDexWSApiImpl(BinanceDexClientEndpoint<JsonRpcResponse> endpoint,String hrp){
+    BinanceDexWSApiImpl(BinanceDexEnvironment env,BinanceDexClientEndpoint<JsonRpcResponse> endpoint){
+        this.endpoint = endpoint;
+        this.transactionConverter = new TransactionConverter(env.getHrp());
+    }
+
+    BinanceDexWSApiImpl(String hrp,BinanceDexClientEndpoint<JsonRpcResponse> endpoint){
         this.endpoint = endpoint;
         this.transactionConverter = new TransactionConverter(hrp);
     }

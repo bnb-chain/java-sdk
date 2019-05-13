@@ -18,9 +18,7 @@ public class BinanceDexWSApiExample {
 
     @Before
     public void before(){
-        BinanceDexClientEndpoint<JsonRpcResponse> endpoint = BinanceDexClientWSFactory.newDefaultClientEndpoint();
-        WebsocketLauncher.startUp(endpoint, BinanceDexEnvironment.TEST_NET_NODE.getWsBaseUrl());
-        binanceDexWSApi = new BinanceDexWSApiImpl(endpoint,BinanceDexEnvironment.TEST_NET_NODE.getHrp());
+        binanceDexWSApi = BinanceDexClientWSFactory.getWSApiImpl(BinanceDexEnvironment.TEST_NET_NODE);
     }
 
     @Test

@@ -29,8 +29,13 @@ public class WSResponseCache extends LinkedHashMap<String, JsonRpcResponse> {
             return;
         }
         addLock.lock();
-        this.put(response.getId(),response);
-        addLock.unlock();
+        try{
+            this.put(response.getId(),response);
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }finally {
+            addLock.unlock();
+        }
     }
 
     /**

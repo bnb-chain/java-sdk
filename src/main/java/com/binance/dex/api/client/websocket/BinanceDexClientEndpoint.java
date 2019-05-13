@@ -22,7 +22,6 @@ public class BinanceDexClientEndpoint<T> {
      */
     @OnOpen
     public void onOpen(Session userSession){
-        System.out.println("open session");
         this.userSession = userSession;
     }
 
