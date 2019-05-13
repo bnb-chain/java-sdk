@@ -4,6 +4,7 @@ import com.binance.dex.api.client.domain.jsonrpc.JsonRpcResponse;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.websocket.Session;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * the default implementation of {@link BinanceDexMessageHandler},it is must when {@link BinanceDexWSApiImpl} is needed.
@@ -13,12 +14,14 @@ public class DefaultMessageHandler implements BinanceDexMessageHandler<JsonRpcRe
 
     private long callBackTimeout;
     private static final long DEFAULT_CALLBACK_TIMEOUT = 30_000L;
+    private volatile WSResponseCache cache = WSResponseCache.instance();
     DefaultMessageHandler(long callBackTimeout){
         this.callBackTimeout = callBackTimeout;
     }
     DefaultMessageHandler(){
         this.callBackTimeout = DEFAULT_CALLBACK_TIMEOUT;
     }
+
 
     /**
      * send a message to websocket server,then wait synchronously for the result to be returned
@@ -36,7 +39,7 @@ public class DefaultMessageHandler implements BinanceDexMessageHandler<JsonRpcRe
         boolean isTimeout = false;
         long time = System.currentTimeMillis();
         long waitTime = 0L;
-        while ( null == (response = WSResponseCache.instance().get(id)) && !(isTimeout = waitTime > callBackTimeout)){
+        while ( null == (response = cache.get(id)) && !(isTimeout = waitTime > callBackTimeout)){
             waitTime = System.currentTimeMillis() - time;
         }
         if(isTimeout){
@@ -54,7 +57,7 @@ public class DefaultMessageHandler implements BinanceDexMessageHandler<JsonRpcRe
         if(response == null || StringUtils.isEmpty(response.getId())){
             throw new RuntimeException("invalid response");
         }
-        WSResponseCache.instance().add(response);
+        cache.add(response);
     }
 
 }

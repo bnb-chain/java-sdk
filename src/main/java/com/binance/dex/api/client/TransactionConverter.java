@@ -1,17 +1,27 @@
 package com.binance.dex.api.client;
 
-import com.binance.dex.api.client.domain.OrderSide;
-import com.binance.dex.api.client.domain.OrderType;
-import com.binance.dex.api.client.domain.ProposalType;
-import com.binance.dex.api.client.domain.TimeInForce;
+import com.binance.dex.api.client.domain.*;
 import com.binance.dex.api.client.domain.broadcast.*;
+import com.binance.dex.api.client.domain.broadcast.Burn;
+import com.binance.dex.api.client.domain.broadcast.CancelOrder;
+import com.binance.dex.api.client.domain.broadcast.CreateValidator;
+import com.binance.dex.api.client.domain.broadcast.RemoveValidator;
+import com.binance.dex.api.client.domain.broadcast.Deposit;
+import com.binance.dex.api.client.domain.broadcast.Issue;
+import com.binance.dex.api.client.domain.broadcast.Mint;
+import com.binance.dex.api.client.domain.broadcast.NewOrder;
+import com.binance.dex.api.client.domain.broadcast.SubmitProposal;
+import com.binance.dex.api.client.domain.broadcast.TokenFreeze;
+import com.binance.dex.api.client.domain.broadcast.TokenUnfreeze;
+import com.binance.dex.api.client.domain.broadcast.Transaction;
+import com.binance.dex.api.client.domain.broadcast.Vote;
 import com.binance.dex.api.client.encoding.Crypto;
 import com.binance.dex.api.client.encoding.message.MessageType;
-import com.binance.dex.api.proto.Send;
-import com.binance.dex.api.proto.StdTx;
+import com.binance.dex.api.proto.*;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class TransactionConverter {
@@ -42,13 +52,13 @@ public class TransactionConverter {
                         transaction.setCode(txMessage.getTx_result().getCode());
                         transaction.setMemo(stdTx.getMemo());
                         return transaction;
-                    }).filter(t -> null != t).collect(Collectors.toList());
+                    }).filter(Objects::nonNull).collect(Collectors.toList());
         } catch (InvalidProtocolBufferException e) {
             throw new RuntimeException(e);
         }
     }
 
-    protected int getStartIndex(byte[] bytes) {
+    public int getStartIndex(byte[] bytes) {
         for (int i = 0; i < bytes.length; i++) {
             if (((int) bytes[i] & 0xff) < 0x80) {
                 return i + 5;
@@ -84,12 +94,21 @@ public class TransactionConverter {
                     return convertMint(bytes);
                 case SubmitProposal:
                     return convertSubmitProposal(bytes);
+                case Deposit:
+                    return convertDeposit(bytes);
+                case CreateValidator:
+                    return convertCreateValidator(bytes);
+                case RemoveValidator:
+                    return convertRemoveValidator(bytes);
+                case Listing:
+                    return convertListing(bytes);
             }
             return null;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
 
     protected Transaction convertTransfer(byte[] value) throws InvalidProtocolBufferException {
         byte[] array = new byte[value.length - 4];
@@ -266,6 +285,76 @@ public class TransactionConverter {
         transaction.setTxType(TxType.SUBMIT_PROPOSAL);
         transaction.setRealTx(proposal);
         return transaction;
+    }
+
+    private Transaction convertDeposit(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.Deposit depositMessage = com.binance.dex.api.proto.Deposit.parseFrom(array);
+
+        Deposit deposit = new Deposit();
+        deposit.setProposalId(depositMessage.getProposalId());
+        deposit.setDepositer(Crypto.encodeAddress(hrp,depositMessage.getDepositer().toByteArray()));
+        if(null != depositMessage.getAmountList()){
+            deposit.setAmount(depositMessage.getAmountList().stream()
+            .map(com.binance.dex.api.client.encoding.message.Token::of).collect(Collectors.toList()));
+        }
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.DEPOSIT);
+        transaction.setRealTx(deposit);
+        return transaction;
+    }
+
+    private Transaction convertCreateValidator(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.CreateValidator createValidatorMessage = com.binance.dex.api.proto.CreateValidator.parseFrom(array);
+
+        CreateValidator createValidator = new CreateValidator();
+        createValidator.setDelegatorAddress(Crypto.encodeAddress(hrp,createValidatorMessage.getDelegatorAddress().toByteArray()));
+        createValidator.setValidatorAddress(Crypto.encodeAddress(hrp,createValidatorMessage.getValidatorAddress().toByteArray()));
+        createValidator.setDelegation(com.binance.dex.api.client.encoding.message.Token.of(createValidatorMessage.getDelegation()));
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.CREATE_VALIDATOR);
+        transaction.setRealTx(createValidator);
+        return transaction;
+    }
+
+    private Transaction convertRemoveValidator(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.RemoveValidator removeValidatorMessage = com.binance.dex.api.proto.RemoveValidator.parseFrom(array);
+
+        RemoveValidator removeValidator = new RemoveValidator();
+        removeValidator.setLauncherAddr(Crypto.encodeAddress(hrp,removeValidatorMessage.getLauncherAddr().toByteArray()));
+        removeValidator.setValAddr(Crypto.encodeAddress(hrp,removeValidatorMessage.getValAddr().toByteArray()));
+        removeValidator.setValConsAddr(Crypto.encodeAddress(hrp,removeValidatorMessage.getValConsAddr().toByteArray()));
+        removeValidator.setProposalId(removeValidatorMessage.getProposalId());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.REMOVE_VALIDATOR);
+        transaction.setRealTx(removeValidator);
+        return transaction;
+    }
+
+
+    private Transaction convertListing(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.List listMessage = com.binance.dex.api.proto.List.parseFrom(array);
+
+        Listing listing = new Listing();
+        listing.setProposalId(listMessage.getProposalId());
+        listing.setBaseAssetSymbol(listMessage.getBaseAssetSymbol());
+        listing.setQuoteAssetSymbol(listMessage.getQuoteAssetSymbol());
+        listing.setInitPrice(listMessage.getInitPrice());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.Listing);
+        transaction.setRealTx(listing);
+        return transaction;
+
     }
 
 }

@@ -37,8 +37,8 @@ public class WebsocketExample {
                     throw new RuntimeException(e);
                 }
             }
-        });
-        WebsocketLauncher.startUp(endpoint, BinanceDexEnvironment.TEST_NET_NODE.getWsBaseUrl());
+        },BinanceDexEnvironment.TEST_NET_NODE.getWsBaseUrl());
+        WebsocketLauncher.startUp(endpoint);
     }
 
     @Test

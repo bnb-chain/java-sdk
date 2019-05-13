@@ -1,14 +1,19 @@
 package com.binance.dex.api.client.websocket;
 
+import com.binance.dex.api.client.domain.BlockMeta;
 import com.binance.dex.api.client.domain.broadcast.Transaction;
+import com.binance.dex.api.client.domain.jsonrpc.JsonRpcResponse;
 
 import java.util.List;
 
 public interface BinanceDexWSApi {
 
-    void netInfo(String id);
+    JsonRpcResponse netInfo();
 
-    void blockByHeight(Long height,String id);
+    BlockMeta.BlockMetaResult blockByHeight(Long height);
 
-    List<Transaction> txSearch(Long height, String id);
+    List<Transaction> txSearch(Long height);
+
+    Transaction txByHash(String hash);
+
 }

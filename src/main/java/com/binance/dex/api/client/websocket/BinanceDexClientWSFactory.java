@@ -10,12 +10,12 @@ public class BinanceDexClientWSFactory {
 
     private final static Object lock = new Object();
 
-    public static BinanceDexClientEndpoint newClientEndpoint(BinanceDexMessageHandler messageHandler){
-        return new BinanceDexClientEndpoint(messageHandler);
+    public static BinanceDexClientEndpoint newClientEndpoint(BinanceDexMessageHandler messageHandler,String url){
+        return new BinanceDexClientEndpoint(messageHandler,url);
     }
 
-    public static BinanceDexClientEndpoint<JsonRpcResponse> newDefaultClientEndpoint(){
-        return new BinanceDexClientEndpoint<>(new DefaultMessageHandler());
+    public static BinanceDexClientEndpoint<JsonRpcResponse> newDefaultClientEndpoint(String url){
+        return new BinanceDexClientEndpoint<>(new DefaultMessageHandler(),url);
     }
 
     /**
@@ -25,8 +25,8 @@ public class BinanceDexClientWSFactory {
     public static BinanceDexWSApiImpl getWSApiImpl(BinanceDexEnvironment env){
         synchronized (lock){
             binanceDexWSApiImplMap.computeIfAbsent(env.getWsBaseUrl(),(k)->{
-                BinanceDexClientEndpoint<JsonRpcResponse> endpoint = newDefaultClientEndpoint();
-                WebsocketLauncher.startUp(endpoint,env.getWsBaseUrl());
+                BinanceDexClientEndpoint<JsonRpcResponse> endpoint = newDefaultClientEndpoint(env.getWsBaseUrl());
+                WebsocketLauncher.startUp(endpoint);
                 return new BinanceDexWSApiImpl(env,endpoint);
             });
         }
@@ -35,8 +35,8 @@ public class BinanceDexClientWSFactory {
     public static BinanceDexWSApiImpl getWSApiImpl(String url,String hrp){
         synchronized (lock){
             binanceDexWSApiImplMap.computeIfAbsent(url,(k)->{
-                BinanceDexClientEndpoint<JsonRpcResponse> endpoint = newDefaultClientEndpoint();
-                WebsocketLauncher.startUp(endpoint,url);
+                BinanceDexClientEndpoint<JsonRpcResponse> endpoint = newDefaultClientEndpoint(url);
+                WebsocketLauncher.startUp(endpoint);
                 return new BinanceDexWSApiImpl(hrp,endpoint);
             });
         }

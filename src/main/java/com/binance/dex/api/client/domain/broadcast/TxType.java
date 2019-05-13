@@ -10,5 +10,9 @@ public enum TxType {
     ISSUE,
     BURN,
     MINT,
-    SUBMIT_PROPOSAL
+    SUBMIT_PROPOSAL,
+    DEPOSIT,
+    CREATE_VALIDATOR,
+    REMOVE_VALIDATOR,
+    Listing
 }

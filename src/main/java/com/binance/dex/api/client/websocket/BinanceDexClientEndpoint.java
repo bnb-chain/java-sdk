@@ -1,18 +1,26 @@
 package com.binance.dex.api.client.websocket;
 
 import com.binance.dex.api.client.domain.jsonrpc.JsonRpcResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import sun.misc.BASE64Encoder;
 
 import javax.websocket.*;
 
 @ClientEndpoint(decoders = {MessageDecoder.class})
 public class BinanceDexClientEndpoint<T> {
 
+    private Logger logger = LoggerFactory.getLogger(BinanceDexClientEndpoint.class);
+
     private Session userSession;
 
     private BinanceDexMessageHandler<T> messageHandler;
 
-    public BinanceDexClientEndpoint(BinanceDexMessageHandler<T> messageHandler){
+    private String url;
+
+    public BinanceDexClientEndpoint(BinanceDexMessageHandler<T> messageHandler,String url){
         this.messageHandler = messageHandler;
+        this.url = url;
     }
 
     /**
@@ -33,7 +41,30 @@ public class BinanceDexClientEndpoint<T> {
      */
     @OnClose
     public void onClose(Session userSession, CloseReason reason){
+        logger.warn("WebSocket connection closed!,reason = {}.try reconnecting...",reason.toString());
         this.userSession = null;
+        reconnect();
+    }
+    private void reconnect(){
+        boolean success;
+        int count = 1;
+        do {
+            try{
+                logger.info("reconnecting round {}...",count);
+                WebsocketLauncher.startUp(this);
+                success = true;
+                logger.info("WebSocket reconnect successfully!");
+            }catch (Exception e){
+                count++;
+                success = false;
+                try {
+                    Thread.sleep(3000L);
+                } catch (InterruptedException e1) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }while (!success);
+
     }
 
     @OnMessage
@@ -48,4 +79,7 @@ public class BinanceDexClientEndpoint<T> {
     }
 
 
+    public String getUrl() {
+        return url;
+    }
 }

@@ -171,3 +171,50 @@ message SubmitProposal {
     repeated Token initial_deposit = 5;
     int64  voting_period = 6;
 }
+
+message Deposit {
+    // 0xA18A56E5
+  int64 proposal_id = 1;
+  bytes   depositer = 2;
+  repeated Token amount = 3;
+}
+
+message Description {
+   string moniker  = 1;
+   string identity = 2;
+   string website = 3;
+   string details = 4;
+}
+
+message Commission {
+    int64 rate = 1;
+    int64 max_rate = 2;
+    int64 max_change_rate = 3;
+}
+
+message CreateValidator  {
+    // 0xEB361D01
+  Description description = 1;
+  Commission    commission = 2;
+  bytes delegator_address  = 3;
+  bytes validator_address  = 4;
+  bytes  pubkey = 5;
+  Token      delegation = 6;
+}
+
+message RemoveValidator {
+ //0xC1AFE85F
+  bytes launcher_addr = 1;
+  bytes    val_addr = 2;
+  bytes val_cons_addr = 3;
+  int64 proposal_id = 4;
+}
+
+message List {
+// 0xB41DE13F
+  bytes from  = 1;
+   int64          proposal_id = 2;
+   string         base_asset_symbol = 3;
+   string        quote_asset_symbol = 4;
+   int64          init_price = 5;
+}

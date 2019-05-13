@@ -20,7 +20,11 @@ public enum MessageType {
     Issue("17EFAB80"),
     Burn("7ED2D2A0"),
     Mint("467E0829"),
-    SubmitProposal("B42D614E");
+    SubmitProposal("B42D614E"),
+    Deposit("A18A56E5"),
+    CreateValidator("EB361D01"),
+    RemoveValidator("C1AFE85F"),
+    Listing("B41DE13F");
 
     private byte[] typePrefixBytes;
 
