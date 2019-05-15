@@ -54,8 +54,14 @@ public class BinanceDexWSApiImpl extends IdGenerator implements BinanceDexWSApi 
     public BlockMeta.BlockMetaResult blockByHeight(Long height) {
         String id = getId(WSMethod.block.name());
         BlockMeta.BlockMetaResult block;
-        Map.Entry params = Maps.immutableEntry("block",String.valueOf(height));
-        JsonRpcResponse response = endpoint.sendMessage(id,buildWSRequest(WSMethod.block.name(),id,params));
+        Map.Entry params = Maps.immutableEntry("height",String.valueOf(height));
+        String request = buildWSRequest(WSMethod.block.name(),id,params);
+        try {
+            System.out.println(objectMapper.writeValueAsString(request));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        JsonRpcResponse response = endpoint.sendMessage(id,request);
         try {
             if(response.getError() != null){
                 throw new BinanceDexWSException(id,WSMethod.block.name(),response.getError().toString());

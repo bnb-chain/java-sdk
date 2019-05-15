@@ -22,6 +22,10 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
 
     BlockMeta getBlockMetaByHash(String hash);
 
+    Token getTokenInfoBySymbol(String symbol);
+
+    List<StakeValidator> getStakeValidator();
+
     @Override
     default Time getTime() {
         throw new UnsupportedOperationException();
@@ -34,11 +38,6 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
 
     @Override
     default List<Peer> getPeers() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    default List<Fees> getFees() {
         throw new UnsupportedOperationException();
     }
 

@@ -5,11 +5,11 @@ import com.binance.dex.api.client.BinanceDexApiClientFactory;
 import com.binance.dex.api.client.BinanceDexApiNodeClient;
 import com.binance.dex.api.client.BinanceDexEnvironment;
 import com.binance.dex.api.client.Wallet;
-import com.binance.dex.api.client.domain.Account;
-import com.binance.dex.api.client.domain.BlockMeta;
-import com.binance.dex.api.client.domain.Infos;
-import com.binance.dex.api.client.domain.TransactionMetadata;
+import com.binance.dex.api.client.domain.*;
 import com.binance.dex.api.client.domain.broadcast.*;
+import com.binance.dex.api.client.domain.broadcast.Transaction;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -218,5 +218,27 @@ public class NodeClientExample {
         BlockMeta blockMeta = binanceDexNodeApi.getBlockMetaByHash("6FACD5586859B67AD5B5BABF0A0DC971AF91215DEBB9EF3D2F3847E4D2D97DDD");
         Assert.assertNotNull(blockMeta);
         Assert.assertEquals(8665773L, blockMeta.getHeader().getHeight().longValue());
+    }
+
+    @Test
+    public void testGetTokenInfoBySymbol(){
+        Token token = binanceDexNodeApi.getTokenInfoBySymbol("BNB");
+        Assert.assertNotNull(token);
+        Assert.assertEquals("BNB",token.getSymbol());
+    }
+
+    @Test
+    public void testGetFees() throws JsonProcessingException {
+        ObjectMapper ob = new ObjectMapper();
+        List<Fees> feesList = binanceDexNodeApi.getFees();
+        Assert.assertNotNull(feesList);
+        Assert.assertTrue(feesList.size() > 0);
+    }
+
+    @Test
+    public void testStakeValidator() throws JsonProcessingException {
+        List<StakeValidator> stakeValidators = binanceDexNodeApi.getStakeValidator();
+        Assert.assertNotNull(stakeValidators);
+        Assert.assertTrue(stakeValidators.size() > 0);
     }
 }

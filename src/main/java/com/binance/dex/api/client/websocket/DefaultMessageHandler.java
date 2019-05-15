@@ -4,7 +4,6 @@ import com.binance.dex.api.client.domain.jsonrpc.JsonRpcResponse;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.websocket.Session;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * the default implementation of {@link BinanceDexMessageHandler},it is must when {@link BinanceDexWSApiImpl} is needed.

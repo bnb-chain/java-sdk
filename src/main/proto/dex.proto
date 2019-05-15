@@ -122,6 +122,40 @@ message AppAccount {
     repeated Token locked = 4;
 }
 
+message TokenInfo{
+    string name = 1;
+    string symbol = 2;
+    string original_symbol = 3;
+    string total_supply = 4;
+    bytes owner = 5;
+    bool mintable = 6;
+}
+
+
+message DexFeeParam {
+    // 0x495A5044
+    message DexFeeField {
+        string fee_name = 1;
+        int64 fee_value = 2;
+    }
+    repeated DexFeeField dex_fee_fields = 1;
+}
+
+message FixedFeeParams {
+    // 0xC2A96FA3
+    string msg_type = 1;
+    int64 fee = 2;
+    int32 fee_for = 3;
+}
+
+message TransferFeeParam {
+    // 0x9A3D2769
+    FixedFeeParams fixed_fee_params = 1;
+    int64 multi_transfer_fee = 2;
+    int64 lower_limit_as_multi = 3;
+
+}
+
 // sync/async response
 message ResultBroadcastTx {
     int32 code = 1; //uint32
@@ -218,3 +252,4 @@ message List {
    string        quote_asset_symbol = 4;
    int64          init_price = 5;
 }
+

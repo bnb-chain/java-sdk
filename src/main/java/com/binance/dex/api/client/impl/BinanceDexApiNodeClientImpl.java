@@ -2,19 +2,20 @@ package com.binance.dex.api.client.impl;
 
 import com.binance.dex.api.client.*;
 import com.binance.dex.api.client.domain.*;
+import com.binance.dex.api.client.domain.StakeValidator;
 import com.binance.dex.api.client.domain.broadcast.Transaction;
 import com.binance.dex.api.client.domain.broadcast.*;
 import com.binance.dex.api.client.domain.jsonrpc.*;
+import com.binance.dex.api.client.encoding.Bech32;
 import com.binance.dex.api.client.encoding.Crypto;
-import com.binance.dex.api.client.encoding.message.MessageType;
 import com.binance.dex.api.client.encoding.message.TransactionRequestAssembler;
-import com.binance.dex.api.proto.AppAccount;
-import com.binance.dex.api.proto.Send;
-import com.binance.dex.api.proto.StdTx;
+import com.binance.dex.api.proto.*;
 import com.binance.dex.api.proto.Token;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.ListValue;
+import com.google.protobuf.Value;
 import org.apache.commons.lang3.StringUtils;
 import org.spongycastle.util.encoders.Hex;
 
@@ -33,12 +34,17 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
 
     private TransactionConverter transactionConverter;
 
+    private FeeConverter feeConverter;
+
+
+
     private final String ARG_ACCOUNT_PREFIX = Hex.toHexString("account:".getBytes());
 
     public BinanceDexApiNodeClientImpl(String nodeUrl, String hrp) {
         this.binanceDexNodeApi = BinanceDexApiClientGenerator.createService(BinanceDexNodeApi.class, nodeUrl);
         this.hrp = hrp;
         transactionConverter = new TransactionConverter(hrp);
+        feeConverter = new FeeConverter();
     }
 
     @Override
@@ -48,6 +54,24 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
             checkRpcResult(rpcResponse);
             NodeInfos nodeInfos = rpcResponse.getResult();
             return convert(nodeInfos);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Fees> getFees() {
+        try {
+            JsonRpcResponse<ABCIQueryResult> rpcResponse = binanceDexNodeApi.getFees().execute().body();
+            checkRpcResult(rpcResponse);
+            byte[] value = rpcResponse.getResult().getResponse().getValue();
+            int startIndex = 2;
+            byte[] array = new byte[value.length - startIndex];
+            System.arraycopy(value, startIndex, array, 0, array.length);
+            Value protoValue = Value.parseFrom(array);
+            List<ByteString> byteStrings = protoValue.getUnknownFields().asMap().get(1).getLengthDelimitedList();
+            return byteStrings.stream().map((ByteString byteString)
+                    -> feeConverter.convert(byteString.toByteArray())).collect(Collectors.toList());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -146,6 +170,41 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     }
 
     @Override
+    public com.binance.dex.api.client.domain.Token getTokenInfoBySymbol(String symbol) {
+        try {
+            String pathWithSymbol = "\"tokens/info/" + symbol + "\"";
+            JsonRpcResponse<ABCIQueryResult> rpcResponse = binanceDexNodeApi.getTokenInfo(pathWithSymbol).execute().body();
+            checkRpcResult(rpcResponse);
+            byte[] value = rpcResponse.getResult().getResponse().getValue();
+            int startIndex = getStartIndex(value);
+            byte[] array = new byte[value.length - startIndex];
+            System.arraycopy(value, startIndex, array, 0, array.length);
+            TokenInfo tokenInfo =  TokenInfo.parseFrom(array);
+            return convert(tokenInfo);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<StakeValidator> getStakeValidator() {
+        try {
+            JsonRpcResponse<ABCIQueryResult> rpcResponse = binanceDexNodeApi.getStakeValidators().execute().body();
+            checkRpcResult(rpcResponse);
+            byte[] value = rpcResponse.getResult().getResponse().getValue();
+            return StakeValidator.fromJsonToArray(new String(value),hrp);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.print(Bech32.encode("tbnb",Bech32.decode("bva135mqtf9gef879nmjlpwz6u2fzqcw4qlzdfxujm").getData()));
+    }
+
+
+
+    @Override
     public List<TransactionMetadata> transfer(Transfer transfer, Wallet wallet, TransactionOption options, boolean sync)
             throws IOException, NoSuchAlgorithmException {
         wallet.ensureWalletIsReady(this);
@@ -211,6 +270,17 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
 
         account.setBalances(balanceList);
         return account;
+    }
+
+    protected com.binance.dex.api.client.domain.Token convert(TokenInfo tokenInfo) {
+        com.binance.dex.api.client.domain.Token token = new com.binance.dex.api.client.domain.Token();
+        token.setName(tokenInfo.getName());
+        token.setOriginalSymbol(tokenInfo.getOriginalSymbol());
+        token.setSymbol(tokenInfo.getSymbol());
+        token.setOwner(Crypto.encodeAddress(hrp,tokenInfo.getOwner().toByteArray()));
+        token.setTotalSupply(tokenInfo.getTotalSupply());
+        token.setMintable(tokenInfo.getMintable());
+        return token;
     }
 
     protected List<TransactionMetadata> syncBroadcast(String requestBody, Wallet wallet) {
