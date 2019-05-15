@@ -8,6 +8,7 @@ public enum WSMethod {
     net_info,
     block,
     tx_search,
-    tx
+    tx,
+    abci_query
 
 }

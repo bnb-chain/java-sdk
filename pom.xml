@@ -73,6 +73,11 @@
             <artifactId>usb4java</artifactId>
             <version>1.2.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.4</version>
+        </dependency>
 
         <!-- https://mvnrepository.com/artifact/javax.websocket/javax.websocket-api -->
         <dependency>

@@ -2,6 +2,7 @@ package com.binance.dex.api.client.examples;
 
 import com.binance.dex.api.client.BinanceDexEnvironment;
 import com.binance.dex.api.client.domain.BlockMeta;
+import com.binance.dex.api.client.domain.Proposal;
 import com.binance.dex.api.client.domain.broadcast.Transaction;
 import com.binance.dex.api.client.domain.broadcast.TxType;
 import com.binance.dex.api.client.domain.jsonrpc.JsonRpcResponse;
@@ -120,6 +121,13 @@ public class BinanceDexWSApiExample {
         Assert.assertNotNull(transaction);
         Assert.assertEquals(transaction.getTxType(), TxType.TRANSFER);
         Assert.assertEquals(14396883L, transaction.getHeight().intValue());
+    }
+
+    @Test
+    public void testGetProposalById() throws JsonProcessingException {
+        Proposal proposal = binanceDexWSApi.getProposalByID("1");
+        Assert.assertNotNull(proposal);
+        Assert.assertEquals("1",proposal.getValue().getProposalId());
     }
 
 

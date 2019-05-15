@@ -1,6 +1,7 @@
 package com.binance.dex.api.client.websocket;
 
 import com.binance.dex.api.client.domain.BlockMeta;
+import com.binance.dex.api.client.domain.Proposal;
 import com.binance.dex.api.client.domain.broadcast.Transaction;
 import com.binance.dex.api.client.domain.jsonrpc.JsonRpcResponse;
 
@@ -15,5 +16,7 @@ public interface BinanceDexWSApi {
     List<Transaction> txSearch(Long height);
 
     Transaction txByHash(String hash);
+
+    Proposal getProposalByID(String proposalId);
 
 }

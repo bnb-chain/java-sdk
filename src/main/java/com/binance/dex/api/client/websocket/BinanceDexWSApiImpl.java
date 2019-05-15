@@ -3,15 +3,16 @@ package com.binance.dex.api.client.websocket;
 import com.binance.dex.api.client.BinanceDexEnvironment;
 import com.binance.dex.api.client.TransactionConverter;
 import com.binance.dex.api.client.domain.BlockMeta;
+import com.binance.dex.api.client.domain.Proposal;
 import com.binance.dex.api.client.domain.WSMethod;
 import com.binance.dex.api.client.domain.broadcast.Transaction;
 import com.binance.dex.api.client.domain.exception.BinanceDexWSException;
+import com.binance.dex.api.client.domain.jsonrpc.ABCIQueryResult;
 import com.binance.dex.api.client.domain.jsonrpc.BlockInfoResult;
 import com.binance.dex.api.client.domain.jsonrpc.JsonRpcResponse;
-import com.binance.dex.api.client.domain.jsonrpc.TransactionResult;
+import com.binance.dex.api.client.domain.websocket.AbciQueryRequest;
 import com.binance.dex.api.client.domain.websocket.CommonRequest;
 import com.binance.dex.api.client.domain.websocket.TxSearchRequest;
-import com.binance.dex.api.proto.StdTx;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
@@ -114,6 +115,27 @@ public class BinanceDexWSApiImpl extends IdGenerator implements BinanceDexWSApi 
                 return transactionList.get(0);
             }
             return null;
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Proposal getProposalByID(String proposalId) {
+        try {
+            String id = getId(WSMethod.abci_query.name());
+            Map.Entry proposalIdEntry = Maps.immutableEntry("ProposalID",proposalId);
+            AbciQueryRequest abciQueryRequest = new AbciQueryRequest();
+            abciQueryRequest.setPath("custom/gov/proposal");
+            abciQueryRequest.setData(Hex.encodeHexString(objectMapper.writeValueAsString(proposalIdEntry).getBytes()));
+
+            JsonRpcResponse response = endpoint.sendMessage(id,buildWSRequest(WSMethod.abci_query.name(),id,abciQueryRequest));
+            if(response.getError() != null){
+                throw new BinanceDexWSException(id,WSMethod.abci_query.name(),response.getError().toString());
+            }
+            ABCIQueryResult result = objectMapper.readValue(objectMapper.writeValueAsString(response.getResult()), ABCIQueryResult.class);
+            String proposalJson = new String(result.getResponse().getValue());
+            return objectMapper.readValue(proposalJson, Proposal.class);
         }catch (Exception e){
             throw new RuntimeException(e);
         }
