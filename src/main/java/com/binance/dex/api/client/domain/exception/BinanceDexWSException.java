@@ -44,4 +44,12 @@ public class BinanceDexWSException extends RuntimeException {
     public String getMethod() {
         return method;
     }
+
+    public Error getError() {
+        return error;
+    }
+
+    public void setError(Error error) {
+        this.error = error;
+    }
 }
