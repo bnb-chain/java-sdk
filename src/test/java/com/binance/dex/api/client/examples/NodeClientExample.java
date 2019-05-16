@@ -241,4 +241,10 @@ public class NodeClientExample {
         Assert.assertNotNull(stakeValidators);
         Assert.assertTrue(stakeValidators.size() > 0);
     }
+
+    @Test
+    public void testGetProposalById(){
+        Proposal proposal = binanceDexNodeApi.getProposalById("1");
+        Assert.assertEquals("1",proposal.getValue().getProposalId());
+    }
 }

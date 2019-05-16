@@ -23,6 +23,10 @@ public class BinanceDexWSException extends RuntimeException {
         super(cause);
     }
 
+    public BinanceDexWSException(String message){
+        super(message);
+    }
+
     public String getId() {
         return id;
     }

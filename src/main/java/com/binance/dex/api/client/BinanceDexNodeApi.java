@@ -22,6 +22,9 @@ public interface BinanceDexNodeApi {
     @GET("/abci_query?path=%22custom/stake/validators%22")
     Call<JsonRpcResponse<ABCIQueryResult>> getStakeValidators();
 
+    @GET("/abci_query?path=%22custom/gov/proposal%22")
+    Call<JsonRpcResponse<ABCIQueryResult>> getProposalById(@Query("data") String data);
+
     @GET("/tx_search")
     Call<JsonRpcResponse<BlockInfoResult>> getBlockTransactions(@Query("query") String height);
 

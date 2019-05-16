@@ -8,10 +8,13 @@ import com.binance.dex.api.client.domain.broadcast.*;
 import com.binance.dex.api.client.domain.jsonrpc.*;
 import com.binance.dex.api.client.encoding.Bech32;
 import com.binance.dex.api.client.encoding.Crypto;
+import com.binance.dex.api.client.encoding.EncodeUtils;
 import com.binance.dex.api.client.encoding.message.TransactionRequestAssembler;
 import com.binance.dex.api.proto.*;
 import com.binance.dex.api.proto.Token;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.ListValue;
@@ -194,6 +197,27 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
             byte[] value = rpcResponse.getResult().getResponse().getValue();
             return StakeValidator.fromJsonToArray(new String(value),hrp);
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Proposal getProposalById(String proposalId) {
+        try {
+            Map.Entry proposalIdEntry = Maps.immutableEntry("ProposalID",proposalId);
+            String requestData = "0x" + Hex.toHexString(EncodeUtils.toJsonStringSortKeys(proposalIdEntry).getBytes());
+            JsonRpcResponse<ABCIQueryResult> rpcResponse = binanceDexNodeApi.getProposalById(requestData).execute().body();
+            checkRpcResult(rpcResponse);
+            ABCIQueryResult.Response response = rpcResponse.getResult().getResponse();
+            if(response.getCode() != null){
+                BinanceDexApiError binanceDexApiError = new BinanceDexApiError();
+                binanceDexApiError.setCode(response.getCode());
+                binanceDexApiError.setMessage(response.getLog());
+                throw new BinanceDexApiException(binanceDexApiError);
+            }
+            String proposalJson = new String(response.getValue());
+            return EncodeUtils.toObjectFromJsonString(proposalJson, Proposal.class);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

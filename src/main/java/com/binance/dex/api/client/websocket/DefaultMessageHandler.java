@@ -1,5 +1,6 @@
 package com.binance.dex.api.client.websocket;
 
+import com.binance.dex.api.client.domain.exception.DexWSTimeoutException;
 import com.binance.dex.api.client.domain.jsonrpc.JsonRpcResponse;
 import org.apache.commons.lang3.StringUtils;
 
@@ -42,7 +43,7 @@ public class DefaultMessageHandler implements BinanceDexMessageHandler<JsonRpcRe
             waitTime = System.currentTimeMillis() - time;
         }
         if(isTimeout){
-            throw new RuntimeException("timeout");
+            throw new DexWSTimeoutException("timeout,request body: " + message );
         }
         return response;
     }

@@ -16,6 +16,7 @@ import com.binance.dex.api.client.domain.websocket.TxSearchRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
 import java.io.IOException;
@@ -57,11 +58,6 @@ public class BinanceDexWSApiImpl extends IdGenerator implements BinanceDexWSApi 
         BlockMeta.BlockMetaResult block;
         Map.Entry params = Maps.immutableEntry("height",String.valueOf(height));
         String request = buildWSRequest(WSMethod.block.name(),id,params);
-        try {
-            System.out.println(objectMapper.writeValueAsString(request));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
         JsonRpcResponse response = endpoint.sendMessage(id,request);
         try {
             if(response.getError() != null){
@@ -103,7 +99,12 @@ public class BinanceDexWSApiImpl extends IdGenerator implements BinanceDexWSApi 
     public Transaction txByHash(String hash) {
         try {
             String id = getId(WSMethod.tx.name());
-            Map.Entry params = Maps.immutableEntry("hash",Hex.decodeHex(hash.toCharArray()));
+            Map.Entry params = null;
+            try {
+                params = Maps.immutableEntry("hash", Hex.decodeHex(hash.toCharArray()));
+            } catch (DecoderException e) {
+                throw new BinanceDexWSException(id,WSMethod.tx.name(),"invalid tx hash:"+hash);
+            }
             JsonRpcResponse response = endpoint.sendMessage(id,buildWSRequest(WSMethod.tx.name(),id,params));
             if(response.getError() != null){
                 throw new BinanceDexWSException(id,WSMethod.tx.name(),response.getError().toString());
@@ -133,7 +134,10 @@ public class BinanceDexWSApiImpl extends IdGenerator implements BinanceDexWSApi 
             if(response.getError() != null){
                 throw new BinanceDexWSException(id,WSMethod.abci_query.name(),response.getError().toString());
             }
-            ABCIQueryResult result = objectMapper.readValue(objectMapper.writeValueAsString(response.getResult()), ABCIQueryResult.class);
+            ABCIQueryResult result = objectMapper.readValue(objectMapper.writeValueAsString(response.getResult()),ABCIQueryResult.class);
+            if(null != result.getResponse().getCode() || null == result.getResponse().getValue()){
+                throw new BinanceDexWSException(id,WSMethod.abci_query.name(),result.getResponse().getLog());
+            }
             String proposalJson = new String(result.getResponse().getValue());
             return objectMapper.readValue(proposalJson, Proposal.class);
         }catch (Exception e){

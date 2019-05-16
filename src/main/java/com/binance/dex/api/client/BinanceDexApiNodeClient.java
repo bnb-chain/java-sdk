@@ -26,6 +26,8 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
 
     List<StakeValidator> getStakeValidator();
 
+    Proposal getProposalById(String proposalId);
+
     @Override
     default Time getTime() {
         throw new UnsupportedOperationException();
