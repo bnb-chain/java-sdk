@@ -30,6 +30,7 @@ public class BinanceDexClientEndpoint<T> {
      */
     @OnOpen
     public void onOpen(Session userSession){
+        logger.info("===>Successfully establish websocket connection...");
         this.userSession = userSession;
     }
 
