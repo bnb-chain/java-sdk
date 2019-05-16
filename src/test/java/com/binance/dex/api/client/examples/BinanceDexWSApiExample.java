@@ -80,7 +80,7 @@ public class BinanceDexWSApiExample {
 
         List<Transaction> transactions5 = binanceDexWSApi.txSearch(13028378L);
         Assert.assertNotNull(transactions5);
-        Assert.assertEquals(transactions5.get(0).getTxType(), TxType.Listing);
+        Assert.assertEquals(transactions5.get(0).getTxType(), TxType.LISTING);
 
         List<Transaction> transactions6 = binanceDexWSApi.txSearch(14338593L);
         Assert.assertNotNull(transactions6);

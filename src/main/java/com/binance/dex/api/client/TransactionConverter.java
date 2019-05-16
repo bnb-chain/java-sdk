@@ -351,7 +351,7 @@ public class TransactionConverter {
         listing.setInitPrice(listMessage.getInitPrice());
 
         Transaction transaction = new Transaction();
-        transaction.setTxType(TxType.Listing);
+        transaction.setTxType(TxType.LISTING);
         transaction.setRealTx(listing);
         return transaction;
 
