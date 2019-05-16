@@ -61,7 +61,7 @@ public class BinanceDexWSApiImpl extends IdGenerator implements BinanceDexWSApi 
         JsonRpcResponse response = endpoint.sendMessage(id,request);
         try {
             if(response.getError() != null){
-                throw new BinanceDexWSException(id,WSMethod.block.name(),response.getError().toString());
+                throw new BinanceDexWSException(id,WSMethod.block.name(),response.getError());
             }
             block = objectMapper.readValue(objectMapper.writeValueAsBytes(response.getResult()),BlockMeta.BlockMetaResult.class);
         }catch (Exception e){
@@ -82,7 +82,7 @@ public class BinanceDexWSApiImpl extends IdGenerator implements BinanceDexWSApi 
         JsonRpcResponse response = endpoint.sendMessage(id,buildWSRequest(WSMethod.tx_search.name(),id,txSearchRequest));
         try {
             if(response.getError() != null){
-                throw new BinanceDexWSException(id,WSMethod.tx_search.name(),response.getError().toString());
+                throw new BinanceDexWSException(id,WSMethod.tx_search.name(),response.getError());
             }
             BlockInfoResult blockInfoResult =  objectMapper.readValue(objectMapper.writeValueAsString(response.getResult()),BlockInfoResult.class);
             transactions = blockInfoResult.getTxs().stream()
@@ -107,7 +107,7 @@ public class BinanceDexWSApiImpl extends IdGenerator implements BinanceDexWSApi 
             }
             JsonRpcResponse response = endpoint.sendMessage(id,buildWSRequest(WSMethod.tx.name(),id,params));
             if(response.getError() != null){
-                throw new BinanceDexWSException(id,WSMethod.tx.name(),response.getError().toString());
+                throw new BinanceDexWSException(id,WSMethod.tx.name(),response.getError());
             }
             com.binance.dex.api.client.domain.jsonrpc.BlockInfoResult.Transaction transaction = objectMapper.readValue(objectMapper.writeValueAsString(response.getResult()), com.binance.dex.api.client.domain.jsonrpc.BlockInfoResult.Transaction.class);
 
@@ -132,7 +132,7 @@ public class BinanceDexWSApiImpl extends IdGenerator implements BinanceDexWSApi 
 
             JsonRpcResponse response = endpoint.sendMessage(id,buildWSRequest(WSMethod.abci_query.name(),id,abciQueryRequest));
             if(response.getError() != null){
-                throw new BinanceDexWSException(id,WSMethod.abci_query.name(),response.getError().toString());
+                throw new BinanceDexWSException(id,WSMethod.abci_query.name(),response.getError());
             }
             ABCIQueryResult result = objectMapper.readValue(objectMapper.writeValueAsString(response.getResult()),ABCIQueryResult.class);
             if(null != result.getResponse().getCode() || null == result.getResponse().getValue()){
