@@ -4,6 +4,7 @@ public class Transaction {
     private Long height;
     private String hash;
     private Integer code;
+    private String log;
     private String memo;
     private TxType txType;
     private Object realTx;
@@ -54,5 +55,13 @@ public class Transaction {
 
     public void setMemo(String memo) {
         this.memo = memo;
+    }
+
+    public String getLog() {
+        return log;
+    }
+
+    public void setLog(String log) {
+        this.log = log;
     }
 }

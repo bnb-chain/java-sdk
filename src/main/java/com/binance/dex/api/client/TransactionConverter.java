@@ -50,6 +50,7 @@ public class TransactionConverter {
                         transaction.setHash(txMessage.getHash());
                         transaction.setHeight(txMessage.getHeight());
                         transaction.setCode(txMessage.getTx_result().getCode());
+                        transaction.setLog(txMessage.getTx_result().getLog());
                         transaction.setMemo(stdTx.getMemo());
                         return transaction;
                     }).filter(Objects::nonNull).collect(Collectors.toList());
