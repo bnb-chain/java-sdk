@@ -12,6 +12,7 @@ public class NewOrder {
     private String price;
     private String quantity;
     private TimeInForce timeInForce;
+    private String orderId;
 
     public String getSymbol() {
         return symbol;
@@ -80,5 +81,13 @@ public class NewOrder {
                 ", quantity='" + quantity + '\'' +
                 ", timeInForce=" + timeInForce +
                 '}';
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 }

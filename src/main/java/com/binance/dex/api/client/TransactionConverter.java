@@ -51,6 +51,7 @@ public class TransactionConverter {
                         transaction.setHeight(txMessage.getHeight());
                         transaction.setCode(txMessage.getTx_result().getCode());
                         transaction.setLog(txMessage.getTx_result().getLog());
+                        transaction.setTags(txMessage.getTx_result().getTags());
                         transaction.setMemo(stdTx.getMemo());
                         return transaction;
                     }).filter(Objects::nonNull).collect(Collectors.toList());
@@ -144,6 +145,7 @@ public class TransactionConverter {
         newOrder.setQuantity("" + newOrderMessage.getQuantity());
         newOrder.setSide(OrderSide.fromValue(newOrderMessage.getSide()));
         newOrder.setTimeInForce(TimeInForce.fromValue(newOrderMessage.getTimeinforce()));
+        newOrder.setOrderId(newOrderMessage.getId());
         Transaction transaction = new Transaction();
         transaction.setTxType(TxType.NEW_ORDER);
         transaction.setRealTx(newOrder);
@@ -350,6 +352,7 @@ public class TransactionConverter {
         listing.setBaseAssetSymbol(listMessage.getBaseAssetSymbol());
         listing.setQuoteAssetSymbol(listMessage.getQuoteAssetSymbol());
         listing.setInitPrice(listMessage.getInitPrice());
+        listing.setFromAddr(Crypto.encodeAddress(hrp,listMessage.getFrom().toByteArray()));
 
         Transaction transaction = new Transaction();
         transaction.setTxType(TxType.LISTING);

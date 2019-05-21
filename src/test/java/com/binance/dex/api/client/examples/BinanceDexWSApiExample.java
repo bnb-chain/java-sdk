@@ -59,7 +59,7 @@ public class BinanceDexWSApiExample {
     }
 
     @Test
-    public void testTxSearch(){
+    public void testTxSearch() throws JsonProcessingException {
         //Transfer
         List<Transaction> transactions1 = binanceDexWSApi.txSearch(13513018L);
         Assert.assertNotNull(transactions1);
@@ -113,6 +113,8 @@ public class BinanceDexWSApiExample {
         List<Transaction> transactions13 = binanceDexWSApi.txSearch(13712675L);
         Assert.assertNotNull(transactions13);
         Assert.assertEquals(transactions13.get(0).getTxType(), TxType.MINT);
+        System.out.println(objectMapper.writeValueAsString(transactions13));
+
     }
 
     @Test

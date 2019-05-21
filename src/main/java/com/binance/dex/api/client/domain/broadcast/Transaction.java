@@ -1,5 +1,9 @@
 package com.binance.dex.api.client.domain.broadcast;
 
+import com.binance.dex.api.client.domain.jsonrpc.TxResult;
+
+import java.util.List;
+
 public class Transaction {
     private Long height;
     private String hash;
@@ -8,6 +12,7 @@ public class Transaction {
     private String memo;
     private TxType txType;
     private Object realTx;
+    private List<TxResult.Tag> tags;
 
     public Long getHeight() {
         return height;
@@ -63,5 +68,13 @@ public class Transaction {
 
     public void setLog(String log) {
         this.log = log;
+    }
+
+    public List<TxResult.Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<TxResult.Tag> tags) {
+        this.tags = tags;
     }
 }

@@ -10,6 +10,7 @@ public class Listing {
     private String baseAssetSymbol;
     private String quoteAssetSymbol;
     private Long initPrice;
+    private String fromAddr;
 
     public Long getProposalId() {
         return proposalId;
@@ -41,5 +42,13 @@ public class Listing {
 
     public void setInitPrice(Long initPrice) {
         this.initPrice = initPrice;
+    }
+
+    public String getFromAddr() {
+        return fromAddr;
+    }
+
+    public void setFromAddr(String fromAddr) {
+        this.fromAddr = fromAddr;
     }
 }
