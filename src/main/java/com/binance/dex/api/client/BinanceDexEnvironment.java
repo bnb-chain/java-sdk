@@ -14,6 +14,11 @@ public class BinanceDexEnvironment {
             "wss://testnet-dex.binance.org/api/",
             "tbnb"
     );
+    public static final BinanceDexEnvironment QA = new BinanceDexEnvironment(
+            "https://dex-api.fdgahl.cn",
+            "wss://dex-api.fdgahl.cn/api/",
+            "tbnb"
+    );
     public static final BinanceDexEnvironment TEST_NET_NODE = new BinanceDexEnvironment(
             "http://data-seed-pre-0-s3.binance.org",
             "",
