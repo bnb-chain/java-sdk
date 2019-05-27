@@ -1,5 +1,6 @@
 package com.binance.dex.api.client.domain;
 
+import com.binance.dex.api.client.encoding.message.FeeType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -12,6 +13,8 @@ import java.util.List;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Fees {
+    @JsonProperty("fee_type")
+    private FeeType feeType;
     @JsonProperty("msg_type")
     private String msgType;
     @JsonProperty("fee")
@@ -82,5 +85,13 @@ public class Fees {
 
     public void setDexFeeFields(List<DexFeeField> dexFeeFields) {
         this.dexFeeFields = dexFeeFields;
+    }
+
+    public FeeType getFeeType() {
+        return feeType;
+    }
+
+    public void setFeeType(FeeType feeType) {
+        this.feeType = feeType;
     }
 }

@@ -126,7 +126,7 @@ message TokenInfo{
     string name = 1;
     string symbol = 2;
     string original_symbol = 3;
-    string total_supply = 4;
+    int64 total_supply = 4;
     bytes owner = 5;
     bool mintable = 6;
 }

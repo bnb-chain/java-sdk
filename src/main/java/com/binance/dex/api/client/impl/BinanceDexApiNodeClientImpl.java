@@ -222,12 +222,6 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         }
     }
 
-    public static void main(String[] args) {
-        System.out.print(Bech32.encode("tbnb",Bech32.decode("bva135mqtf9gef879nmjlpwz6u2fzqcw4qlzdfxujm").getData()));
-    }
-
-
-
     @Override
     public List<TransactionMetadata> transfer(Transfer transfer, Wallet wallet, TransactionOption options, boolean sync)
             throws IOException, NoSuchAlgorithmException {

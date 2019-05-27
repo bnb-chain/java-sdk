@@ -1,19 +1,17 @@
 package com.binance.dex.api.client.domain;
 
-import com.binance.dex.api.client.TransactionConverter;
 import com.binance.dex.api.client.encoding.Bech32;
 import com.binance.dex.api.client.encoding.Crypto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.bitcoinj.core.Sha256Hash;
-import org.bitcoinj.core.Utils;
 import org.spongycastle.util.encoders.Hex;
 
 import java.io.IOException;
@@ -36,7 +34,7 @@ public class StakeValidator {
     private String feeAddress;
 
     @JsonProperty(value = "consensus_pubkey")
-    @JsonSerialize(using = ConsensusAddrSerializer.class)
+    @JsonDeserialize(using = ConsensusAddrDerializer.class)
     private String consensusAddress;
 
     @JsonProperty(value = "tokens")
@@ -182,19 +180,17 @@ public class StakeValidator {
         this.operaHrAddress = operaHrAddress;
     }
 
-    static class ConsensusAddrSerializer extends JsonSerializer<String>{
+
+    static class ConsensusAddrDerializer extends JsonDeserializer<String>{
 
         @Override
-        public void serialize(String consensusPubKey, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-            if(StringUtils.isBlank(consensusPubKey)){
-                return;
-            }
+        public String deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+            String consensusPubKey = jsonParser.getText();
             byte[] pubkey = Crypto.decodeAddress(consensusPubKey);
             int startIndex = getStartIndex(pubkey);
             byte[] array = new byte[pubkey.length - startIndex];
             System.arraycopy(pubkey, startIndex, array, 0, array.length);
-            jsonGenerator.writeString(Hex.toHexString(Sha256Hash.hash(array)).toUpperCase().substring(0,40));
-
+            return Hex.toHexString(Sha256Hash.hash(array)).toUpperCase().substring(0,40);
         }
     }
 

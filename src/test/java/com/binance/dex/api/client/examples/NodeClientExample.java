@@ -8,8 +8,6 @@ import com.binance.dex.api.client.Wallet;
 import com.binance.dex.api.client.domain.*;
 import com.binance.dex.api.client.domain.broadcast.*;
 import com.binance.dex.api.client.domain.broadcast.Transaction;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -228,15 +226,14 @@ public class NodeClientExample {
     }
 
     @Test
-    public void testGetFees() throws JsonProcessingException {
-        ObjectMapper ob = new ObjectMapper();
+    public void testGetFees() {
         List<Fees> feesList = binanceDexNodeApi.getFees();
         Assert.assertNotNull(feesList);
         Assert.assertTrue(feesList.size() > 0);
     }
 
     @Test
-    public void testStakeValidator() throws JsonProcessingException {
+    public void testStakeValidator() {
         List<StakeValidator> stakeValidators = binanceDexNodeApi.getStakeValidator();
         Assert.assertNotNull(stakeValidators);
         Assert.assertTrue(stakeValidators.size() > 0);

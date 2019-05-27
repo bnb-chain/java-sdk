@@ -42,6 +42,7 @@ public class FeeConverter {
         System.arraycopy(value, 4, array, 0, array.length);
         TransferFeeParam transferFeeParam = TransferFeeParam.parseFrom(array);
         Fees fees = new Fees();
+        fees.setFeeType(FeeType.TransferFeeParam);
         fees.setFixedFeeParams(convert(transferFeeParam.getFixedFeeParams()));
         fees.setMultiTransferFee(String.valueOf(transferFeeParam.getMultiTransferFee()));
         fees.setLowerLimitAsMulti(String.valueOf(transferFeeParam.getLowerLimitAsMulti()));
@@ -61,6 +62,7 @@ public class FeeConverter {
         System.arraycopy(value, 4, array, 0, array.length);
         FixedFeeParams fixedFeeParams = FixedFeeParams.parseFrom(array);
         Fees fees = new Fees();
+        fees.setFeeType(FeeType.FixedFeeParams);
         fees.setMsgType(fixedFeeParams.getMsgType());
         fees.setFeeFor(fixedFeeParams.getFeeFor());
         fees.setFee(fixedFeeParams.getFee());
@@ -72,6 +74,7 @@ public class FeeConverter {
         System.arraycopy(value, 4, array, 0, array.length);
         DexFeeParam dexFeeParam = DexFeeParam.parseFrom(array);
         Fees fees = new Fees();
+        fees.setFeeType(FeeType.DexFeeParam);
         fees.setDexFeeFields(dexFeeParam.getDexFeeFieldsList().stream().map(dexFeeField -> {
             DexFeeField feeField = new DexFeeField();
             feeField.setFeeName(dexFeeField.getFeeName());

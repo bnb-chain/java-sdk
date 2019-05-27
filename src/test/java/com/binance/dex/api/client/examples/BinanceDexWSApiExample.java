@@ -6,6 +6,7 @@ import com.binance.dex.api.client.domain.Proposal;
 import com.binance.dex.api.client.domain.broadcast.Transaction;
 import com.binance.dex.api.client.domain.broadcast.TxType;
 import com.binance.dex.api.client.domain.jsonrpc.JsonRpcResponse;
+import com.binance.dex.api.client.encoding.EncodeUtils;
 import com.binance.dex.api.client.websocket.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -126,7 +127,7 @@ public class BinanceDexWSApiExample {
     }
 
     @Test
-    public void testGetProposalById() throws JsonProcessingException {
+    public void testGetProposalById() {
         Proposal proposal = binanceDexWSApi.getProposalByID("1");
         Assert.assertNotNull(proposal);
         Assert.assertEquals("1",proposal.getValue().getProposalId());
