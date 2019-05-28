@@ -59,12 +59,12 @@ public class BinanceDexWSApiImpl extends IdGenerator implements BinanceDexWSApi 
         Map.Entry params = Maps.immutableEntry("height",String.valueOf(height));
         String request = buildWSRequest(WSMethod.block.name(),id,params);
         JsonRpcResponse response = endpoint.sendMessage(id,request);
+        if(response.getError() != null){
+            throw new BinanceDexWSException(id,WSMethod.block.name(),response.getError());
+        }
         try {
-            if(response.getError() != null){
-                throw new BinanceDexWSException(id,WSMethod.block.name(),response.getError());
-            }
             block = objectMapper.readValue(objectMapper.writeValueAsBytes(response.getResult()),BlockMeta.BlockMetaResult.class);
-        }catch (Exception e){
+        }catch (IOException e){
             throw new RuntimeException(e);
         }
         return block;
@@ -80,10 +80,10 @@ public class BinanceDexWSApiImpl extends IdGenerator implements BinanceDexWSApi 
         txSearchRequest.setProve(false);
         txSearchRequest.setQuery("tx.height="+height);
         JsonRpcResponse response = endpoint.sendMessage(id,buildWSRequest(WSMethod.tx_search.name(),id,txSearchRequest));
+        if(response.getError() != null){
+            throw new BinanceDexWSException(id,WSMethod.tx_search.name(),response.getError());
+        }
         try {
-            if(response.getError() != null){
-                throw new BinanceDexWSException(id,WSMethod.tx_search.name(),response.getError());
-            }
             BlockInfoResult blockInfoResult =  objectMapper.readValue(objectMapper.writeValueAsString(response.getResult()),BlockInfoResult.class);
             transactions = blockInfoResult.getTxs().stream()
                     .map(transactionConverter::convert)
@@ -116,7 +116,7 @@ public class BinanceDexWSApiImpl extends IdGenerator implements BinanceDexWSApi 
                 return transactionList.get(0);
             }
             return null;
-        }catch (Exception e){
+        }catch (IOException e){
             throw new RuntimeException(e);
         }
     }
@@ -140,7 +140,7 @@ public class BinanceDexWSApiImpl extends IdGenerator implements BinanceDexWSApi 
             }
             String proposalJson = new String(result.getResponse().getValue());
             return objectMapper.readValue(proposalJson, Proposal.class);
-        }catch (Exception e){
+        }catch (IOException e){
             throw new RuntimeException(e);
         }
     }
