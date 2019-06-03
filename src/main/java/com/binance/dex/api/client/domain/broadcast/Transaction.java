@@ -13,6 +13,8 @@ public class Transaction {
     private TxType txType;
     private Object realTx;
     private List<TxResult.Tag> tags;
+    private byte[] resultData;
+    private long source;
 
     public Long getHeight() {
         return height;
@@ -76,5 +78,21 @@ public class Transaction {
 
     public void setTags(List<TxResult.Tag> tags) {
         this.tags = tags;
+    }
+
+    public byte[] getResultData() {
+        return resultData;
+    }
+
+    public void setResultData(byte[] resultData) {
+        this.resultData = resultData;
+    }
+
+    public long getSource() {
+        return source;
+    }
+
+    public void setSource(long source) {
+        this.source = source;
     }
 }

@@ -17,15 +17,21 @@ import com.binance.dex.api.client.domain.broadcast.Transaction;
 import com.binance.dex.api.client.domain.broadcast.Vote;
 import com.binance.dex.api.client.encoding.Crypto;
 import com.binance.dex.api.client.encoding.message.MessageType;
+import com.binance.dex.api.client.encoding.message.Token;
 import com.binance.dex.api.proto.*;
+import com.binance.dex.api.proto.TimeLock;
+import com.binance.dex.api.proto.TimeRelock;
+import com.binance.dex.api.proto.TimeUnlock;
 import com.google.protobuf.InvalidProtocolBufferException;
 
+import java.time.Instant;
+import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class TransactionConverter {
-
 
     private String hrp;
 
@@ -53,6 +59,8 @@ public class TransactionConverter {
                         transaction.setLog(txMessage.getTx_result().getLog());
                         transaction.setTags(txMessage.getTx_result().getTags());
                         transaction.setMemo(stdTx.getMemo());
+                        transaction.setResultData(txMessage.getTx_result().getData());
+                        transaction.setSource(stdTx.getSource());
                         return transaction;
                     }).filter(Objects::nonNull).collect(Collectors.toList());
         } catch (InvalidProtocolBufferException e) {
@@ -104,11 +112,74 @@ public class TransactionConverter {
                     return convertRemoveValidator(bytes);
                 case Listing:
                     return convertListing(bytes);
+                case TimeLock:
+                    return convertTimeLock(bytes);
+                case TimeUnlock:
+                    return convertTimeUnlock(bytes);
+                case TimeRelock:
+                    return convertTimeRelock(bytes);
             }
             return null;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Transaction convertTimeRelock(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        TimeRelock timeRelock = TimeRelock.parseFrom(array);
+        com.binance.dex.api.client.domain.broadcast.TimeRelock trl = new com.binance.dex.api.client.domain.broadcast.TimeRelock();
+        trl.setFromAddr(Crypto.encodeAddress(hrp,timeRelock.getFrom().toByteArray()));
+        trl.setLockId(timeRelock.getTimeLockId());
+        trl.setLockTime(Date.from(Instant.ofEpochSecond(timeRelock.getLockTime())));
+        trl.setDescription(timeRelock.getDescription());
+        List<Token> amount = timeRelock.getAmountList().stream().map(token -> {
+            Token msgToken = new Token();
+            msgToken.setAmount(token.getAmount());
+            msgToken.setDenom(token.getDenom());
+            return msgToken;
+        }).collect(Collectors.toList());
+        trl.setAmount(amount);
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.TimeRelock);
+        transaction.setRealTx(trl);
+        return transaction;
+    }
+
+    private Transaction convertTimeUnlock(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        TimeUnlock timeUnlock = TimeUnlock.parseFrom(array);
+        com.binance.dex.api.client.domain.broadcast.TimeUnlock tul = new com.binance.dex.api.client.domain.broadcast.TimeUnlock();
+        tul.setFromAddr(Crypto.encodeAddress(hrp,timeUnlock.getFrom().toByteArray()));
+        tul.setLockId(timeUnlock.getTimeLockId());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.TimeUnlock);
+        transaction.setRealTx(tul);
+        return transaction;
+    }
+
+    private Transaction convertTimeLock(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        TimeLock timeLock = TimeLock.parseFrom(array);
+        com.binance.dex.api.client.domain.broadcast.TimeLock tl = new com.binance.dex.api.client.domain.broadcast.TimeLock();
+        tl.setFromAddr(Crypto.encodeAddress(hrp,timeLock.getFrom().toByteArray()));
+        tl.setDescription(timeLock.getDescription());
+        tl.setLockTime(Date.from(Instant.ofEpochSecond(timeLock.getLockTime())));
+        List<Token> amount = timeLock.getAmountList().stream().map(token -> {
+            Token msgToken = new Token();
+            msgToken.setAmount(token.getAmount());
+            msgToken.setDenom(token.getDenom());
+            return msgToken;
+        }).collect(Collectors.toList());
+        tl.setAmount(amount);
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.TimeLock);
+        transaction.setRealTx(tl);
+        return transaction;
     }
 
 

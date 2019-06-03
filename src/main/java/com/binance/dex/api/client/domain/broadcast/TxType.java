@@ -14,5 +14,8 @@ public enum TxType {
     DEPOSIT,
     CREATE_VALIDATOR,
     REMOVE_VALIDATOR,
-    LISTING
+    LISTING,
+    TimeLock,
+    TimeUnlock,
+    TimeRelock;
 }

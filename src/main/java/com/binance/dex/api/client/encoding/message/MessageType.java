@@ -24,7 +24,10 @@ public enum MessageType {
     Deposit("A18A56E5"),
     CreateValidator("EB361D01"),
     RemoveValidator("C1AFE85F"),
-    Listing("B41DE13F");
+    Listing("B41DE13F"),
+    TimeLock("07921531"),
+    TimeUnlock("C4050C6C"),
+    TimeRelock("504711DA");
 
     private byte[] typePrefixBytes;
 

@@ -253,3 +253,34 @@ message List {
    int64          init_price = 5;
 }
 
+message TimeLock {
+    message Token {
+        string denom = 1;
+        int64 amount = 2;
+    }
+    // 07921531
+    bytes from = 1;
+    string description = 2;
+    repeated Token amount = 3;
+    int64 lock_time = 4;
+}
+
+message TimeUnlock {
+    // C4050C6C
+    bytes from = 1;
+    int64 time_lock_id = 2;
+}
+
+message TimeRelock {
+    message Token {
+        string denom = 1;
+        int64 amount = 2;
+    }
+    // 504711DA
+    bytes from = 1;
+    int64 time_lock_id = 2;
+    string description = 3;
+    repeated Token amount = 4;
+    int64 lock_time = 5;
+}
+
