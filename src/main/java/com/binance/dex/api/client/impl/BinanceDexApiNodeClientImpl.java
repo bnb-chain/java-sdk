@@ -145,26 +145,30 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     @Override
     public List<TransactionMetadata> transfer(Transfer transfer, Wallet wallet, TransactionOption options, boolean sync)
             throws IOException, NoSuchAlgorithmException {
-        wallet.ensureWalletIsReady(this);
-        TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
-        String requestPayload = "0x" + assembler.buildTransferPayload(transfer);
-        if (sync) {
-            return syncBroadcast(requestPayload, wallet);
-        } else {
-            return asyncBroadcast(requestPayload, wallet);
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
+            String requestPayload = "0x" + assembler.buildTransferPayload(transfer);
+            if (sync) {
+                return syncBroadcast(requestPayload, wallet);
+            } else {
+                return asyncBroadcast(requestPayload, wallet);
+            }
         }
     }
 
     @Override
     public List<TransactionMetadata> multiTransfer(MultiTransfer multiTransfer, Wallet wallet, TransactionOption options, boolean sync)
             throws IOException, NoSuchAlgorithmException {
-        wallet.ensureWalletIsReady(this);
-        TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
-        String requestPayload = "0x" + assembler.buildMultiTransferPayload(multiTransfer);
-        if (sync) {
-            return syncBroadcast(requestPayload, wallet);
-        } else {
-            return asyncBroadcast(requestPayload, wallet);
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
+            String requestPayload = "0x" + assembler.buildMultiTransferPayload(multiTransfer);
+            if (sync) {
+                return syncBroadcast(requestPayload, wallet);
+            } else {
+                return asyncBroadcast(requestPayload, wallet);
+            }
         }
     }
 
@@ -415,7 +419,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
                     .map(com.binance.dex.api.client.encoding.message.Token::of).collect(Collectors.toList()));
         }
         proposal.setVotingPeriod(proposalMessage.getVotingPeriod());
-        
+
         Transaction transaction = new Transaction();
         transaction.setTxType(TxType.SUBMIT_PROPOSAL);
         transaction.setRealTx(proposal);
@@ -460,6 +464,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
                 transactionMetadata.setHeight(commitBroadcastResult.getHeight());
                 transactionMetadata.setOk(true);
             } else {
+                wallet.invalidAccountSequence();
                 transactionMetadata.setLog(commitBroadcastResult.getCheckTx().getLog());
                 transactionMetadata.setOk(false);
             }
@@ -485,6 +490,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
                 transactionMetadata.setData(asyncBroadcastResult.getData());
                 transactionMetadata.setOk(true);
             } else {
+                wallet.invalidAccountSequence();
                 transactionMetadata.setOk(false);
             }
 
