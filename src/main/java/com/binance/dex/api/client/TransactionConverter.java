@@ -23,7 +23,6 @@ import com.binance.dex.api.proto.TimeLock;
 import com.binance.dex.api.proto.TimeRelock;
 import com.binance.dex.api.proto.TimeUnlock;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.apache.commons.codec.binary.Hex;
 
 import java.time.Instant;
 import java.util.Date;
@@ -46,6 +45,7 @@ public class TransactionConverter {
             byte[] array = new byte[value.length - startIndex];
             System.arraycopy(value, startIndex, array, 0, array.length);
             StdTx stdTx = StdTx.parseFrom(array);
+            StdSignature stdSignature = StdSignature.parseFrom(stdTx.getSignatures(0));
             return stdTx.getMsgsList().stream()
                     .map(byteString -> {
                         byte[] bytes = byteString.toByteArray();
@@ -61,6 +61,7 @@ public class TransactionConverter {
                         transaction.setMemo(stdTx.getMemo());
                         transaction.setResultData(txMessage.getTx_result().getData());
                         transaction.setSource(stdTx.getSource());
+                        transaction.setSequence(stdSignature.getSequence());
                         return transaction;
                     }).filter(Objects::nonNull).collect(Collectors.toList());
         } catch (InvalidProtocolBufferException e) {

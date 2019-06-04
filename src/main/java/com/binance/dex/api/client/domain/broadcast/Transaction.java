@@ -15,6 +15,7 @@ public class Transaction {
     private List<TxResult.Tag> tags;
     private byte[] resultData;
     private long source;
+    private long sequence;
 
     public Long getHeight() {
         return height;
@@ -94,5 +95,13 @@ public class Transaction {
 
     public void setSource(long source) {
         this.source = source;
+    }
+
+    public long getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(long sequence) {
+        this.sequence = sequence;
     }
 }
