@@ -236,6 +236,12 @@ message CreateValidator  {
   Token      delegation = 6;
 }
 
+message RealCreateValidator {
+    // 0xDB6A19FD
+    CreateValidator createValidator = 1;
+    int64 proposal_id = 2;
+}
+
 message RemoveValidator {
  //0xC1AFE85F
   bytes launcher_addr = 1;

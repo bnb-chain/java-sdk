@@ -22,7 +22,7 @@ public enum MessageType {
     Mint("467E0829"),
     SubmitProposal("B42D614E"),
     Deposit("A18A56E5"),
-    CreateValidator("EB361D01"),
+    CreateValidator("DB6A19FD"),
     RemoveValidator("C1AFE85F"),
     Listing("B41DE13F"),
     TimeLock("07921531"),

@@ -11,6 +11,7 @@ public class CreateValidator {
     private String delegatorAddress;
     private String validatorAddress;
     private Token delegation;
+    private Long proposalId;
 
     public String getDelegatorAddress() {
         return delegatorAddress;
@@ -34,5 +35,13 @@ public class CreateValidator {
 
     public void setDelegation(Token delegation) {
         this.delegation = delegation;
+    }
+
+    public Long getProposalId() {
+        return proposalId;
+    }
+
+    public void setProposalId(Long proposalId) {
+        this.proposalId = proposalId;
     }
 }

@@ -23,9 +23,9 @@ import com.binance.dex.api.proto.TimeLock;
 import com.binance.dex.api.proto.TimeRelock;
 import com.binance.dex.api.proto.TimeUnlock;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.apache.commons.codec.binary.Hex;
 
 import java.time.Instant;
-import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -382,12 +382,14 @@ public class TransactionConverter {
     private Transaction convertCreateValidator(byte[] value) throws InvalidProtocolBufferException {
         byte[] array = new byte[value.length - 4];
         System.arraycopy(value, 4, array, 0, array.length);
-        com.binance.dex.api.proto.CreateValidator createValidatorMessage = com.binance.dex.api.proto.CreateValidator.parseFrom(array);
+        //com.binance.dex.api.proto.CreateValidator createValidatorMessage = com.binance.dex.api.proto.CreateValidator.parseFrom(array);
+        RealCreateValidator realCreateValidator = RealCreateValidator.parseFrom(array);
 
         CreateValidator createValidator = new CreateValidator();
-        createValidator.setDelegatorAddress(Crypto.encodeAddress(hrp,createValidatorMessage.getDelegatorAddress().toByteArray()));
-        createValidator.setValidatorAddress(Crypto.encodeAddress(hrp,createValidatorMessage.getValidatorAddress().toByteArray()));
-        createValidator.setDelegation(com.binance.dex.api.client.encoding.message.Token.of(createValidatorMessage.getDelegation()));
+        createValidator.setDelegatorAddress(Crypto.encodeAddress(hrp,realCreateValidator.getCreateValidator().getDelegatorAddress().toByteArray()));
+        createValidator.setValidatorAddress(Crypto.encodeAddress(hrp,realCreateValidator.getCreateValidator().getValidatorAddress().toByteArray()));
+        createValidator.setDelegation(com.binance.dex.api.client.encoding.message.Token.of(realCreateValidator.getCreateValidator().getDelegation()));
+        createValidator.setProposalId(realCreateValidator.getProposalId());
 
         Transaction transaction = new Transaction();
         transaction.setTxType(TxType.CREATE_VALIDATOR);
