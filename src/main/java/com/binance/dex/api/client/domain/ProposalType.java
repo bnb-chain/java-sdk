@@ -32,7 +32,7 @@ public enum ProposalType {
     }
 
     @JsonValue
-    public long toValue() {
-        return this.value;
+    public String toName() {
+        return this.name();
     }
 }

@@ -122,6 +122,40 @@ message AppAccount {
     repeated Token locked = 4;
 }
 
+message TokenInfo{
+    string name = 1;
+    string symbol = 2;
+    string original_symbol = 3;
+    int64 total_supply = 4;
+    bytes owner = 5;
+    bool mintable = 6;
+}
+
+
+message DexFeeParam {
+    // 0x495A5044
+    message DexFeeField {
+        string fee_name = 1;
+        int64 fee_value = 2;
+    }
+    repeated DexFeeField dex_fee_fields = 1;
+}
+
+message FixedFeeParams {
+    // 0xC2A96FA3
+    string msg_type = 1;
+    int64 fee = 2;
+    int32 fee_for = 3;
+}
+
+message TransferFeeParam {
+    // 0x9A3D2769
+    FixedFeeParams fixed_fee_params = 1;
+    int64 multi_transfer_fee = 2;
+    int64 lower_limit_as_multi = 3;
+
+}
+
 // sync/async response
 message ResultBroadcastTx {
     int32 code = 1; //uint32
@@ -171,3 +205,88 @@ message SubmitProposal {
     repeated Token initial_deposit = 5;
     int64  voting_period = 6;
 }
+
+message Deposit {
+    // 0xA18A56E5
+  int64 proposal_id = 1;
+  bytes   depositer = 2;
+  repeated Token amount = 3;
+}
+
+message Description {
+   string moniker  = 1;
+   string identity = 2;
+   string website = 3;
+   string details = 4;
+}
+
+message Commission {
+    int64 rate = 1;
+    int64 max_rate = 2;
+    int64 max_change_rate = 3;
+}
+
+message CreateValidator  {
+    // 0xEB361D01
+  Description description = 1;
+  Commission    commission = 2;
+  bytes delegator_address  = 3;
+  bytes validator_address  = 4;
+  bytes  pubkey = 5;
+  Token      delegation = 6;
+}
+
+message RealCreateValidator {
+    // 0xDB6A19FD
+    CreateValidator createValidator = 1;
+    int64 proposal_id = 2;
+}
+
+message RemoveValidator {
+ //0xC1AFE85F
+  bytes launcher_addr = 1;
+  bytes    val_addr = 2;
+  bytes val_cons_addr = 3;
+  int64 proposal_id = 4;
+}
+
+message List {
+// 0xB41DE13F
+  bytes from  = 1;
+   int64          proposal_id = 2;
+   string         base_asset_symbol = 3;
+   string        quote_asset_symbol = 4;
+   int64          init_price = 5;
+}
+
+message TimeLock {
+    message Token {
+        string denom = 1;
+        int64 amount = 2;
+    }
+    // 07921531
+    bytes from = 1;
+    string description = 2;
+    repeated Token amount = 3;
+    int64 lock_time = 4;
+}
+
+message TimeUnlock {
+    // C4050C6C
+    bytes from = 1;
+    int64 time_lock_id = 2;
+}
+
+message TimeRelock {
+    message Token {
+        string denom = 1;
+        int64 amount = 2;
+    }
+    // 504711DA
+    bytes from = 1;
+    int64 time_lock_id = 2;
+    string description = 3;
+    repeated Token amount = 4;
+    int64 lock_time = 5;
+}
+
