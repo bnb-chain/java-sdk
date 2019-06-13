@@ -119,7 +119,7 @@ public class NodeClientExample {
         transfer.setCoin(symbol);
         transfer.setFromAddress(wallet.getAddress());
         transfer.setToAddress("tbnb16hywxpvvkaz6cecjz89mf2w0da3vfeg6z6yky2");
-        transfer.setAmount("1.1");
+        transfer.setAmount("0.001");
         TransactionOption options = new TransactionOption("test1g2g", 1, null);
         List<TransactionMetadata> resp = binanceDexNodeApi.transfer(transfer, wallet, options, true);
 
