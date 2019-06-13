@@ -36,8 +36,6 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
 
     private FeeConverter feeConverter;
 
-
-
     private final String ARG_ACCOUNT_PREFIX = Hex.toHexString("account:".getBytes());
 
     public BinanceDexApiNodeClientImpl(String nodeUrl, String hrp) {
@@ -45,6 +43,14 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         this.hrp = hrp;
         transactionConverter = new TransactionConverter(hrp);
         feeConverter = new FeeConverter();
+    }
+
+    @Override
+    public AccountSequence getAccountSequence(String address) {
+        Account account = this.getAccount(address);
+        AccountSequence accountSequence = new AccountSequence();
+        accountSequence.setSequence(account.getSequence());
+        return accountSequence;
     }
 
     @Override
@@ -179,7 +185,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
             int startIndex = getStartIndex(value);
             byte[] array = new byte[value.length - startIndex];
             System.arraycopy(value, startIndex, array, 0, array.length);
-            TokenInfo tokenInfo =  TokenInfo.parseFrom(array);
+            TokenInfo tokenInfo = TokenInfo.parseFrom(array);
             return convert(tokenInfo);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -192,7 +198,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
             JsonRpcResponse<ABCIQueryResult> rpcResponse = binanceDexNodeApi.getStakeValidators().execute().body();
             checkRpcResult(rpcResponse);
             byte[] value = rpcResponse.getResult().getResponse().getValue();
-            return StakeValidator.fromJsonToArray(new String(value),hrp);
+            return StakeValidator.fromJsonToArray(new String(value), hrp);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -201,12 +207,12 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     @Override
     public Proposal getProposalById(String proposalId) {
         try {
-            Map.Entry proposalIdEntry = Maps.immutableEntry("ProposalID",proposalId);
+            Map.Entry proposalIdEntry = Maps.immutableEntry("ProposalID", proposalId);
             String requestData = "0x" + Hex.toHexString(EncodeUtils.toJsonStringSortKeys(proposalIdEntry).getBytes());
             JsonRpcResponse<ABCIQueryResult> rpcResponse = binanceDexNodeApi.getProposalById(requestData).execute().body();
             checkRpcResult(rpcResponse);
             ABCIQueryResult.Response response = rpcResponse.getResult().getResponse();
-            if(response.getCode() != null){
+            if (response.getCode() != null) {
                 BinanceDexApiError binanceDexApiError = new BinanceDexApiError();
                 binanceDexApiError.setCode(response.getCode());
                 binanceDexApiError.setMessage(response.getLog());
@@ -296,7 +302,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         token.setName(tokenInfo.getName());
         token.setOriginalSymbol(tokenInfo.getOriginalSymbol());
         token.setSymbol(tokenInfo.getSymbol());
-        token.setOwner(Crypto.encodeAddress(hrp,tokenInfo.getOwner().toByteArray()));
+        token.setOwner(Crypto.encodeAddress(hrp, tokenInfo.getOwner().toByteArray()));
         token.setTotalSupply(tokenInfo.getTotalSupply());
         token.setMintable(tokenInfo.getMintable());
         return token;

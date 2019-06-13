@@ -49,11 +49,6 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
     }
 
     @Override
-    default AccountSequence getAccountSequence(String address) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     default TransactionMetadata getTransactionMetadata(String hash) {
         throw new UnsupportedOperationException();
     }
