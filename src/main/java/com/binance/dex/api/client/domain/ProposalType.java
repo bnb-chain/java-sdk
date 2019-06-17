@@ -13,7 +13,8 @@ public enum ProposalType {
     ListTradingPair(4L),
     FeeChange(5L),
     CreateValidator(6L),
-    RemoveValidator(7L);
+    RemoveValidator(7L),
+    DelistTradingPair(8L);
 
     private long value;
 
