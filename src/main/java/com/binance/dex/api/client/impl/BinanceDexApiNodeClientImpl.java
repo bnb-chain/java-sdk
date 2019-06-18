@@ -89,11 +89,14 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         try {
             JsonRpcResponse<AccountResult> response = binanceDexNodeApi.getAccount(encodedAddress).execute().body();
             checkRpcResult(response);
-            byte[] value = response.getResult().getResponse().getValue();
-            byte[] array = new byte[value.length - 4];
-            System.arraycopy(value, 4, array, 0, array.length);
-            AppAccount account = AppAccount.parseFrom(array);
-            return convert(account);
+            if(response.getResult().getResponse().getValue() != null){
+                byte[] value = response.getResult().getResponse().getValue();
+                byte[] array = new byte[value.length - 4];
+                System.arraycopy(value, 4, array, 0, array.length);
+                AppAccount account = AppAccount.parseFrom(array);
+                return convert(account);
+            }
+            return null;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
