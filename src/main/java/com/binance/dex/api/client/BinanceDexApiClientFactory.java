@@ -21,7 +21,7 @@ public class BinanceDexApiClientFactory {
     }
 
     public BinanceDexApiNodeClient newNodeRpcClient() {
-        return newNodeRpcClient(BinanceDexEnvironment.TEST_NET_NODE.getBaseUrl(), BinanceDexEnvironment.TEST_NET_NODE.getHrp());
+        return newNodeRpcClient(BinanceDexEnvironment.PROD.getNodeUrl(), BinanceDexEnvironment.PROD.getHrp());
     }
 
     public BinanceDexApiNodeClient newNodeRpcClient(String baseUrl, String hrp) {
