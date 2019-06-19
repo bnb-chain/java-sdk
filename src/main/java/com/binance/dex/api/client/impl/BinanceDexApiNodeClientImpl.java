@@ -55,20 +55,16 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
 
     @Override
     public Infos getNodeInfo() {
-        try {
-            JsonRpcResponse<NodeInfos> rpcResponse = binanceDexNodeApi.getNodeStatus().execute().body();
-            checkRpcResult(rpcResponse);
-            NodeInfos nodeInfos = rpcResponse.getResult();
-            return convert(nodeInfos);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        JsonRpcResponse<NodeInfos> rpcResponse = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getNodeStatus());
+        checkRpcResult(rpcResponse);
+        NodeInfos nodeInfos = rpcResponse.getResult();
+        return convert(nodeInfos);
     }
 
     @Override
     public List<Fees> getFees() {
         try {
-            JsonRpcResponse<ABCIQueryResult> rpcResponse = binanceDexNodeApi.getFees().execute().body();
+            JsonRpcResponse<ABCIQueryResult> rpcResponse = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getFees());
             checkRpcResult(rpcResponse);
             byte[] value = rpcResponse.getResult().getResponse().getValue();
             int startIndex = 2;
@@ -87,13 +83,16 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     public Account getAccount(String address) {
         String encodedAddress = "0x" + ARG_ACCOUNT_PREFIX + Hex.toHexString(Crypto.decodeAddress(address));
         try {
-            JsonRpcResponse<AccountResult> response = binanceDexNodeApi.getAccount(encodedAddress).execute().body();
+            JsonRpcResponse<AccountResult> response = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getAccount(encodedAddress));
             checkRpcResult(response);
-            byte[] value = response.getResult().getResponse().getValue();
-            byte[] array = new byte[value.length - 4];
-            System.arraycopy(value, 4, array, 0, array.length);
-            AppAccount account = AppAccount.parseFrom(array);
-            return convert(account);
+            if(response.getResult().getResponse().getValue() != null){
+                byte[] value = response.getResult().getResponse().getValue();
+                byte[] array = new byte[value.length - 4];
+                System.arraycopy(value, 4, array, 0, array.length);
+                AppAccount account = AppAccount.parseFrom(array);
+                return convert(account);
+            }
+            return null;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -101,23 +100,19 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
 
     @Override
     public List<Transaction> getBlockTransactions(Long height) {
-        try {
-            JsonRpcResponse<BlockInfoResult> response = binanceDexNodeApi
-                    .getBlockTransactions("\"tx.height=" + height.toString() + "\"").execute().body();
-            checkRpcResult(response);
-            return response.getResult().getTxs().stream()
-                    .map(transactionConverter::convert)
-                    .flatMap(List::stream)
-                    .collect(Collectors.toList());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        JsonRpcResponse<BlockInfoResult> response = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi
+                .getBlockTransactions("\"tx.height=" + height.toString() + "\""));
+        checkRpcResult(response);
+        return response.getResult().getTxs().stream()
+                .map(transactionConverter::convert)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
     }
 
     @Override
     public Transaction getTransaction(String hash) {
         try {
-            JsonRpcResponse<TransactionResult> rpcResponse = binanceDexNodeApi.getTransaction("0x" + hash).execute().body();
+            JsonRpcResponse<TransactionResult> rpcResponse = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getTransaction("0x" + hash));
             checkRpcResult(rpcResponse);
             TransactionResult transactionResult = rpcResponse.getResult();
             byte[] txBytes = transactionResult.getTx();
@@ -149,25 +144,17 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
 
     @Override
     public BlockMeta getBlockMetaByHeight(Long height) {
-        try {
-            JsonRpcResponse<BlockMeta.BlockMetaResult> rpcResponse = binanceDexNodeApi.getBlock(height).execute().body();
-            checkRpcResult(rpcResponse);
-            BlockMeta.BlockMetaResult result = rpcResponse.getResult();
-            return result.getBlockMeta();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        JsonRpcResponse<BlockMeta.BlockMetaResult> rpcResponse = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getBlock(height));
+        checkRpcResult(rpcResponse);
+        BlockMeta.BlockMetaResult result = rpcResponse.getResult();
+        return result.getBlockMeta();
     }
 
     @Override
     public BlockMeta getBlockMetaByHash(String hash) {
         try {
-            JsonRpcResponse<BlockMeta.BlockMetaResult> rpcResponse = binanceDexNodeApi.getBlock("0x" + hash).execute().body();
+            JsonRpcResponse<BlockMeta.BlockMetaResult> rpcResponse = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getBlock("0x" + hash));
             checkRpcResult(rpcResponse);
-            if (null != rpcResponse.getError() && null != rpcResponse.getError().getCode() && rpcResponse.getError().getCode().intValue() != 0) {
-                throw new RuntimeException(rpcResponse.getError().toString());
-            }
-
             BlockMeta.BlockMetaResult result = rpcResponse.getResult();
             return result.getBlockMeta();
         } catch (Exception e) {
@@ -179,7 +166,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     public com.binance.dex.api.client.domain.Token getTokenInfoBySymbol(String symbol) {
         try {
             String pathWithSymbol = "\"tokens/info/" + symbol + "\"";
-            JsonRpcResponse<ABCIQueryResult> rpcResponse = binanceDexNodeApi.getTokenInfo(pathWithSymbol).execute().body();
+            JsonRpcResponse<ABCIQueryResult> rpcResponse = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getTokenInfo(pathWithSymbol));
             checkRpcResult(rpcResponse);
             byte[] value = rpcResponse.getResult().getResponse().getValue();
             int startIndex = getStartIndex(value);
@@ -194,14 +181,10 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
 
     @Override
     public List<StakeValidator> getStakeValidator() {
-        try {
-            JsonRpcResponse<ABCIQueryResult> rpcResponse = binanceDexNodeApi.getStakeValidators().execute().body();
-            checkRpcResult(rpcResponse);
-            byte[] value = rpcResponse.getResult().getResponse().getValue();
-            return StakeValidator.fromJsonToArray(new String(value), hrp);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        JsonRpcResponse<ABCIQueryResult> rpcResponse = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getStakeValidators());
+        checkRpcResult(rpcResponse);
+        byte[] value = rpcResponse.getResult().getResponse().getValue();
+        return StakeValidator.fromJsonToArray(new String(value), hrp);
     }
 
     @Override
@@ -209,7 +192,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         try {
             Map.Entry proposalIdEntry = Maps.immutableEntry("ProposalID", proposalId);
             String requestData = "0x" + Hex.toHexString(EncodeUtils.toJsonStringSortKeys(proposalIdEntry).getBytes());
-            JsonRpcResponse<ABCIQueryResult> rpcResponse = binanceDexNodeApi.getProposalById(requestData).execute().body();
+            JsonRpcResponse<ABCIQueryResult> rpcResponse = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getProposalById(requestData));
             checkRpcResult(rpcResponse);
             ABCIQueryResult.Response response = rpcResponse.getResult().getResponse();
             if (response.getCode() != null) {
@@ -310,13 +293,11 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
 
     protected List<TransactionMetadata> syncBroadcast(String requestBody, Wallet wallet) {
         try {
-            CommitBroadcastResult commitBroadcastResult = binanceDexNodeApi.commitBroadcast(requestBody).execute().body().getResult();
+            JsonRpcResponse<CommitBroadcastResult> rpcResponse = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.commitBroadcast(requestBody));
+            CommitBroadcastResult commitBroadcastResult = rpcResponse.getResult();
             TransactionMetadata transactionMetadata = new TransactionMetadata();
             transactionMetadata.setCode(commitBroadcastResult.getCheckTx().getCode());
-            if (commitBroadcastResult != null
-                    && commitBroadcastResult.getHeight() != null
-                    && StringUtils.isNoneBlank(commitBroadcastResult.getHash())
-                    && transactionMetadata.getCode() == 0) {
+            if (commitBroadcastResult.getHeight() != null && StringUtils.isNoneBlank(commitBroadcastResult.getHash()) && transactionMetadata.getCode() == 0) {
                 wallet.increaseAccountSequence();
                 transactionMetadata.setHash(commitBroadcastResult.getHash());
                 transactionMetadata.setHeight(commitBroadcastResult.getHeight());
@@ -328,7 +309,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
             }
 
             return Lists.newArrayList(transactionMetadata);
-        } catch (BinanceDexApiException | IOException e) {
+        } catch (BinanceDexApiException e) {
             wallet.invalidAccountSequence();
             throw new RuntimeException(e);
         }
@@ -336,13 +317,14 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
 
     protected List<TransactionMetadata> asyncBroadcast(String requestBody, Wallet wallet) {
         try {
-            AsyncBroadcastResult asyncBroadcastResult = binanceDexNodeApi.asyncBroadcast(requestBody).execute().body().getResult();
+            JsonRpcResponse<AsyncBroadcastResult> rpcResponse = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.asyncBroadcast(requestBody));
+            AsyncBroadcastResult asyncBroadcastResult = rpcResponse.getResult();
             TransactionMetadata transactionMetadata = new TransactionMetadata();
 
             transactionMetadata.setCode(asyncBroadcastResult.getCode());
             transactionMetadata.setLog(asyncBroadcastResult.getLog());
 
-            if (asyncBroadcastResult != null && asyncBroadcastResult.getCode().intValue() == 0) {
+            if (asyncBroadcastResult.getCode() == 0) {
                 wallet.increaseAccountSequence();
                 transactionMetadata.setHash(asyncBroadcastResult.getHash());
                 transactionMetadata.setData(asyncBroadcastResult.getData());
@@ -353,7 +335,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
             }
 
             return Lists.newArrayList(transactionMetadata);
-        } catch (BinanceDexApiException | IOException e) {
+        } catch (BinanceDexApiException e) {
             wallet.invalidAccountSequence();
             throw new RuntimeException(e);
         }

@@ -6,15 +6,12 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class BinanceDexEnvironment {
     public static final BinanceDexEnvironment PROD = new BinanceDexEnvironment(
             "https://dex.binance.org",
-            "wss://dex.binance.org/api/",
+            "https://dataseed1.ninicoin.io",
+            "wss://dataseed1.ninicoin.io/websocket",
             "bnb"
     );
     public static final BinanceDexEnvironment TEST_NET = new BinanceDexEnvironment(
             "https://testnet-dex.binance.org",
-            "wss://testnet-dex.binance.org/api/",
-            "tbnb"
-    );
-    public static final BinanceDexEnvironment TEST_NET_NODE = new BinanceDexEnvironment(
             "http://data-seed-pre-0-s3.binance.org",
             "wss://data-seed-pre-0-s3.binance.org/websocket",
             "tbnb"
@@ -22,13 +19,16 @@ public class BinanceDexEnvironment {
 
     // Rest API base URL
     private String baseUrl;
+    // RPC API base URL
+    private String nodeUrl;
     // Websocket API base URL
     private String wsBaseUrl;
     // Address human readable part prefix
     private String hrp;
 
-    public BinanceDexEnvironment(String baseUrl, String wsBaseUrl, String hrp) {
+    public BinanceDexEnvironment(String baseUrl,String nodeUrl ,String wsBaseUrl, String hrp) {
         this.baseUrl = baseUrl;
+        this.nodeUrl = nodeUrl;
         this.wsBaseUrl = wsBaseUrl;
         this.hrp = hrp;
     }
@@ -67,5 +67,9 @@ public class BinanceDexEnvironment {
                 .append(wsBaseUrl)
                 .append(hrp)
                 .toHashCode();
+    }
+
+    public String getNodeUrl() {
+        return nodeUrl;
     }
 }

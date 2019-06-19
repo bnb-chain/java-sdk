@@ -23,7 +23,7 @@ public class BinanceDexWSApiExample {
 
     @Before
     public void before(){
-        binanceDexWSApi = BinanceDexClientWSFactory.getWSApiImpl(BinanceDexEnvironment.TEST_NET_NODE);
+        binanceDexWSApi = BinanceDexClientWSFactory.getWSApiImpl(BinanceDexEnvironment.TEST_NET);
     }
 
     @Test

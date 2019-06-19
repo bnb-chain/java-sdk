@@ -37,7 +37,7 @@ public class WebsocketExample {
                     throw new RuntimeException(e);
                 }
             }
-        },BinanceDexEnvironment.TEST_NET_NODE.getWsBaseUrl());
+        },BinanceDexEnvironment.TEST_NET.getWsBaseUrl());
         WebsocketLauncher.startUp(endpoint);
     }
 
