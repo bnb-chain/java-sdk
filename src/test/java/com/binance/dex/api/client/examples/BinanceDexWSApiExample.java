@@ -30,7 +30,7 @@ public class BinanceDexWSApiExample {
     public void testBlockAndTx() throws Exception{
         System.out.println(objectMapper.writeValueAsString(binanceDexWSApi.netInfo()));
         System.out.println(objectMapper.writeValueAsString(binanceDexWSApi.blockByHeight(13513018L)));
-        System.out.println(objectMapper.writeValueAsString(binanceDexWSApi.txSearch(13513018L)));
+        System.out.println(objectMapper.writeValueAsString(binanceDexWSApi.txSearch(22703696L)));
         System.out.println(objectMapper.writeValueAsString(binanceDexWSApi.txSearch(14386667L)));
         System.out.println(objectMapper.writeValueAsString(binanceDexWSApi.txSearch(14353547L)));
         System.out.println(objectMapper.writeValueAsString(binanceDexWSApi.txSearch(13080127L)));
