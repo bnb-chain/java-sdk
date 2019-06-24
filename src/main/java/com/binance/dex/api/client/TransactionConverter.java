@@ -16,6 +16,7 @@ import com.binance.dex.api.client.domain.broadcast.TokenUnfreeze;
 import com.binance.dex.api.client.domain.broadcast.Transaction;
 import com.binance.dex.api.client.domain.broadcast.Vote;
 import com.binance.dex.api.client.encoding.Crypto;
+import com.binance.dex.api.client.encoding.message.InputOutput;
 import com.binance.dex.api.client.encoding.message.MessageType;
 import com.binance.dex.api.client.encoding.message.Token;
 import com.binance.dex.api.proto.*;
@@ -188,13 +189,21 @@ public class TransactionConverter {
         byte[] array = new byte[value.length - 4];
         System.arraycopy(value, 4, array, 0, array.length);
         Send send = Send.parseFrom(array);
-        MultiTransfer transfer = new MultiTransfer();
-        transfer.setFromAddress(Crypto.encodeAddress(hrp, send.getInputsList().get(0).getAddress().toByteArray()));
+        TransferInfo transfer = new TransferInfo();
+        transfer.setInputs(send.getInputsList().stream().map(i -> {
+            InputOutput input = new InputOutput();
+            input.setAddress(Crypto.encodeAddress(hrp, i.getAddress().toByteArray()));
+            input.setCoins(i.getCoinsList().stream()
+                    .map(Token::of)
+                    .collect(Collectors.toList()));
+            return input;
+        }).collect(Collectors.toList()));
+
         transfer.setOutputs(send.getOutputsList().stream().map(o -> {
-            Output output = new Output();
+            InputOutput output = new InputOutput();
             output.setAddress(Crypto.encodeAddress(hrp, o.getAddress().toByteArray()));
-            output.setTokens(o.getCoinsList().stream()
-                    .map(coin -> new OutputToken(coin.getDenom(), "" + coin.getAmount()))
+            output.setCoins(o.getCoinsList().stream()
+                    .map(Token::of)
                     .collect(Collectors.toList()));
             return output;
         }).collect(Collectors.toList()));
