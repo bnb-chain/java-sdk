@@ -18,6 +18,10 @@ import java.util.List;
 public class Crypto {
 
     private static final String HD_PATH = "44H/714H/0H/0/0";
+    private static final String MAINNET_PREFIX = "bnb";
+    private static final String TESTNET_PREFIX = "tbnb";
+    private static final int DECODED_ADDRESS_LEN = 20;
+
 
     public static byte[] sign(byte[] msg, String privateKey) throws NoSuchAlgorithmException {
         ECKey k = ECKey.fromPrivate(new BigInteger(privateKey, 16));
@@ -52,6 +56,32 @@ public class Crypto {
     public static String encodeAddress(String hrp, byte[] code) {
         byte[] convertedCode = Crypto.convertBits(code, 0, code.length, 8, 5, true);
         return Bech32.encode(hrp, convertedCode);
+    }
+
+    public static boolean checkAddress(String address) {
+        try {
+            if (!(address.startsWith(TESTNET_PREFIX) || address.startsWith(MAINNET_PREFIX))) {
+                return false;
+            }
+            Bech32.Bech32Data decodedAddress = Bech32.decode(address);
+            String hrp = decodedAddress.getHrp();
+
+            if (!(hrp.equals(TESTNET_PREFIX) || hrp.equals(MAINNET_PREFIX))) {
+                return false;
+            }
+
+            int decodeAddressLength =  decodeAddress(address).length;
+
+            if (decodeAddressLength != DECODED_ADDRESS_LEN) {
+                return false;
+            }
+
+            return true;
+
+        } catch (AddressFormatException e) {
+            return false;
+        }
+
     }
 
     public static String getAddressFromPrivateKey(String privateKey, String hrp) {
