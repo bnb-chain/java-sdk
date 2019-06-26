@@ -1,5 +1,6 @@
 package com.binance.dex.api.client.encoding;
 
+import com.binance.dex.api.client.BinanceDexEnvironment;
 import com.binance.dex.api.client.ledger.LedgerKey;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.Sha256Hash;
@@ -18,8 +19,8 @@ import java.util.List;
 public class Crypto {
 
     private static final String HD_PATH = "44H/714H/0H/0/0";
-    private static final String MAINNET_PREFIX = "bnb";
-    private static final String TESTNET_PREFIX = "tbnb";
+    private static final String MAINNET_PREFIX = BinanceDexEnvironment.PROD.getHrp();
+    private static final String TESTNET_PREFIX = BinanceDexEnvironment.TEST_NET.getHrp();
     private static final int DECODED_ADDRESS_LEN = 20;
 
 
@@ -58,7 +59,7 @@ public class Crypto {
         return Bech32.encode(hrp, convertedCode);
     }
 
-    public static boolean checkAddress(String address) {
+    public static boolean checkBNBAddress(String address) {
         try {
             if (!(address.startsWith(TESTNET_PREFIX) || address.startsWith(MAINNET_PREFIX))) {
                 return false;

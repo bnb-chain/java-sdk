@@ -43,7 +43,7 @@ public class CryptoTest {
     @Test
     public void testCheckValidBNBAddress() {
         String address = "bnb1x9nnkazcgrqr902a83k7xecu44607jpjlw4snf";
-        boolean result = Crypto.checkAddress(address);
+        boolean result = Crypto.checkBNBAddress(address);
         Assert.assertEquals(true,
                 result);
     }
@@ -51,7 +51,7 @@ public class CryptoTest {
     @Test
     public void testCheckInvalidBNBAddress() {
         String address = "bnb1x9nnkazcgrqr902a83k7xecu44607jpjlw4snx";
-        boolean result = Crypto.checkAddress(address);
+        boolean result = Crypto.checkBNBAddress(address);
         Assert.assertEquals(false,
                 result);
     }
@@ -59,7 +59,7 @@ public class CryptoTest {
     @Test
     public void testCheckNonBNBAddress() {
         String address = "cosmosaccaddr1wqrn76z0v36pr3vx3sgue4y5rv4pzpu6ffnjj0";
-        boolean result = Crypto.checkAddress(address);
+        boolean result = Crypto.checkBNBAddress(address);
         Assert.assertEquals(false,
                 result);
     }
