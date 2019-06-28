@@ -7,7 +7,7 @@ public class BinanceDexConstants {
     /**
      * Identifier of this client.
      */
-    public static final long BINANCE_DEX_API_CLIENT_JAVA_SOURCE = 3L;
+    public static final long BINANCE_DEX_API_CLIENT_JAVA_SOURCE = 0L;
 
     /**
      * Default ToStringStyle used by toString methods.
