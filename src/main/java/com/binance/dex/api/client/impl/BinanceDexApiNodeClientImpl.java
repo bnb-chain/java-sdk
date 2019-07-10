@@ -36,8 +36,6 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
 
     private FeeConverter feeConverter;
 
-    private final String ARG_ACCOUNT_PREFIX = Hex.toHexString("account:".getBytes());
-
     public BinanceDexApiNodeClientImpl(String nodeUrl, String hrp) {
         this.binanceDexNodeApi = BinanceDexApiClientGenerator.createService(BinanceDexNodeApi.class, nodeUrl);
         this.hrp = hrp;
@@ -81,9 +79,9 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
 
     @Override
     public Account getAccount(String address) {
-        String encodedAddress = "0x" + ARG_ACCOUNT_PREFIX + Hex.toHexString(Crypto.decodeAddress(address));
         try {
-            JsonRpcResponse<AccountResult> response = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getAccount(encodedAddress));
+            String queryPath = String.format("\"/account/%s\"",address);
+            JsonRpcResponse<AccountResult> response = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getAccount(queryPath));
             checkRpcResult(response);
             if(response.getResult().getResponse().getValue() != null){
                 byte[] value = response.getResult().getResponse().getValue();
