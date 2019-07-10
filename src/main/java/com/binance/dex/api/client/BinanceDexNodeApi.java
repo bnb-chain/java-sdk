@@ -11,6 +11,9 @@ public interface BinanceDexNodeApi {
     @GET("/abci_query")
     Call<JsonRpcResponse<AccountResult>> getAccount(@Query("path") String pathWithAddress);
 
+    @GET("/abci_query?path=%22/store/acc/key%22")
+    Call<JsonRpcResponse<AccountResult>> getCommittedAccount(@Query("data") String address);
+
     @GET("/abci_query")
     Call<JsonRpcResponse<ABCIQueryResult>> getTokenInfo(@Query("path") String pathWithSymbol);
 

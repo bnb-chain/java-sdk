@@ -39,6 +39,13 @@ public class NodeClientExample {
     }
 
     @Test
+    public void testCommittedAccount(){
+        String address = "tbnb16hywxpvvkaz6cecjz89mf2w0da3vfeg6z6yky2";
+        Account account = binanceDexNodeApi.getCommittedAccount(address);
+        Assert.assertEquals(address, account.getAddress());
+    }
+
+    @Test
     public void testBlockTransactions() {
 
         //Transfer
