@@ -28,6 +28,8 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
 
     Proposal getProposalById(String proposalId);
 
+    Account getCommittedAccount(String address);
+
     @Override
     default Time getTime() {
         throw new UnsupportedOperationException();

@@ -20,6 +20,9 @@ public class Trade {
     private String symbol;
     private Long time;
     private String tradeId;
+    private String buySingleFee;
+    private String sellSingleFee;
+    private String tickType;
 
     public String getBaseAsset() {
         return baseAsset;
@@ -150,6 +153,33 @@ public class Trade {
                 .append("symbol", symbol)
                 .append("time", time)
                 .append("tradeId", tradeId)
+                .append("buySingleFee",buySingleFee)
+                .append("sellSingleFee",sellSingleFee)
+                .append("tickType",tickType)
                 .toString();
+    }
+
+    public String getBuySingleFee() {
+        return buySingleFee;
+    }
+
+    public void setBuySingleFee(String buySingleFee) {
+        this.buySingleFee = buySingleFee;
+    }
+
+    public String getSellSingleFee() {
+        return sellSingleFee;
+    }
+
+    public void setSellSingleFee(String sellSingleFee) {
+        this.sellSingleFee = sellSingleFee;
+    }
+
+    public String getTickType() {
+        return tickType;
+    }
+
+    public void setTickType(String tickType) {
+        this.tickType = tickType;
     }
 }

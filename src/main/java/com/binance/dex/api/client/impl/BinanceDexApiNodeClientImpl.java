@@ -81,9 +81,28 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
 
     @Override
     public Account getAccount(String address) {
+        try {
+            String queryPath = String.format("\"/account/%s\"",address);
+            JsonRpcResponse<AccountResult> response = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getAccount(queryPath));
+            checkRpcResult(response);
+            if(response.getResult().getResponse().getValue() != null){
+                byte[] value = response.getResult().getResponse().getValue();
+                byte[] array = new byte[value.length - 4];
+                System.arraycopy(value, 4, array, 0, array.length);
+                AppAccount account = AppAccount.parseFrom(array);
+                return convert(account);
+            }
+            return null;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Account getCommittedAccount(String address) {
         String encodedAddress = "0x" + ARG_ACCOUNT_PREFIX + Hex.toHexString(Crypto.decodeAddress(address));
         try {
-            JsonRpcResponse<AccountResult> response = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getAccount(encodedAddress));
+            JsonRpcResponse<AccountResult> response = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getCommittedAccount(encodedAddress));
             checkRpcResult(response);
             if(response.getResult().getResponse().getValue() != null){
                 byte[] value = response.getResult().getResponse().getValue();
@@ -207,6 +226,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
             throw new RuntimeException(e);
         }
     }
+
 
     @Override
     public List<TransactionMetadata> transfer(Transfer transfer, Wallet wallet, TransactionOption options, boolean sync)

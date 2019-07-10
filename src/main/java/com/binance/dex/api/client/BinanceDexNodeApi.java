@@ -1,17 +1,18 @@
 package com.binance.dex.api.client;
 
 import com.binance.dex.api.client.domain.BlockMeta;
-import com.binance.dex.api.client.domain.Token;
 import com.binance.dex.api.client.domain.jsonrpc.*;
 import retrofit2.Call;
 import retrofit2.http.GET;
-import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface BinanceDexNodeApi {
 
+    @GET("/abci_query")
+    Call<JsonRpcResponse<AccountResult>> getAccount(@Query("path") String pathWithAddress);
+
     @GET("/abci_query?path=%22/store/acc/key%22")
-    Call<JsonRpcResponse<AccountResult>> getAccount(@Query("data") String address);
+    Call<JsonRpcResponse<AccountResult>> getCommittedAccount(@Query("data") String address);
 
     @GET("/abci_query")
     Call<JsonRpcResponse<ABCIQueryResult>> getTokenInfo(@Query("path") String pathWithSymbol);
