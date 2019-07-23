@@ -17,5 +17,6 @@ public enum TxType {
     LISTING,
     TimeLock,
     TimeUnlock,
-    TimeRelock;
+    TimeRelock,
+    SetAccountFlag
 }

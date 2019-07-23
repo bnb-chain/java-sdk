@@ -10,6 +10,7 @@ import com.binance.dex.api.client.domain.broadcast.Deposit;
 import com.binance.dex.api.client.domain.broadcast.Issue;
 import com.binance.dex.api.client.domain.broadcast.Mint;
 import com.binance.dex.api.client.domain.broadcast.NewOrder;
+import com.binance.dex.api.client.domain.broadcast.SetAccountFlag;
 import com.binance.dex.api.client.domain.broadcast.SubmitProposal;
 import com.binance.dex.api.client.domain.broadcast.TokenFreeze;
 import com.binance.dex.api.client.domain.broadcast.TokenUnfreeze;
@@ -120,11 +121,26 @@ public class TransactionConverter {
                     return convertTimeUnlock(bytes);
                 case TimeRelock:
                     return convertTimeRelock(bytes);
+                case SetAccountFlag:
+                    return convertSetAccountFlag(bytes);
             }
             return null;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Transaction convertSetAccountFlag(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.SetAccountFlag setAccountFlag = com.binance.dex.api.proto.SetAccountFlag.parseFrom(array);
+        SetAccountFlag saf = new SetAccountFlag();
+        saf.setFromAddr(Crypto.encodeAddress(hrp,setAccountFlag.getFrom().toByteArray()));
+        saf.setFlags(setAccountFlag.getFlags());
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.SetAccountFlag);
+        transaction.setRealTx(saf);
+        return transaction;
     }
 
     private Transaction convertTimeRelock(byte[] value) throws InvalidProtocolBufferException {
