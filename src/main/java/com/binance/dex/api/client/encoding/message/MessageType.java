@@ -27,7 +27,8 @@ public enum MessageType {
     Listing("B41DE13F"),
     TimeLock("07921531"),
     TimeUnlock("C4050C6C"),
-    TimeRelock("504711DA");
+    TimeRelock("504711DA"),
+    SetAccountFlag("BEA6E301");
 
     private byte[] typePrefixBytes;
 

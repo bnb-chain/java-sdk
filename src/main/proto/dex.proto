@@ -290,3 +290,9 @@ message TimeRelock {
     int64 lock_time = 5;
 }
 
+message SetAccountFlag {
+    // 
+    bytes from = 1;
+    int64 flags =2;
+}
+
