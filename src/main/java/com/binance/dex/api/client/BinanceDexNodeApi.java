@@ -27,7 +27,7 @@ public interface BinanceDexNodeApi {
     Call<JsonRpcResponse<ABCIQueryResult>> getProposalById(@Query("data") String data);
 
     @GET("/tx_search")
-    Call<JsonRpcResponse<BlockInfoResult>> getBlockTransactions(@Query("query") String height);
+    Call<JsonRpcResponse<BlockInfoResult>> getBlockTransactions(@Query("query") String height,@Query("page") int page,@Query("per_page") int perPage);
 
     @GET("/broadcast_tx_commit")
     Call<JsonRpcResponse<CommitBroadcastResult>> commitBroadcast(@Query("tx") String tx);
