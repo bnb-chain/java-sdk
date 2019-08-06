@@ -38,6 +38,10 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
 
     private final String ARG_ACCOUNT_PREFIX = Hex.toHexString("account:".getBytes());
 
+    private final static int TX_SEARCH_PAGE = 1;
+
+    private final static int TX_SEARCH_PERPAGE = 10000;
+
     public BinanceDexApiNodeClientImpl(String nodeUrl, String hrp) {
         this.binanceDexNodeApi = BinanceDexApiClientGenerator.createService(BinanceDexNodeApi.class, nodeUrl);
         this.hrp = hrp;
@@ -120,7 +124,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     @Override
     public List<Transaction> getBlockTransactions(Long height) {
         JsonRpcResponse<BlockInfoResult> response = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi
-                .getBlockTransactions("\"tx.height=" + height.toString() + "\""));
+                .getBlockTransactions("\"tx.height=" + height.toString() + "\"",TX_SEARCH_PAGE,TX_SEARCH_PERPAGE));
         checkRpcResult(response);
         return response.getResult().getTxs().stream()
                 .map(transactionConverter::convert)
