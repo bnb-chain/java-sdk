@@ -3,7 +3,6 @@ package com.binance.dex.api.client.websocket;
 import com.binance.dex.api.client.domain.jsonrpc.JsonRpcResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.misc.BASE64Encoder;
 
 import javax.websocket.*;
 

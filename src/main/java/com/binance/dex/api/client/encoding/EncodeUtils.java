@@ -2,8 +2,6 @@ package com.binance.dex.api.client.encoding;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.protobuf.CodedOutputStream;
 import org.spongycastle.util.encoders.Hex;
 
