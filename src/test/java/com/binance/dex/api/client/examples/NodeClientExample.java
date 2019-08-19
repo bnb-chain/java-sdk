@@ -49,7 +49,7 @@ public class NodeClientExample {
     public void testBlockTransactions() {
 
         //Transfer
-        Long height = 7794210L;
+        Long height = 33896036L;
         List<Transaction> transactions = binanceDexNodeApi.getBlockTransactions(height);
         Assert.assertNotNull(transactions);
         Assert.assertTrue(transactions.size() == 1);
@@ -178,12 +178,12 @@ public class NodeClientExample {
         List<Output> outputs = new ArrayList<>();
 
         List<OutputToken> outputTokens1 = new ArrayList<OutputToken>();
-        outputTokens1.add(new OutputToken("BNB", "0.1"));
+        outputTokens1.add(new OutputToken("BNB", "0.00001"));
         outputTokens1.add(new OutputToken("XRP.B-585", "0.1"));
         Output o1 = new Output("tbnb1mrslq6lhglm3jp7pxzlk8u4549pmtp9sgvn2rc", outputTokens1);
 
         List<OutputToken> outputTokens2 = new ArrayList<OutputToken>();
-        outputTokens2.add(new OutputToken("BNB", "0.1"));
+        outputTokens2.add(new OutputToken("BNB", "0.00001"));
         Output o2 = new Output("tbnb1sadf5e0gdpg757zefd6yru086cknjyttudg532", outputTokens2);
 
         outputs.add(o1);
@@ -205,9 +205,9 @@ public class NodeClientExample {
 
     @Test
     public void testGetTransaction() {
-        Transaction transaction = binanceDexNodeApi.getTransaction("9A4EFAEAC70A9115AD88B540FED7515D5DDBECF2BB19C0A7CBDC4E3F5053ECB8");
+        Transaction transaction = binanceDexNodeApi.getTransaction("A1D07086EC08E983A47157FEACC1CF42179C37FCCDD56E7A4460CD1E4C82E51F");
         Assert.assertNotNull(transaction);
-        Assert.assertEquals("9A4EFAEAC70A9115AD88B540FED7515D5DDBECF2BB19C0A7CBDC4E3F5053ECB8", transaction.getHash());
+        Assert.assertEquals("A1D07086EC08E983A47157FEACC1CF42179C37FCCDD56E7A4460CD1E4C82E51F", transaction.getHash());
         Assert.assertEquals(0, transaction.getCode().intValue());
     }
 

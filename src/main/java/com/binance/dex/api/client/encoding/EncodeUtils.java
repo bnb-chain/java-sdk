@@ -3,7 +3,7 @@ package com.binance.dex.api.client.encoding;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.CodedOutputStream;
-import org.spongycastle.util.encoders.Hex;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
