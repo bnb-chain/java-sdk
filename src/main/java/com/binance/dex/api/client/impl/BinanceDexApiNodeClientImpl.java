@@ -89,8 +89,8 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
             String queryPath = String.format("\"/account/%s\"",address);
             JsonRpcResponse<AccountResult> response = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getAccount(queryPath));
             checkRpcResult(response);
-            if(response.getResult().getResponse().getValue() != null){
-                byte[] value = response.getResult().getResponse().getValue();
+            byte[] value = response.getResult().getResponse().getValue();
+            if(value != null && value.length > 0){
                 byte[] array = new byte[value.length - 4];
                 System.arraycopy(value, 4, array, 0, array.length);
                 AppAccount account = AppAccount.parseFrom(array);
@@ -108,8 +108,8 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         try {
             JsonRpcResponse<AccountResult> response = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getCommittedAccount(encodedAddress));
             checkRpcResult(response);
-            if(response.getResult().getResponse().getValue() != null){
-                byte[] value = response.getResult().getResponse().getValue();
+            byte[] value = response.getResult().getResponse().getValue();
+            if(value != null && value.length > 0){
                 byte[] array = new byte[value.length - 4];
                 System.arraycopy(value, 4, array, 0, array.length);
                 AppAccount account = AppAccount.parseFrom(array);
@@ -117,6 +117,22 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
             }
             return null;
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public AtomicSwap getAtomicSwapByHash(String randomNumberHash) {
+        try {
+            JsonRpcResponse<ABCIQueryResult> response = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getSwapByHash("0x01" + randomNumberHash));
+            checkRpcResult(response);
+            byte[] value;
+            if((value = response.getResult().getResponse().getValue()) != null){
+                AtomicSwapInfo atomicSwapInfo = AtomicSwapInfo.parseFrom(value);
+                return convert(atomicSwapInfo);
+            }
+            return null;
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -280,6 +296,26 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         return infos;
     }
 
+    protected AtomicSwap convert(AtomicSwapInfo atomicSwapInfo){
+        AtomicSwap atomicSwap = new AtomicSwap();
+        atomicSwap.setFrom(Hex.toHexString(atomicSwapInfo.getFrom().toByteArray()));
+        atomicSwap.setTo(Hex.toHexString(atomicSwapInfo.getTo().toByteArray()));
+        atomicSwap.setOutSymbol(atomicSwapInfo.getOutAmount().getDenom());
+        atomicSwap.setOutAmount(atomicSwapInfo.getOutAmount().getAmount());
+        atomicSwap.setInSymbol(atomicSwapInfo.getInAmount().getDenom());
+        atomicSwap.setInAmount(atomicSwapInfo.getInAmount().getAmount());
+        atomicSwap.setExpectedIncome(atomicSwapInfo.getExpectedIncome());
+        atomicSwap.setRecipientOtherChain(Hex.toHexString(atomicSwapInfo.getRecipientOtherChain().toByteArray()));
+        atomicSwap.setRandomNumberHash(Hex.toHexString(atomicSwapInfo.getRandomNumberHash().toByteArray()));
+        atomicSwap.setRandomNumber(Hex.toHexString(atomicSwapInfo.getRandomNumber().toByteArray()));
+        atomicSwap.setTimestamp(atomicSwapInfo.getTimestamp());
+        atomicSwap.setCrossChain(atomicSwapInfo.getCrossChain());
+        atomicSwap.setExpireHeight(atomicSwapInfo.getExpireHeight());
+        atomicSwap.setIndex(atomicSwapInfo.getIndex());
+        atomicSwap.setClosedTime(atomicSwapInfo.getClosedTime());
+        atomicSwap.setStatus(atomicSwapInfo.getStatus());
+        return atomicSwap;
+    }
 
     protected Account convert(AppAccount appAccount) {
         Account account = new Account();
