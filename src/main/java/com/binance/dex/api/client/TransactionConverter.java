@@ -179,8 +179,7 @@ public class TransactionConverter {
         DepositHashTimerLock depositHashTimerLock = new DepositHashTimerLock();
         depositHashTimerLock.setFrom(Crypto.encodeAddress(hrp,depositHtlMsg.getFrom().toByteArray()));
         depositHashTimerLock.setTo(Crypto.encodeAddress(hrp,depositHtlMsg.getTo().toByteArray()));
-        depositHashTimerLock.setSymbol(depositHtlMsg.getOutAmount().getDenom());
-        depositHashTimerLock.setAmount(depositHtlMsg.getOutAmount().getAmount());
+        depositHashTimerLock.setInAmount(depositHtlMsg.getInAmountList().stream().map(Token::of).collect(Collectors.toList()));
         depositHashTimerLock.setRandomNumberHash(Hex.toHexString(depositHtlMsg.getRandomNumberHash().toByteArray()));
 
         Transaction transaction = new Transaction();
@@ -201,8 +200,7 @@ public class TransactionConverter {
         hashTimerLockTransfer.setRecipientOtherChain(Hex.toHexString(htlTransferMsg.getRecipientOtherChain().toByteArray()));
         hashTimerLockTransfer.setRandomNumberHash(Hex.toHexString(htlTransferMsg.getRandomNumberHash().toByteArray()));
         hashTimerLockTransfer.setTimestamp(htlTransferMsg.getTimestamp());
-        hashTimerLockTransfer.setSymbol(htlTransferMsg.getOutAmount().getDenom());
-        hashTimerLockTransfer.setAmount(htlTransferMsg.getOutAmount().getAmount());
+        hashTimerLockTransfer.setOutAmount(htlTransferMsg.getOutAmountList().stream().map(Token::of).collect(Collectors.toList()));
         hashTimerLockTransfer.setExpectedIncome(htlTransferMsg.getExpectedIncome());
         hashTimerLockTransfer.setHeightSpan(htlTransferMsg.getHeightSpan());
         hashTimerLockTransfer.setCrossChain(htlTransferMsg.getCrossChain());

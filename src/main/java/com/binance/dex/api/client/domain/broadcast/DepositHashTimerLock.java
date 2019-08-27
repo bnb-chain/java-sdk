@@ -1,7 +1,10 @@
 package com.binance.dex.api.client.domain.broadcast;
 
+import com.binance.dex.api.client.encoding.message.Token;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 /**
  * @author: fletcher.fan
@@ -13,8 +16,7 @@ public class DepositHashTimerLock {
 
     private String from;
     private String to;
-    private String symbol;
-    private long   amount;
+    private List<Token> inAmount;
     private String randomNumberHash;
 
 }

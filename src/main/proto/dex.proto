@@ -320,7 +320,7 @@ message HashTimerLockTransferMsg {
     bytes recipient_other_chain = 3;
     bytes random_number_hash = 4;
     int64 timestamp = 5;
-    Token out_amount = 6;
+    repeated Token out_amount = 6;
     string expected_income = 7;
     int64 height_span = 8;
     bool  cross_chain = 9;
@@ -330,7 +330,7 @@ message DepositHashTimerLockMsg {
     //
     bytes from = 1;
     bytes to = 2;
-    Token out_amount = 3;
+    repeated Token in_amount = 3;
     bytes random_number_hash = 4;
 }
 

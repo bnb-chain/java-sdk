@@ -1,8 +1,11 @@
 package com.binance.dex.api.client.domain.broadcast;
 
 
+import com.binance.dex.api.client.encoding.message.Token;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 /**
  *
@@ -18,8 +21,7 @@ public class HashTimerLockTransfer {
     private String  recipientOtherChain;
     private String  randomNumberHash;
     private long    timestamp;
-    private String  symbol;
-    private long    amount;
+    private List<Token> outAmount;
     private String  expectedIncome;
     private long    heightSpan;
     private boolean crossChain;
