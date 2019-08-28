@@ -89,8 +89,8 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
             String queryPath = String.format("\"/account/%s\"",address);
             JsonRpcResponse<AccountResult> response = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getAccount(queryPath));
             checkRpcResult(response);
-            if(response.getResult().getResponse().getValue() != null){
-                byte[] value = response.getResult().getResponse().getValue();
+            byte[] value = response.getResult().getResponse().getValue();
+            if(value != null && value.length > 0){
                 byte[] array = new byte[value.length - 4];
                 System.arraycopy(value, 4, array, 0, array.length);
                 AppAccount account = AppAccount.parseFrom(array);
@@ -108,8 +108,8 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         try {
             JsonRpcResponse<AccountResult> response = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getCommittedAccount(encodedAddress));
             checkRpcResult(response);
-            if(response.getResult().getResponse().getValue() != null){
-                byte[] value = response.getResult().getResponse().getValue();
+            byte[] value = response.getResult().getResponse().getValue();
+            if(value != null && value.length > 0){
                 byte[] array = new byte[value.length - 4];
                 System.arraycopy(value, 4, array, 0, array.length);
                 AppAccount account = AppAccount.parseFrom(array);
