@@ -30,8 +30,7 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
 
     Account getCommittedAccount(String address);
 
-    AtomicSwap getAtomicSwapByHash(String randomNumberHash);
-
+    AtomicSwap getSwapByID(String swapID);
 
     @Override
     default Time getTime() {

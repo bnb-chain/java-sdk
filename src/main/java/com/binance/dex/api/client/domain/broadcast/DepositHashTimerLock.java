@@ -15,8 +15,7 @@ import java.util.List;
 public class DepositHashTimerLock {
 
     private String from;
-    private String to;
-    private List<Token> inAmount;
-    private String randomNumberHash;
+    private List<Token> outAmount;
+    private String swapID;
 
 }

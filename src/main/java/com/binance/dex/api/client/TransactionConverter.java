@@ -147,7 +147,7 @@ public class TransactionConverter {
 
         RefundHashTimerLock refundHashTimerLock = new RefundHashTimerLock();
         refundHashTimerLock.setFrom(Crypto.encodeAddress(hrp,refundHtlMsg.getFrom().toByteArray()));
-        refundHashTimerLock.setRandomNumberHash(Hex.toHexString(refundHtlMsg.getRandomNumberHash().toByteArray()));
+        refundHashTimerLock.setSwapID(Hex.toHexString(refundHtlMsg.getSwapId().toByteArray()));
 
         Transaction transaction = new Transaction();
         transaction.setTxType(TxType.REFUND_HTL);
@@ -162,7 +162,7 @@ public class TransactionConverter {
 
         ClaimHashTimerLock claimHashTimerLock = new ClaimHashTimerLock();
         claimHashTimerLock.setFrom(Crypto.encodeAddress(hrp,claimHtlMsg.getFrom().toByteArray()));
-        claimHashTimerLock.setRandomNumberHash(Hex.toHexString(claimHtlMsg.getRandomNumberHash().toByteArray()));
+        claimHashTimerLock.setSwapID(Hex.toHexString(claimHtlMsg.getSwapId().toByteArray()));
         claimHashTimerLock.setRandomNumber(Hex.toHexString(claimHtlMsg.getRandomNumber().toByteArray()));
 
         Transaction transaction = new Transaction();
@@ -178,9 +178,8 @@ public class TransactionConverter {
 
         DepositHashTimerLock depositHashTimerLock = new DepositHashTimerLock();
         depositHashTimerLock.setFrom(Crypto.encodeAddress(hrp,depositHtlMsg.getFrom().toByteArray()));
-        depositHashTimerLock.setTo(Crypto.encodeAddress(hrp,depositHtlMsg.getTo().toByteArray()));
-        depositHashTimerLock.setInAmount(depositHtlMsg.getInAmountList().stream().map(Token::of).collect(Collectors.toList()));
-        depositHashTimerLock.setRandomNumberHash(Hex.toHexString(depositHtlMsg.getRandomNumberHash().toByteArray()));
+        depositHashTimerLock.setOutAmount(depositHtlMsg.getOutAmountList().stream().map(Token::of).collect(Collectors.toList()));
+        depositHashTimerLock.setSwapID(Hex.toHexString(depositHtlMsg.getSwapId().toByteArray()));
 
         Transaction transaction = new Transaction();
         transaction.setTxType(TxType.DEPOSIT_HTL);
@@ -198,6 +197,7 @@ public class TransactionConverter {
         hashTimerLockTransfer.setFrom(Crypto.encodeAddress(hrp,htlTransferMsg.getFrom().toByteArray()));
         hashTimerLockTransfer.setTo(Crypto.encodeAddress(hrp,htlTransferMsg.getTo().toByteArray()));
         hashTimerLockTransfer.setRecipientOtherChain(Hex.toHexString(htlTransferMsg.getRecipientOtherChain().toByteArray()));
+        hashTimerLockTransfer.setSenderOtherChain(Hex.toHexString(htlTransferMsg.getSenderOtherChain().toByteArray()));
         hashTimerLockTransfer.setRandomNumberHash(Hex.toHexString(htlTransferMsg.getRandomNumberHash().toByteArray()));
         hashTimerLockTransfer.setTimestamp(htlTransferMsg.getTimestamp());
         hashTimerLockTransfer.setOutAmount(htlTransferMsg.getOutAmountList().stream().map(Token::of).collect(Collectors.toList()));

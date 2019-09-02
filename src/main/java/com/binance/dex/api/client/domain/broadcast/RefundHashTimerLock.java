@@ -12,6 +12,6 @@ import lombok.Setter;
 public class RefundHashTimerLock {
 
     private String from;
-    private String randomNumberHash;
+    private String swapID;
 
 }

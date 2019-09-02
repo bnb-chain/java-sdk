@@ -19,6 +19,7 @@ public class HashTimerLockTransfer {
     private String  from;
     private String  to;
     private String  recipientOtherChain;
+    private String  senderOtherChain;
     private String  randomNumberHash;
     private long    timestamp;
     private List<Token> outAmount;

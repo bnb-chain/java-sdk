@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
 
@@ -122,16 +123,21 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     }
 
     @Override
-    public AtomicSwap getAtomicSwapByHash(String randomNumberHash) {
+    public AtomicSwap getSwapByID(String swapID){
         try {
-            JsonRpcResponse<ABCIQueryResult> response = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getSwapByHash("0x01" + randomNumberHash));
-            checkRpcResult(response);
-            byte[] value;
-            if((value = response.getResult().getResponse().getValue()) != null){
-                AtomicSwapInfo atomicSwapInfo = AtomicSwapInfo.parseFrom(value);
-                return convert(atomicSwapInfo);
+            Map.Entry swapIdEntry = Maps.immutableEntry("SwapID", "0x"+swapID);
+            String requestData = "0x" + Hex.toHexString(EncodeUtils.toJsonStringSortKeys(swapIdEntry).getBytes());
+            JsonRpcResponse<ABCIQueryResult> rpcResponse = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getSwapByID(requestData));
+            checkRpcResult(rpcResponse);
+            ABCIQueryResult.Response response = rpcResponse.getResult().getResponse();
+            if (response.getCode() != null) {
+                BinanceDexApiError binanceDexApiError = new BinanceDexApiError();
+                binanceDexApiError.setCode(response.getCode());
+                binanceDexApiError.setMessage(response.getLog());
+                throw new BinanceDexApiException(binanceDexApiError);
             }
-            return null;
+            String swapJson = new String(response.getValue());
+            return EncodeUtils.toObjectFromJsonString(swapJson, AtomicSwap.class);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -296,26 +302,6 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         return infos;
     }
 
-    protected AtomicSwap convert(AtomicSwapInfo atomicSwapInfo){
-        AtomicSwap atomicSwap = new AtomicSwap();
-        atomicSwap.setFrom(Hex.toHexString(atomicSwapInfo.getFrom().toByteArray()));
-        atomicSwap.setTo(Hex.toHexString(atomicSwapInfo.getTo().toByteArray()));
-        atomicSwap.setOutSymbol(atomicSwapInfo.getOutAmount().getDenom());
-        atomicSwap.setOutAmount(atomicSwapInfo.getOutAmount().getAmount());
-        atomicSwap.setInSymbol(atomicSwapInfo.getInAmount().getDenom());
-        atomicSwap.setInAmount(atomicSwapInfo.getInAmount().getAmount());
-        atomicSwap.setExpectedIncome(atomicSwapInfo.getExpectedIncome());
-        atomicSwap.setRecipientOtherChain(Hex.toHexString(atomicSwapInfo.getRecipientOtherChain().toByteArray()));
-        atomicSwap.setRandomNumberHash(Hex.toHexString(atomicSwapInfo.getRandomNumberHash().toByteArray()));
-        atomicSwap.setRandomNumber(Hex.toHexString(atomicSwapInfo.getRandomNumber().toByteArray()));
-        atomicSwap.setTimestamp(atomicSwapInfo.getTimestamp());
-        atomicSwap.setCrossChain(atomicSwapInfo.getCrossChain());
-        atomicSwap.setExpireHeight(atomicSwapInfo.getExpireHeight());
-        atomicSwap.setIndex(atomicSwapInfo.getIndex());
-        atomicSwap.setClosedTime(atomicSwapInfo.getClosedTime());
-        atomicSwap.setStatus(atomicSwapInfo.getStatus());
-        return atomicSwap;
-    }
 
     protected Account convert(AppAccount appAccount) {
         Account account = new Account();

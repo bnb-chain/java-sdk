@@ -12,7 +12,7 @@ import lombok.Setter;
 public class ClaimHashTimerLock {
 
     private String from;
-    private String randomNumberHash;
+    private String swapID;
     private String randomNumber;
 
 }
