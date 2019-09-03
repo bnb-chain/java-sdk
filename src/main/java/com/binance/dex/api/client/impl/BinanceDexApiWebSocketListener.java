@@ -14,9 +14,11 @@ import java.util.Map;
 @Slf4j
 public class BinanceDexApiWebSocketListener extends WebSocketListener {
 
-    protected WebSocketApiCallback callback;
-    protected OkHttpClient client;
-    protected Map<WebSocket, SocketEntity> sockets;
+    private WebSocketApiCallback callback;
+    private OkHttpClient client;
+    private volatile Map<WebSocket, SocketEntity> sockets;
+
+    private volatile long retryInterval = 3000;
 
     public BinanceDexApiWebSocketListener(OkHttpClient client, Map<WebSocket, SocketEntity> sockets, WebSocketApiCallback callback) {
         this.callback = callback;
@@ -59,18 +61,37 @@ public class BinanceDexApiWebSocketListener extends WebSocketListener {
     }
 
     private synchronized void reconnect(WebSocket webSocket) {
-        log.warn("API reconnect {}", webSocket.request().url());
-        SocketEntity entity = sockets.get(webSocket);
-        if (entity != null) {
-            WebSocket ws = client.newWebSocket(entity.getRequest(), entity.getListener());
-            entity.setLastUpdateTime();
-            for (String msg : entity.getMessage()) {
-                log.warn("API resend message {}", msg);
-                ws.send(msg);
+        try {
+            Thread.sleep(nextInterval());
+            log.warn("API reconnect {}", webSocket.request().url());
+            SocketEntity entity = sockets.get(webSocket);
+            if (entity != null) {
+                if (System.currentTimeMillis() - entity.getLastUpdateTime() < 1000) {
+                    retryInterval = 3000;
+                }
+                WebSocket ws = client.newWebSocket(entity.getRequest(), entity.getListener());
+                entity.setLastUpdateTime();
+                for (String msg : entity.getMessage()) {
+                    log.warn("API resend message {}", msg);
+                    ws.send(msg);
+                }
+                sockets.remove(webSocket);
+                sockets.put(ws, entity);
             }
-            sockets.remove(webSocket);
-            sockets.put(ws, entity);
+        } catch (Exception e) {
+            log.error("API reconnect error ", e);
+        } finally {
+            webSocket.close(1000, "close");
         }
-        webSocket.close(1000, "close");
+    }
+
+    private synchronized long nextInterval() {
+        if (retryInterval < 30_000L) {
+            retryInterval *= 2;
+            return retryInterval;
+        } else {
+            retryInterval = 60_000L;
+            return retryInterval;
+        }
     }
 }

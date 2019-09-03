@@ -21,8 +21,7 @@ public class BinanceDexApiWebSocketClientImpl implements BinanceDexApiWebSocketC
     private OkHttpClient client;
     private Map<WebSocket, SocketEntity> sockets;
 
-    //private String webSocketUrl = "wss://dex.binance.org/api";
-    private String webSocketUrl = "wss://testnet-dex.binance.org/api";
+    private String webSocketUrl = BinanceDexEnvironment.PROD.getStreamUrl();
 
     public BinanceDexApiWebSocketClientImpl() {
         this.client = new OkHttpClient.Builder()
@@ -45,13 +44,12 @@ public class BinanceDexApiWebSocketClientImpl implements BinanceDexApiWebSocketC
 
     @Override
     public void onDepthEvent(List<String> symbols, WebSocketApiCallback callback) {
-        StringJoiner sj = new StringJoiner("/");
+        StringJoiner sj = new StringJoiner("/", "stream?streams=", "");
         for (String symbol : symbols) {
             String channel = String.format("%s@marketDepth", symbol);
             sj.add(channel);
         }
-        String combinedChannel = "stream?streams=" + sj.toString();
-        createNewWebSocket(combinedChannel, new BinanceDexApiWebSocketListener(client, sockets, callback));
+        createNewWebSocket(sj.toString(), new BinanceDexApiWebSocketListener(client, sockets, callback));
     }
 
     @Override
@@ -62,13 +60,12 @@ public class BinanceDexApiWebSocketClientImpl implements BinanceDexApiWebSocketC
 
     @Override
     public void onTradeEvent(List<String> symbols, WebSocketApiCallback callback) {
-        StringJoiner sj = new StringJoiner("/");
+        StringJoiner sj = new StringJoiner("/", "stream?streams=", "");
         for (String symbol : symbols) {
             String channel = String.format("%s@trades", symbol);
             sj.add(channel);
         }
-        String combinedChannel = "stream?streams=" + sj.toString();
-        createNewWebSocket(combinedChannel, new BinanceDexApiWebSocketListener(client, sockets, callback));
+        createNewWebSocket(sj.toString(), new BinanceDexApiWebSocketListener(client, sockets, callback));
     }
 
     @Override
