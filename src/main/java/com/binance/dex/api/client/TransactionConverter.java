@@ -178,7 +178,7 @@ public class TransactionConverter {
 
         DepositHashTimerLock depositHashTimerLock = new DepositHashTimerLock();
         depositHashTimerLock.setFrom(Crypto.encodeAddress(hrp,depositHtlMsg.getFrom().toByteArray()));
-        depositHashTimerLock.setOutAmount(depositHtlMsg.getOutAmountList().stream().map(Token::of).collect(Collectors.toList()));
+        depositHashTimerLock.setAmount(depositHtlMsg.getAmountList().stream().map(Token::of).collect(Collectors.toList()));
         depositHashTimerLock.setSwapID(Hex.toHexString(depositHtlMsg.getSwapId().toByteArray()));
 
         Transaction transaction = new Transaction();
@@ -196,11 +196,11 @@ public class TransactionConverter {
         HashTimerLockTransfer hashTimerLockTransfer = new HashTimerLockTransfer();
         hashTimerLockTransfer.setFrom(Crypto.encodeAddress(hrp,htlTransferMsg.getFrom().toByteArray()));
         hashTimerLockTransfer.setTo(Crypto.encodeAddress(hrp,htlTransferMsg.getTo().toByteArray()));
-        hashTimerLockTransfer.setRecipientOtherChain(Hex.toHexString(htlTransferMsg.getRecipientOtherChain().toByteArray()));
-        hashTimerLockTransfer.setSenderOtherChain(Hex.toHexString(htlTransferMsg.getSenderOtherChain().toByteArray()));
+        hashTimerLockTransfer.setRecipientOtherChain(htlTransferMsg.getRecipientOtherChain());
+        hashTimerLockTransfer.setSenderOtherChain(htlTransferMsg.getSenderOtherChain());
         hashTimerLockTransfer.setRandomNumberHash(Hex.toHexString(htlTransferMsg.getRandomNumberHash().toByteArray()));
         hashTimerLockTransfer.setTimestamp(htlTransferMsg.getTimestamp());
-        hashTimerLockTransfer.setOutAmount(htlTransferMsg.getOutAmountList().stream().map(Token::of).collect(Collectors.toList()));
+        hashTimerLockTransfer.setOutAmount(htlTransferMsg.getAmountList().stream().map(Token::of).collect(Collectors.toList()));
         hashTimerLockTransfer.setExpectedIncome(htlTransferMsg.getExpectedIncome());
         hashTimerLockTransfer.setHeightSpan(htlTransferMsg.getHeightSpan());
         hashTimerLockTransfer.setCrossChain(htlTransferMsg.getCrossChain());
