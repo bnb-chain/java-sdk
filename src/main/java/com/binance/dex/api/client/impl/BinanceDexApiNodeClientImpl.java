@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
 
@@ -125,7 +124,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     @Override
     public AtomicSwap getSwapByID(String swapID){
         try {
-            Map.Entry swapIdEntry = Maps.immutableEntry("SwapID", "0x"+swapID);
+            Map.Entry swapIdEntry = Maps.immutableEntry("SwapID", swapID);
             String requestData = "0x" + Hex.toHexString(EncodeUtils.toJsonStringSortKeys(swapIdEntry).getBytes());
             JsonRpcResponse<ABCIQueryResult> rpcResponse = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getSwapByID(requestData));
             checkRpcResult(rpcResponse);
