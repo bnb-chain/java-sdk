@@ -3,6 +3,7 @@ package com.binance.dex.api.client;
 import com.binance.dex.api.client.impl.BinanceDexApiAsyncRestClientImpl;
 import com.binance.dex.api.client.impl.BinanceDexApiNodeClientImpl;
 import com.binance.dex.api.client.impl.BinanceDexApiRestClientImpl;
+import com.binance.dex.api.client.impl.BinanceDexApiWebSocketClientImpl;
 
 public class BinanceDexApiClientFactory {
     private BinanceDexApiClientFactory() {
@@ -34,6 +35,14 @@ public class BinanceDexApiClientFactory {
 
     public BinanceDexApiAsyncRestClient newAsyncRestClient(String baseUrl) {
         return new BinanceDexApiAsyncRestClientImpl(baseUrl);
+    }
+
+    public BinanceDexApiWebSocketClient newWebSocketClient() {
+        return new BinanceDexApiWebSocketClientImpl(BinanceDexEnvironment.PROD.getStreamUrl());
+    }
+
+    public BinanceDexApiWebSocketClient newWebSocketClient(String baseUrl) {
+        return new BinanceDexApiWebSocketClientImpl(baseUrl);
     }
 
 }
