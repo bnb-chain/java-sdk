@@ -21,6 +21,7 @@ public class Transaction {
     private String txHash;
     private String txType;
     private String value;
+    private String memo;
 
     public Long getBlockHeight() {
         return blockHeight;
@@ -134,6 +135,14 @@ public class Transaction {
         this.value = value;
     }
 
+    public String getMemo() {
+        return memo;
+    }
+
+    public void setMemo(String memo) {
+        this.memo = memo;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this, BinanceDexConstants.BINANCE_DEX_TO_STRING_STYLE)
@@ -151,6 +160,7 @@ public class Transaction {
                 .append("txHash", txHash)
                 .append("txType", txType)
                 .append("value", value)
+                .append("memo", memo)
                 .toString();
     }
 }
