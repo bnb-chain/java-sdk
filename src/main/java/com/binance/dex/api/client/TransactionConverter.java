@@ -16,6 +16,7 @@ import com.binance.dex.api.client.domain.broadcast.TokenFreeze;
 import com.binance.dex.api.client.domain.broadcast.TokenUnfreeze;
 import com.binance.dex.api.client.domain.broadcast.Transaction;
 import com.binance.dex.api.client.domain.broadcast.Vote;
+import com.binance.dex.api.client.domain.jsonrpc.TxResult;
 import com.binance.dex.api.client.encoding.Crypto;
 import com.binance.dex.api.client.encoding.message.InputOutput;
 import com.binance.dex.api.client.encoding.message.MessageType;
@@ -25,12 +26,13 @@ import com.binance.dex.api.proto.TimeLock;
 import com.binance.dex.api.proto.TimeRelock;
 import com.binance.dex.api.proto.TimeUnlock;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class TransactionConverter {
@@ -124,11 +126,91 @@ public class TransactionConverter {
                     return convertTimeRelock(bytes);
                 case SetAccountFlag:
                     return convertSetAccountFlag(bytes);
+                case HashTimerLockTransferMsg:
+                    return convertHashTimerLockTransfer(bytes);
+                case DepositHashTimerLockMsg:
+                    return convertDepositHashTimerLock(bytes);
+                case ClaimHashTimerLockMsg:
+                    return convertClaimHashTimerLock(bytes);
+                case RefundHashTimerLockMsg:
+                    return convertRefundHashTimerLock(bytes);
+
             }
             return null;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Transaction convertRefundHashTimerLock(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        RefundHashTimerLockMsg refundHtlMsg = RefundHashTimerLockMsg.parseFrom(array);
+
+        RefundHashTimerLock refundHashTimerLock = new RefundHashTimerLock();
+        refundHashTimerLock.setFrom(Crypto.encodeAddress(hrp,refundHtlMsg.getFrom().toByteArray()));
+        refundHashTimerLock.setSwapID(Hex.toHexString(refundHtlMsg.getSwapId().toByteArray()));
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.REFUND_HTL);
+        transaction.setRealTx(refundHashTimerLock);
+        return transaction;
+    }
+
+    private Transaction convertClaimHashTimerLock(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        ClaimHashTimerLockMsg claimHtlMsg = ClaimHashTimerLockMsg.parseFrom(array);
+
+        ClaimHashTimerLock claimHashTimerLock = new ClaimHashTimerLock();
+        claimHashTimerLock.setFrom(Crypto.encodeAddress(hrp,claimHtlMsg.getFrom().toByteArray()));
+        claimHashTimerLock.setSwapID(Hex.toHexString(claimHtlMsg.getSwapId().toByteArray()));
+        claimHashTimerLock.setRandomNumber(Hex.toHexString(claimHtlMsg.getRandomNumber().toByteArray()));
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.CLAIM_HTL);
+        transaction.setRealTx(claimHashTimerLock);
+        return transaction;
+    }
+
+    private Transaction convertDepositHashTimerLock(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        DepositHashTimerLockMsg depositHtlMsg = DepositHashTimerLockMsg.parseFrom(array);
+
+        DepositHashTimerLock depositHashTimerLock = new DepositHashTimerLock();
+        depositHashTimerLock.setFrom(Crypto.encodeAddress(hrp,depositHtlMsg.getFrom().toByteArray()));
+        depositHashTimerLock.setAmount(depositHtlMsg.getAmountList().stream().map(Token::of).collect(Collectors.toList()));
+        depositHashTimerLock.setSwapID(Hex.toHexString(depositHtlMsg.getSwapId().toByteArray()));
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.DEPOSIT_HTL);
+        transaction.setRealTx(depositHashTimerLock);
+        return transaction;
+    }
+
+
+    private Transaction convertHashTimerLockTransfer(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        HashTimerLockTransferMsg htlTransferMsg = HashTimerLockTransferMsg.parseFrom(array);
+
+        HashTimerLockTransfer hashTimerLockTransfer = new HashTimerLockTransfer();
+        hashTimerLockTransfer.setFrom(Crypto.encodeAddress(hrp,htlTransferMsg.getFrom().toByteArray()));
+        hashTimerLockTransfer.setTo(Crypto.encodeAddress(hrp,htlTransferMsg.getTo().toByteArray()));
+        hashTimerLockTransfer.setRecipientOtherChain(htlTransferMsg.getRecipientOtherChain());
+        hashTimerLockTransfer.setSenderOtherChain(htlTransferMsg.getSenderOtherChain());
+        hashTimerLockTransfer.setRandomNumberHash(Hex.toHexString(htlTransferMsg.getRandomNumberHash().toByteArray()));
+        hashTimerLockTransfer.setTimestamp(htlTransferMsg.getTimestamp());
+        hashTimerLockTransfer.setOutAmount(htlTransferMsg.getAmountList().stream().map(Token::of).collect(Collectors.toList()));
+        hashTimerLockTransfer.setExpectedIncome(htlTransferMsg.getExpectedIncome());
+        hashTimerLockTransfer.setHeightSpan(htlTransferMsg.getHeightSpan());
+        hashTimerLockTransfer.setCrossChain(htlTransferMsg.getCrossChain());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.HTL_TRANSFER);
+        transaction.setRealTx(hashTimerLockTransfer);
+        return transaction;
     }
 
     private Transaction convertSetAccountFlag(byte[] value) throws InvalidProtocolBufferException {

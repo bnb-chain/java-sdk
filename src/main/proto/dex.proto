@@ -122,6 +122,23 @@ message AppAccount {
     repeated Token locked = 4;
 }
 
+message AtomicSwapInfo {
+    bytes from = 1;
+    bytes to   = 2;
+    repeated Token out_amount = 3;
+    repeated Token in_amount = 4;
+    string expected_income = 5;
+    bytes recipient_other_chain = 6;
+    bytes random_number_hash = 7;
+    bytes random_number = 8;
+    int64 timestamp = 9;
+    bool  cross_chain = 10;
+    int64 expire_height = 11;
+    int64 index = 12;
+    int64 closed_time = 13;
+    int32 status = 14;
+}
+
 message TokenInfo{
     string name = 1;
     string symbol = 2;
@@ -291,8 +308,41 @@ message TimeRelock {
 }
 
 message SetAccountFlag {
-    // 
+    // BEA6E301
     bytes from = 1;
     int64 flags =2;
 }
 
+message HashTimerLockTransferMsg {
+    //
+    bytes from = 1;
+    bytes to = 2;
+    string recipient_other_chain = 3;
+    string sender_other_chain = 4;
+    bytes random_number_hash = 5;
+    int64 timestamp = 6;
+    repeated Token amount = 7;
+    string expected_income = 8;
+    int64 height_span = 9;
+    bool  cross_chain = 10;
+}
+
+message DepositHashTimerLockMsg {
+    //
+    bytes from = 1;
+    repeated Token amount = 2;
+    bytes swap_id = 3;
+}
+
+message ClaimHashTimerLockMsg {
+    //
+    bytes from = 1;
+    bytes swap_id = 2;
+    bytes random_number = 3;
+}
+
+message RefundHashTimerLockMsg {
+    //
+    bytes from = 1;
+    bytes swap_id = 2;
+}

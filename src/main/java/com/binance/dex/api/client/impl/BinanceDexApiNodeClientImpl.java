@@ -122,6 +122,27 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     }
 
     @Override
+    public AtomicSwap getSwapByID(String swapID){
+        try {
+            Map.Entry swapIdEntry = Maps.immutableEntry("SwapID", swapID);
+            String requestData = "0x" + Hex.toHexString(EncodeUtils.toJsonStringSortKeys(swapIdEntry).getBytes());
+            JsonRpcResponse<ABCIQueryResult> rpcResponse = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getSwapByID(requestData));
+            checkRpcResult(rpcResponse);
+            ABCIQueryResult.Response response = rpcResponse.getResult().getResponse();
+            if (response.getCode() != null) {
+                BinanceDexApiError binanceDexApiError = new BinanceDexApiError();
+                binanceDexApiError.setCode(response.getCode());
+                binanceDexApiError.setMessage(response.getLog());
+                throw new BinanceDexApiException(binanceDexApiError);
+            }
+            String swapJson = new String(response.getValue());
+            return EncodeUtils.toObjectFromJsonString(swapJson, AtomicSwap.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public List<Transaction> getBlockTransactions(Long height) {
         JsonRpcResponse<BlockInfoResult> response = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi
                 .getBlockTransactions("\"tx.height=" + height.toString() + "\"",TX_SEARCH_PAGE,TX_SEARCH_PERPAGE));
@@ -156,6 +177,8 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
                 transactions.get(0).setHeight(transactionResult.getHeight());
                 transactions.get(0).setHash(transactionResult.getHash());
                 transactions.get(0).setCode(transactionResult.getTxResult().getCode());
+                transactions.get(0).setLog(transactionResult.getTxResult().getLog());
+                transactions.get(0).setTags(transactionResult.getTxResult().getTags());
                 return transactions.get(0);
             }
 

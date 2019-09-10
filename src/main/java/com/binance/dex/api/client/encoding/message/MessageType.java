@@ -28,8 +28,11 @@ public enum MessageType {
     TimeLock("07921531"),
     TimeUnlock("C4050C6C"),
     TimeRelock("504711DA"),
-    SetAccountFlag("BEA6E301");
-
+    SetAccountFlag("BEA6E301"),
+    HashTimerLockTransferMsg("B33F9A24"),
+    DepositHashTimerLockMsg("63986496"),
+    ClaimHashTimerLockMsg("C1665300"),
+    RefundHashTimerLockMsg("3454A27C");
     private byte[] typePrefixBytes;
 
     MessageType(String typePrefix) {

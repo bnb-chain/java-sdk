@@ -18,5 +18,9 @@ public enum TxType {
     TimeLock,
     TimeUnlock,
     TimeRelock,
-    SetAccountFlag
+    SetAccountFlag,
+    HTL_TRANSFER,
+    CLAIM_HTL,
+    REFUND_HTL,
+    DEPOSIT_HTL
 }

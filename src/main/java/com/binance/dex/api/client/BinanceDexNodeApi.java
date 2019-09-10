@@ -20,6 +20,9 @@ public interface BinanceDexNodeApi {
     @GET("/abci_query?path=%22/param/fees%22")
     Call<JsonRpcResponse<ABCIQueryResult>> getFees();
 
+    @GET("abci_query?path=%22custom/atomicSwap/swapid%22")
+    Call<JsonRpcResponse<ABCIQueryResult>> getSwapByID(@Query("data") String data);
+
     @GET("/abci_query?path=%22custom/stake/validators%22")
     Call<JsonRpcResponse<ABCIQueryResult>> getStakeValidators();
 

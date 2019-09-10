@@ -17,9 +17,18 @@ The Binance Chain Java SDK works as a lightweight Java library for interacting w
 <dependency>
     <groupId>com.binance.dex.api</groupId>
     <artifactId>binance-dex-api-client</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.4</version>
 </dependency>
 ```
+# Protobuf
+
+The protobuf-maven-plugin is used in this SDK. It is a plugin that integrates protocol buffers compiler (protoc) into Maven lifecycle. The Plugin generates Java source files from .proto (protocol buffer definition) files for this project by running `mvn compile`. 
+
+These Java source files will be packaged into the final artifact and referenced as imports from the dependent projects or modules by running `mvn clean package`.
+
+More details please refer to https://github.com/xolstice/protobuf-maven-plugin
+
+ 
 
 # API
 
