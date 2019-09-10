@@ -16,6 +16,7 @@ import com.binance.dex.api.client.domain.broadcast.TokenFreeze;
 import com.binance.dex.api.client.domain.broadcast.TokenUnfreeze;
 import com.binance.dex.api.client.domain.broadcast.Transaction;
 import com.binance.dex.api.client.domain.broadcast.Vote;
+import com.binance.dex.api.client.domain.jsonrpc.TxResult;
 import com.binance.dex.api.client.encoding.Crypto;
 import com.binance.dex.api.client.encoding.message.InputOutput;
 import com.binance.dex.api.client.encoding.message.MessageType;
@@ -31,7 +32,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class TransactionConverter {
