@@ -77,4 +77,16 @@ public interface BinanceDexApiRestClient {
 
     List<TransactionMetadata> unfreeze(TokenUnfreeze unfreeze, Wallet wallet, TransactionOption options, boolean sync)
             throws IOException, NoSuchAlgorithmException;
+
+    List<TransactionMetadata> htlt(HtltReq htltReq, Wallet wallet, TransactionOption options, boolean sync)
+            throws IOException, NoSuchAlgorithmException;
+
+    List<TransactionMetadata> depositHtlt(String swapId, List<com.binance.dex.api.client.encoding.message.Token> amount, Wallet wallet, TransactionOption options, boolean sync)
+            throws IOException, NoSuchAlgorithmException;
+
+    List<TransactionMetadata> claimHtlt(String swapId,byte[] randomNumber,Wallet wallet, TransactionOption options, boolean sync)
+            throws IOException, NoSuchAlgorithmException;
+
+    List<TransactionMetadata> refundHtlt(String swapId,Wallet wallet, TransactionOption options, boolean sync)
+            throws IOException, NoSuchAlgorithmException;
 }

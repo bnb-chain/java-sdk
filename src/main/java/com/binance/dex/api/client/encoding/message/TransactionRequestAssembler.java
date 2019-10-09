@@ -6,10 +6,10 @@ import com.binance.dex.api.client.encoding.Crypto;
 import com.binance.dex.api.client.encoding.EncodeUtils;
 import com.binance.dex.api.proto.StdSignature;
 import com.binance.dex.api.proto.StdTx;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.ByteString;
 import okhttp3.RequestBody;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -413,4 +413,140 @@ public class TransactionRequestAssembler {
         byte[] stdTx = encodeStdTx(msg, signature);
         return EncodeUtils.bytesToHex(stdTx);
     }
+
+    public RequestBody buildHtlt(HtltReq htltReq) throws IOException, NoSuchAlgorithmException {
+        return createRequestBody(buildHtltPayload(htltReq));
+    }
+
+    public String buildHtltPayload(HtltReq htltReq) throws IOException, NoSuchAlgorithmException {
+        HtltMessage htltMessage = createHtltMessage(htltReq);
+        byte[] msg = encodeHtltMessage(htltMessage);
+        byte[] signature = encodeSignature(sign(htltMessage));
+        byte[] stdTx = encodeStdTx(msg, signature);
+        return EncodeUtils.bytesToHex(stdTx);
+    }
+
+    @VisibleForTesting
+    public HtltMessage createHtltMessage(HtltReq htltReq){
+        HtltMessage message = new HtltMessage();
+        message.setFrom(wallet.getAddress());
+        message.setTo(htltReq.getRecipient());
+        message.setRecipientOtherChain(htltReq.getRecipientOtherChain());
+        message.setSenderOtherChain(htltReq.getSenderOtherChain());
+        message.setRandomNumberHash(htltReq.getRandomNumberHash());
+        message.setTimestamp(htltReq.getTimestamp());
+        message.setAmount(htltReq.getOutAmount());
+        message.setExpectedIncome(htltReq.getExpectedIncome());
+        message.setHeightSpan(htltReq.getHeightSpan());
+        message.setCrossChain(htltReq.isCrossChain());
+        return message;
+    }
+
+    @VisibleForTesting
+    byte[] encodeHtltMessage(HtltMessage msg)
+            throws IOException {
+        byte[] address = Crypto.decodeAddress(msg.getFrom());
+        byte[] toAddress = Crypto.decodeAddress(msg.getTo());
+        com.binance.dex.api.proto.HashTimerLockTransferMsg.Builder builder = com.binance.dex.api.proto.HashTimerLockTransferMsg.newBuilder();
+        builder.setFrom(ByteString.copyFrom(address));
+        builder.setTo(ByteString.copyFrom(toAddress));
+        builder.setRecipientOtherChain(msg.getRecipientOtherChain());
+        builder.setSenderOtherChain(msg.getSenderOtherChain());
+        builder.setRandomNumberHash(ByteString.copyFrom(msg.getRandomNumberHash()));
+        builder.setTimestamp(msg.getTimestamp());
+        for(Token token : msg.getAmount()){
+            builder.addAmount(com.binance.dex.api.proto.Token.newBuilder().setAmount(token.getAmount()).setDenom(token.getDenom()));
+        }
+        builder.setExpectedIncome(msg.getExpectedIncome());
+        builder.setHeightSpan(msg.getHeightSpan());
+        builder.setCrossChain(msg.getCrossChain());
+        com.binance.dex.api.proto.HashTimerLockTransferMsg proto = builder.build();
+        return EncodeUtils.aminoWrap(proto.toByteArray(), MessageType.HashTimerLockTransferMsg.getTypePrefixBytes(), false);
+    }
+
+    public RequestBody buildDepositHtlt(String swapId, List<Token> amount) throws IOException, NoSuchAlgorithmException {
+        return createRequestBody(buildDepositHtltPayload(swapId,amount));
+    }
+
+    public String buildDepositHtltPayload(String swapId, List<Token> amount) throws IOException, NoSuchAlgorithmException {
+        DepositHtltMessage depositHtltMessage = createDepositHtltMessage(swapId,amount);
+        byte[] msg = encodeDepositHtltMessage(depositHtltMessage);
+        byte[] signature = encodeSignature(sign(depositHtltMessage));
+        byte[] stdTx = encodeStdTx(msg, signature);
+        return EncodeUtils.bytesToHex(stdTx);
+    }
+
+    @VisibleForTesting
+    public DepositHtltMessage createDepositHtltMessage(String swapId, List<Token> amount){
+        DepositHtltMessage message = new DepositHtltMessage();
+        message.setFrom(wallet.getAddress());
+        message.setSwapId(swapId);
+        message.setAmount(amount);
+        return message;
+    }
+
+    @VisibleForTesting
+    public byte[] encodeDepositHtltMessage(DepositHtltMessage msg)
+            throws IOException {
+        byte[] address = Crypto.decodeAddress(msg.getFrom());
+        com.binance.dex.api.proto.DepositHashTimerLockMsg.Builder builder = com.binance.dex.api.proto.DepositHashTimerLockMsg.newBuilder();
+        builder.setFrom(ByteString.copyFrom(address));
+        builder.setSwapId(ByteString.copyFrom(Hex.decode(msg.getSwapId())));
+        for(Token token : msg.getAmount()){
+            builder.addAmount(com.binance.dex.api.proto.Token.newBuilder().setAmount(token.getAmount()).setDenom(token.getDenom()));
+        }
+        com.binance.dex.api.proto.DepositHashTimerLockMsg proto = builder.build();
+        return EncodeUtils.aminoWrap(proto.toByteArray(), MessageType.DepositHashTimerLockMsg.getTypePrefixBytes(), false);
+    }
+
+    public RequestBody buildClaimHtlt(String swapId, byte[] randomNumber) throws IOException, NoSuchAlgorithmException {
+        return createRequestBody(buildClaimHtltPayload(swapId,randomNumber));
+    }
+
+    public String buildClaimHtltPayload(String swapId, byte[] randomNumber) throws IOException, NoSuchAlgorithmException {
+        ClaimHtltMessage claimHtltMessage = new ClaimHtltMessage();
+        claimHtltMessage.setFrom(wallet.getAddress());
+        claimHtltMessage.setRandomNumber(randomNumber);
+        claimHtltMessage.setSwapId(swapId);
+        byte[] msg = encodeClaimHtltMessage(claimHtltMessage);
+        byte[] signature = encodeSignature(sign(claimHtltMessage));
+        byte[] stdTx = encodeStdTx(msg, signature);
+        return EncodeUtils.bytesToHex(stdTx);
+    }
+
+    @VisibleForTesting
+    public byte[] encodeClaimHtltMessage(ClaimHtltMessage msg) throws IOException {
+        byte[] address = Crypto.decodeAddress(msg.getFrom());
+        com.binance.dex.api.proto.ClaimHashTimerLockMsg.Builder builder = com.binance.dex.api.proto.ClaimHashTimerLockMsg.newBuilder();
+        builder.setFrom(ByteString.copyFrom(address));
+        builder.setSwapId(ByteString.copyFrom(Hex.decode(msg.getSwapId())));
+        builder.setRandomNumber(ByteString.copyFrom(msg.getRandomNumber()));
+        com.binance.dex.api.proto.ClaimHashTimerLockMsg proto = builder.build();
+        return EncodeUtils.aminoWrap(proto.toByteArray(), MessageType.ClaimHashTimerLockMsg.getTypePrefixBytes(), false);
+    }
+
+    public RequestBody buildRefundHtlt(String swapId) throws IOException, NoSuchAlgorithmException {
+        return createRequestBody(buildRefundHtltPayload(swapId));
+    }
+
+    public String buildRefundHtltPayload(String swapId) throws IOException, NoSuchAlgorithmException {
+        RefundHtltMessage refundHtltMessage = new RefundHtltMessage();
+        refundHtltMessage.setFrom(wallet.getAddress());
+        refundHtltMessage.setSwapId(swapId);
+        byte[] msg = encodeRefundHtltMessage(refundHtltMessage);
+        byte[] signature = encodeSignature(sign(refundHtltMessage));
+        byte[] stdTx = encodeStdTx(msg, signature);
+        return EncodeUtils.bytesToHex(stdTx);
+    }
+
+    @VisibleForTesting
+    public byte[] encodeRefundHtltMessage(RefundHtltMessage msg) throws IOException {
+        byte[] address = Crypto.decodeAddress(msg.getFrom());
+        com.binance.dex.api.proto.RefundHashTimerLockMsg.Builder builder = com.binance.dex.api.proto.RefundHashTimerLockMsg.newBuilder();
+        builder.setFrom(ByteString.copyFrom(address));
+        builder.setSwapId(ByteString.copyFrom(Hex.decode(msg.getSwapId())));
+        com.binance.dex.api.proto.RefundHashTimerLockMsg proto = builder.build();
+        return EncodeUtils.aminoWrap(proto.toByteArray(), MessageType.RefundHashTimerLockMsg.getTypePrefixBytes(), false);
+    }
+
 }
