@@ -10,7 +10,7 @@ import com.binance.dex.api.client.domain.broadcast.TransactionOption;
 import com.binance.dex.api.client.encoding.EncodeUtils;
 import com.binance.dex.api.client.encoding.message.Token;
 import org.apache.commons.lang3.ArrayUtils;
-import org.bouncycastle.util.encoders.Hex;
+import org.apache.commons.lang3.RandomUtils;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -34,10 +34,9 @@ public class HtltExample {
 
         HtltReq htltReq = new HtltReq();
         htltReq.setRecipient(""); // the recipient
-        htltReq.setRecipientOtherChain("");
-        htltReq.setSenderOtherChain("");
         long timestamp = Instant.now().getEpochSecond();
-        byte[] originData = ArrayUtils.addAll(Hex.decode(wallet.getPrivateKey()), EncodeUtils.long2Bytes(timestamp));
+        byte[] randomNumber = RandomUtils.nextBytes(32); // remember your randomNumber
+        byte[] originData = ArrayUtils.addAll(randomNumber, EncodeUtils.long2Bytes(timestamp));
         htltReq.setRandomNumberHash(EncodeUtils.hashBySHA256(originData));
         htltReq.setTimestamp(timestamp);
         Token token = new Token();
@@ -50,6 +49,5 @@ public class HtltExample {
         TransactionOption options = TransactionOption.DEFAULT_INSTANCE;
         List<TransactionMetadata> resp = client.htlt(htltReq,wallet,options,true);
         System.out.println(resp.get(0).toString());
-
     }
 }

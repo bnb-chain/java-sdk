@@ -419,6 +419,8 @@ public class TransactionRequestAssembler {
     }
 
     public String buildHtltPayload(HtltReq htltReq) throws IOException, NoSuchAlgorithmException {
+        htltReq.setRecipientOtherChain(Optional.ofNullable(htltReq.getRecipientOtherChain()).orElse(""));
+        htltReq.setSenderOtherChain(Optional.ofNullable(htltReq.getSenderOtherChain()).orElse(""));
         HtltMessage htltMessage = createHtltMessage(htltReq);
         byte[] msg = encodeHtltMessage(htltMessage);
         byte[] signature = encodeSignature(sign(htltMessage));

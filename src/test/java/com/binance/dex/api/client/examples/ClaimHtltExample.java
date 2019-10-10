@@ -6,7 +6,6 @@ import com.binance.dex.api.client.BinanceDexEnvironment;
 import com.binance.dex.api.client.Wallet;
 import com.binance.dex.api.client.domain.TransactionMetadata;
 import com.binance.dex.api.client.domain.broadcast.TransactionOption;
-import org.bouncycastle.util.encoders.Hex;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -27,7 +26,7 @@ public class ClaimHtltExample {
                 BinanceDexApiClientFactory.newInstance().newRestClient(BinanceDexEnvironment.TEST_NET.getBaseUrl());
 
         String swapId = ""; // the swap to be claimed
-        byte[] randomNumber = Hex.decode(wallet.getPrivateKey());
+        byte[] randomNumber = new byte[32]; // put in your randomNumber
 
         List<TransactionMetadata> resp = client.claimHtlt(swapId,randomNumber,wallet, TransactionOption.DEFAULT_INSTANCE,true);
         System.out.println(resp.get(0).toString());
