@@ -221,4 +221,37 @@ public class BinanceDexApiRestClientImpl implements BinanceDexApiRestClient {
         RequestBody requestBody = assembler.buildTokenUnfreeze(unfreeze);
         return broadcast(requestBody, sync, wallet);
     }
+
+    @Override
+    public List<TransactionMetadata> htlt(HtltReq htltReq, Wallet wallet, TransactionOption options, boolean sync)
+            throws IOException, NoSuchAlgorithmException {
+        wallet.ensureWalletIsReady(this);
+        TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
+        RequestBody requestBody = assembler.buildHtlt(htltReq);
+        return broadcast(requestBody, sync, wallet);
+    }
+
+    @Override
+    public List<TransactionMetadata> depositHtlt(String swapId, List<com.binance.dex.api.client.encoding.message.Token> amount, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        wallet.ensureWalletIsReady(this);
+        TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
+        RequestBody requestBody = assembler.buildDepositHtlt(swapId,amount);
+        return broadcast(requestBody, sync, wallet);
+    }
+
+    @Override
+    public List<TransactionMetadata> claimHtlt(String swapId, byte[] randomNumber, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        wallet.ensureWalletIsReady(this);
+        TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
+        RequestBody requestBody = assembler.buildClaimHtlt(swapId,randomNumber);
+        return broadcast(requestBody, sync, wallet);
+    }
+
+    @Override
+    public List<TransactionMetadata> refundHtlt(String swapId, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        wallet.ensureWalletIsReady(this);
+        TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
+        RequestBody requestBody = assembler.buildRefundHtlt(swapId);
+        return broadcast(requestBody, sync, wallet);
+    }
 }

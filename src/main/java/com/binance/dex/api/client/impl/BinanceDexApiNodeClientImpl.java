@@ -285,6 +285,62 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         }
     }
 
+    @Override
+    public List<TransactionMetadata> htlt(HtltReq htltReq, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
+            String requestPayload = "0x" + assembler.buildHtltPayload(htltReq);
+            if (sync) {
+                return syncBroadcast(requestPayload, wallet);
+            } else {
+                return asyncBroadcast(requestPayload, wallet);
+            }
+        }
+    }
+
+    @Override
+    public List<TransactionMetadata> depositHtlt(String swapId, List<com.binance.dex.api.client.encoding.message.Token> amount, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
+            String requestPayload = "0x" + assembler.buildDepositHtltPayload(swapId,amount);
+            if (sync) {
+                return syncBroadcast(requestPayload, wallet);
+            } else {
+                return asyncBroadcast(requestPayload, wallet);
+            }
+        }
+    }
+
+    @Override
+    public List<TransactionMetadata> claimHtlt(String swapId, byte[] randomNumber, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
+            String requestPayload = "0x" + assembler.buildClaimHtltPayload(swapId,randomNumber);
+            if (sync) {
+                return syncBroadcast(requestPayload, wallet);
+            } else {
+                return asyncBroadcast(requestPayload, wallet);
+            }
+        }
+    }
+
+    @Override
+    public List<TransactionMetadata> refundHtlt(String swapId, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
+            String requestPayload = "0x" + assembler.buildRefundHtltPayload(swapId);
+            if (sync) {
+                return syncBroadcast(requestPayload, wallet);
+            } else {
+                return asyncBroadcast(requestPayload, wallet);
+            }
+        }
+    }
+
     protected Infos convert(NodeInfos nodeInfos) {
         Infos infos = new Infos();
 
@@ -348,6 +404,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
                 wallet.increaseAccountSequence();
                 transactionMetadata.setHash(commitBroadcastResult.getHash());
                 transactionMetadata.setHeight(commitBroadcastResult.getHeight());
+                transactionMetadata.setLog(commitBroadcastResult.getCheckTx().getLog());
                 transactionMetadata.setOk(true);
             } else {
                 wallet.invalidAccountSequence();
