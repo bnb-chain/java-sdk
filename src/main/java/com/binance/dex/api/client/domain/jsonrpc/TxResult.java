@@ -10,6 +10,7 @@ public class TxResult {
     private String log;
     private Integer code = 0;
     private List<Tag> tags;
+    private List<Event> events;
 
     public byte[] getData() {
         return data;
@@ -43,6 +44,14 @@ public class TxResult {
         this.code = code;
     }
 
+    public List<Event> getEvents() {
+        return events;
+    }
+
+    public void setEvents(List<Event> events) {
+        this.events = events;
+    }
+
     public static class Tag {
         private byte[] key;
         private byte[] value;
@@ -63,4 +72,38 @@ public class TxResult {
             this.value = value;
         }
     }
+
+    public static class Event{
+        private List<Attribute> attributes;
+
+        public List<Attribute> getAttributes() {
+            return attributes;
+        }
+
+        public void setAttributes(List<Attribute> attributes) {
+            this.attributes = attributes;
+        }
+    }
+
+    public static class Attribute{
+        private byte[] key;
+        private byte[] value;
+        public byte[] getKey() {
+            return key;
+        }
+
+        public void setKey(byte[] key) {
+            this.key = key;
+        }
+
+        public byte[] getValue() {
+            return value;
+        }
+
+        public void setValue(byte[] value) {
+            this.value = value;
+        }
+    }
+
+
 }

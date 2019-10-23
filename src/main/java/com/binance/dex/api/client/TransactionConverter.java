@@ -63,6 +63,7 @@ public class TransactionConverter {
                         transaction.setCode(Optional.ofNullable(txMessage.getTx_result()).map(TxResult::getCode).orElse(null));
                         transaction.setLog(Optional.ofNullable(txMessage.getTx_result()).map(TxResult::getLog).orElse(null));
                         transaction.setTags(Optional.ofNullable(txMessage.getTx_result()).map(TxResult::getTags).orElse(null));
+                        transaction.setEvents(Optional.ofNullable(txMessage.getTx_result()).map(TxResult::getEvents).orElse(null));
                         transaction.setMemo(stdTx.getMemo());
                         transaction.setResultData(Optional.ofNullable(txMessage.getTx_result()).map(TxResult::getData).orElse(null));
                         transaction.setSource(stdTx.getSource());

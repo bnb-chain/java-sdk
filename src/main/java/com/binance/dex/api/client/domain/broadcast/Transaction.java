@@ -13,6 +13,7 @@ public class Transaction {
     private TxType txType;
     private Object realTx;
     private List<TxResult.Tag> tags;
+    private List<TxResult.Event> events;
     private byte[] resultData;
     private long source;
     private long sequence;
@@ -103,5 +104,13 @@ public class Transaction {
 
     public void setSequence(long sequence) {
         this.sequence = sequence;
+    }
+
+    public List<TxResult.Event> getEvents() {
+        return events;
+    }
+
+    public void setEvents(List<TxResult.Event> events) {
+        this.events = events;
     }
 }
