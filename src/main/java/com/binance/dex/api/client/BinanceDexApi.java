@@ -65,6 +65,9 @@ public interface BinanceDexApi {
     @GET("api/v1/ticker/24hr")
     Call<List<TickerStatistics>> get24HrPriceStatistics();
 
+    @GET("api/v1/ticker/24hr")
+    Call<List<TickerStatistics>> get24HrPriceStatistics(@Query("symbol") String symbol);
+
     @GET("api/v1/trades")
     Call<TradePage> getTrades(@Query("address") String address,
                               @Query("buyerOrderId") String buyerOrderId, @Query("end") Long end,

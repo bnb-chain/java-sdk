@@ -50,6 +50,8 @@ public interface BinanceDexApiRestClient {
 
     List<TickerStatistics> get24HrPriceStatistics();
 
+    List<TickerStatistics> get24HrPriceStatistics(String symbol);
+
     TradePage getTrades();
 
     TradePage getTrades(TradesRequest request);
@@ -89,4 +91,6 @@ public interface BinanceDexApiRestClient {
 
     List<TransactionMetadata> refundHtlt(String swapId,Wallet wallet, TransactionOption options, boolean sync)
             throws IOException, NoSuchAlgorithmException;
+
+    List<TransactionMetadata> broadcast(String payload,boolean sync);
 }

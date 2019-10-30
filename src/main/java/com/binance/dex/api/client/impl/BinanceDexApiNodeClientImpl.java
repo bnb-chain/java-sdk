@@ -342,6 +342,16 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         }
     }
 
+    @Override
+    public List<TransactionMetadata> broadcast(String payload, boolean sync) {
+        payload = "0x" + payload;
+        if (sync) {
+            return syncBroadcast(payload);
+        } else {
+            return asyncBroadcast(payload);
+        }
+    }
+
     protected Infos convert(NodeInfos nodeInfos) {
         Infos infos = new Infos();
 
@@ -419,6 +429,52 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
             throw new RuntimeException(e);
         }
     }
+
+    protected List<TransactionMetadata> syncBroadcast(String requestBody) {
+        try {
+            JsonRpcResponse<CommitBroadcastResult> rpcResponse = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.commitBroadcast(requestBody));
+            CommitBroadcastResult commitBroadcastResult = rpcResponse.getResult();
+            TransactionMetadata transactionMetadata = new TransactionMetadata();
+            transactionMetadata.setCode(commitBroadcastResult.getCheckTx().getCode());
+            if (commitBroadcastResult.getHeight() != null && StringUtils.isNoneBlank(commitBroadcastResult.getHash()) && transactionMetadata.getCode() == 0) {
+                transactionMetadata.setHash(commitBroadcastResult.getHash());
+                transactionMetadata.setHeight(commitBroadcastResult.getHeight());
+                transactionMetadata.setLog(commitBroadcastResult.getCheckTx().getLog());
+                transactionMetadata.setOk(true);
+            } else {
+                transactionMetadata.setLog(commitBroadcastResult.getCheckTx().getLog());
+                transactionMetadata.setOk(false);
+            }
+
+            return Lists.newArrayList(transactionMetadata);
+        } catch (BinanceDexApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected List<TransactionMetadata> asyncBroadcast(String requestBody) {
+        try {
+            JsonRpcResponse<AsyncBroadcastResult> rpcResponse = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.asyncBroadcast(requestBody));
+            AsyncBroadcastResult asyncBroadcastResult = rpcResponse.getResult();
+            TransactionMetadata transactionMetadata = new TransactionMetadata();
+
+            transactionMetadata.setCode(asyncBroadcastResult.getCode());
+            transactionMetadata.setLog(asyncBroadcastResult.getLog());
+
+            if (asyncBroadcastResult.getCode() == 0) {
+                transactionMetadata.setHash(asyncBroadcastResult.getHash());
+                transactionMetadata.setData(asyncBroadcastResult.getData());
+                transactionMetadata.setOk(true);
+            } else {
+                transactionMetadata.setOk(false);
+            }
+
+            return Lists.newArrayList(transactionMetadata);
+        } catch (BinanceDexApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     protected List<TransactionMetadata> asyncBroadcast(String requestBody, Wallet wallet) {
         try {
