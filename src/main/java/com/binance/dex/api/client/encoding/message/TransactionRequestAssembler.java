@@ -93,7 +93,7 @@ public class TransactionRequestAssembler {
         return EncodeUtils.aminoWrap(stdTx.toByteArray(), MessageType.StdTx.getTypePrefixBytes(), true);
     }
 
-    private RequestBody createRequestBody(String payload) {
+    public RequestBody createRequestBody(String payload) {
         return RequestBody.create(MEDIA_TYPE, payload);
     }
 

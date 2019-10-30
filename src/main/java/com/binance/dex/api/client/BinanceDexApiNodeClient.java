@@ -108,6 +108,11 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
     }
 
     @Override
+    default List<TickerStatistics> get24HrPriceStatistics(String symbol) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     default TradePage getTrades() {
         throw new UnsupportedOperationException();
     }
