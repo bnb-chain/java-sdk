@@ -178,8 +178,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
                 transactions.get(0).setHash(transactionResult.getHash());
                 transactions.get(0).setCode(transactionResult.getTxResult().getCode());
                 transactions.get(0).setLog(transactionResult.getTxResult().getLog());
-                transactions.get(0).setTags(transactionResult.getTxResult().getTags());
-                transactions.get(0).setEvents(transactionResult.getTxResult().getEvents());
+                transactionConverter.fillTagsAndEvents(transactionResult.getTxResult(),transactions.get(0));
                 return transactions.get(0);
             }
 

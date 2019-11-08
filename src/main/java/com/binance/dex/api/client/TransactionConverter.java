@@ -29,10 +29,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.time.Instant;
-import java.util.Date;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class TransactionConverter {
@@ -62,17 +60,48 @@ public class TransactionConverter {
                         transaction.setHeight(txMessage.getHeight());
                         transaction.setCode(Optional.ofNullable(txMessage.getTx_result()).map(TxResult::getCode).orElse(null));
                         transaction.setLog(Optional.ofNullable(txMessage.getTx_result()).map(TxResult::getLog).orElse(null));
-                        transaction.setTags(Optional.ofNullable(txMessage.getTx_result()).map(TxResult::getTags).orElse(null));
-                        transaction.setEvents(Optional.ofNullable(txMessage.getTx_result()).map(TxResult::getEvents).orElse(null));
                         transaction.setMemo(stdTx.getMemo());
                         transaction.setResultData(Optional.ofNullable(txMessage.getTx_result()).map(TxResult::getData).orElse(null));
                         transaction.setSource(stdTx.getSource());
                         transaction.setSequence(stdSignature.getSequence());
+                        fillTagsAndEvents(txMessage.getTx_result(),transaction);
                         return transaction;
                     }).filter(Objects::nonNull).collect(Collectors.toList());
         } catch (InvalidProtocolBufferException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void fillTagsAndEvents(TxResult txResult,Transaction transaction){
+        boolean hasTags = txResult.getTags() != null && txResult.getTags().size() > 0;
+        boolean hasEvents = txResult.getEvents() != null && txResult.getEvents().size() > 0
+                && txResult.getEvents().get(0).getAttributes() != null
+                && txResult.getEvents().get(0).getAttributes().size() > 0;
+        if(hasTags && !hasEvents){
+            transaction.setTags(txResult.getTags());
+            List<TxResult.Attribute> attributes = txResult.getTags().stream().map(this::convertOf).collect(Collectors.toList());
+            TxResult.Event event = new TxResult.Event();
+            event.setAttributes(attributes);
+            transaction.setEvents(Collections.singletonList(event));
+        }else if(hasEvents && !hasTags){
+            transaction.setEvents(txResult.getEvents());
+            List<TxResult.Tag> tags = txResult.getEvents().get(0).getAttributes().stream().map(this::convertOf).collect(Collectors.toList());
+            transaction.setTags(tags);
+        }
+    }
+
+    private TxResult.Attribute convertOf(TxResult.Tag tag){
+        TxResult.Attribute attribute = new TxResult.Attribute();
+        attribute.setKey(tag.getKey());
+        attribute.setValue(tag.getValue());
+        return attribute;
+    }
+
+    private TxResult.Tag convertOf(TxResult.Attribute attribute){
+        TxResult.Tag tag = new TxResult.Tag();
+        tag.setKey(attribute.getKey());
+        tag.setValue(attribute.getValue());
+        return tag;
     }
 
     public int getStartIndex(byte[] bytes) {
