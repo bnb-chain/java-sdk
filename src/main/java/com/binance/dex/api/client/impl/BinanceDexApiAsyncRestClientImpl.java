@@ -6,6 +6,7 @@ import com.binance.dex.api.client.domain.request.ClosedOrdersRequest;
 import com.binance.dex.api.client.domain.request.OpenOrdersRequest;
 import com.binance.dex.api.client.domain.request.TradesRequest;
 import com.binance.dex.api.client.domain.request.TransactionsRequest;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +16,14 @@ public class BinanceDexApiAsyncRestClientImpl implements BinanceDexApiAsyncRestC
 
     public BinanceDexApiAsyncRestClientImpl(String baseUrl) {
         this.binanceDexApi = BinanceDexApiClientGenerator.createService(BinanceDexApi.class, baseUrl);
+    }
+
+    public BinanceDexApiAsyncRestClientImpl(String baseUrl,String apiKey){
+        if(StringUtils.isBlank(apiKey)){
+            this.binanceDexApi = BinanceDexApiClientGenerator.createService(BinanceDexApi.class, baseUrl);
+        }else{
+            this.binanceDexApi = BinanceDexApiClientGenerator.createService(BinanceDexApi.class,apiKey,baseUrl + "/internal/");
+        }
     }
 
     @Override

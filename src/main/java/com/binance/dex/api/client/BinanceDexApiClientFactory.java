@@ -41,6 +41,10 @@ public class BinanceDexApiClientFactory {
         return new BinanceDexApiAsyncRestClientImpl(baseUrl);
     }
 
+    public BinanceDexApiAsyncRestClient newAsyncRestClient(String baseUrl,String apiKey) {
+        return new BinanceDexApiAsyncRestClientImpl(baseUrl,apiKey);
+    }
+
     public BinanceDexApiWebSocketClient newWebSocketClient() {
         return new BinanceDexApiWebSocketClientImpl(BinanceDexEnvironment.PROD.getStreamUrl());
     }
