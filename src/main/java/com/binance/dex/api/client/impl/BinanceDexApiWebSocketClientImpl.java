@@ -3,6 +3,8 @@ package com.binance.dex.api.client.impl;
 import com.binance.dex.api.client.BinanceDexApiWebSocketClient;
 import com.binance.dex.api.client.BinanceDexEnvironment;
 import com.binance.dex.api.client.WebSocketApiCallback;
+import com.binance.dex.api.client.domain.ws.AccountUpdateEvent;
+import com.binance.dex.api.client.domain.ws.OrdersUpdateEvent;
 import com.binance.dex.api.client.domain.ws.SocketEntity;
 import com.google.common.collect.Maps;
 import okhttp3.OkHttpClient;
@@ -72,6 +74,30 @@ public class BinanceDexApiWebSocketClientImpl implements BinanceDexApiWebSocketC
     public void onUserEvent(String address, WebSocketApiCallback callback) {
         final String channel = String.format("ws/%s", address);
         createNewWebSocket(channel, new BinanceDexApiWebSocketListener(client, sockets, callback));
+    }
+
+
+
+    @Override
+    public void onAccountUpdateEvent(String address, WebSocketApiCallback<AccountUpdateEvent> callback) {
+        final String channel = String.format("ws/%s", address);
+        WebSocketApiCallback<AccountUpdateEvent> onAccountCallBack = response -> {
+            if (response.getStream().equals("accounts")){
+                callback.onResponse(response);
+            }
+        };
+        createNewWebSocket(channel, new BinanceDexApiWebSocketListener(client, sockets, AccountUpdateEvent.class, onAccountCallBack));
+    }
+
+    @Override
+     public void onOrderUpdateEvent(String address, WebSocketApiCallback<OrdersUpdateEvent> callback) {
+        final String channel = String.format("ws/%s", address);
+        WebSocketApiCallback<OrdersUpdateEvent> onOrderCallBack = response -> {
+            if (response.getStream().equals("orders")){
+                callback.onResponse(response);
+            }
+        };
+        createNewWebSocket(channel, new BinanceDexApiWebSocketListener(client, sockets, OrdersUpdateEvent.class, onOrderCallBack));
     }
 
     private synchronized void createNewWebSocket(String channel, WebSocketListener listener) {

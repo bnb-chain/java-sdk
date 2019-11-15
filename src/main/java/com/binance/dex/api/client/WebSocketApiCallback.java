@@ -1,7 +1,7 @@
 package com.binance.dex.api.client;
 
-public interface WebSocketApiCallback {
+public interface WebSocketApiCallback<T> {
 
-    void onResponse(String response) throws Exception;
+    void onResponse(T response) throws Exception;
 
 }
