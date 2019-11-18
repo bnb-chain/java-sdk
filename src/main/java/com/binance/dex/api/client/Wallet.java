@@ -100,11 +100,14 @@ public class Wallet {
         if (this.usePreviousSequence && this.sequence < this.previousSequence) {
             this.sequence = this.previousSequence;
         }
+        this.previousSequence = this.sequence;
     }
 
     public synchronized void increaseAccountSequence() {
-        if (this.sequence != null)
+        if (this.sequence != null){
             this.sequence++;
+            this.previousSequence = this.sequence;
+        }
     }
 
     public synchronized void decreaseAccountSequence() {
