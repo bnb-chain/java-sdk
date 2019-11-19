@@ -35,7 +35,11 @@ public class Wallet {
 
     public Wallet(String privateKey, BinanceDexEnvironment env, Boolean usePreviousSequence){
         this(privateKey,env);
-        this.usePreviousSequence = usePreviousSequence;
+        if (usePreviousSequence == null) {
+            this.usePreviousSequence = false;
+        }else{
+            this.usePreviousSequence = usePreviousSequence;
+        }
     }
 
     public Wallet(String privateKey, BinanceDexEnvironment env) {
