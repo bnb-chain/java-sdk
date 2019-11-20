@@ -19,6 +19,8 @@ import java.util.Map;
 
 public class Wallet {
     private final static Map<BinanceDexEnvironment, String> CHAIN_IDS = new HashMap<>();
+    private Long previousSequence = null;
+    private Boolean usePreviousSequence;
     private String privateKey;
     private LedgerKey ledgerKey;
     private String address;
@@ -31,10 +33,21 @@ public class Wallet {
 
     private String chainId;
 
+    public Wallet(String privateKey, BinanceDexEnvironment env, Boolean usePreviousSequence){
+        this(privateKey,env);
+        if (usePreviousSequence == null) {
+            this.usePreviousSequence = false;
+        }else{
+            this.usePreviousSequence = usePreviousSequence;
+        }
+    }
+
     public Wallet(String privateKey, BinanceDexEnvironment env) {
         if (!StringUtils.isEmpty(privateKey)) {
             this.privateKey = privateKey;
             this.env = env;
+            this.usePreviousSequence = false;
+            this.previousSequence = 0L;
             this.ecKey = ECKey.fromPrivate(new BigInteger(privateKey, 16));
             this.address = Crypto.getAddressFromECKey(this.ecKey, env.getHrp());
             this.addressBytes = Crypto.decodeAddress(this.address);
@@ -60,8 +73,8 @@ public class Wallet {
         System.arraycopy(pubKeyPrefix, 0, this.pubKeyForSign, 0, pubKeyPrefix.length);
         pubKeyForSign[pubKeyPrefix.length] = (byte) 33;
         System.arraycopy(pubKey, 0, this.pubKeyForSign, pubKeyPrefix.length + 1, pubKey.length);
-        this.accountNumber = new Integer(0);
-        this.sequence = new Long(0);
+        this.accountNumber = 0;
+        this.sequence = 0L;
     }
 
     public static Wallet createRandomWallet(BinanceDexEnvironment env) throws IOException {
@@ -88,11 +101,17 @@ public class Wallet {
     public synchronized void reloadAccountSequence(BinanceDexApiRestClient client) {
         AccountSequence accountSequence = client.getAccountSequence(this.address);
         this.sequence = accountSequence.getSequence();
+        if (this.usePreviousSequence && this.sequence < this.previousSequence) {
+            this.sequence = this.previousSequence;
+        }
+        this.previousSequence = this.sequence;
     }
 
     public synchronized void increaseAccountSequence() {
-        if (this.sequence != null)
+        if (this.sequence != null){
             this.sequence++;
+            this.previousSequence = this.sequence;
+        }
     }
 
     public synchronized void decreaseAccountSequence() {
@@ -119,6 +138,7 @@ public class Wallet {
     }
 
     public synchronized void invalidAccountSequence() {
+        this.previousSequence = sequence;
         this.sequence = null;
     }
 
