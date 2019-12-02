@@ -81,7 +81,7 @@ public class BinanceDexApiClientGenerator {
                     BinanceDexApiError apiError = getBinanceApiError(response);
                     throw new BinanceDexApiException(apiError);
                 } catch (IOException e) {
-                    throw new BinanceDexApiException(response.toString(), e);
+                    throw new BinanceDexApiException(response.code(), response.toString());
                 }
             }
         } catch (IOException e) {

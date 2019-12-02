@@ -13,6 +13,13 @@ public class BinanceDexApiException extends RuntimeException {
         super(cause);
     }
 
+    public BinanceDexApiException(int code,String message){
+        BinanceDexApiError apiError = new BinanceDexApiError();
+        apiError.setCode(code);
+        apiError.setMessage(message);
+        this.error = apiError;
+    }
+
     public BinanceDexApiException(String message, Throwable cause) {
         super(message, cause);
     }
