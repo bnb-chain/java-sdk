@@ -112,12 +112,12 @@ public class BinanceDexApiAsyncRestClientImpl implements BinanceDexApiAsyncRestC
 
     @Override
     public void getClosedOrders(ClosedOrdersRequest request, BinanceDexApiCallback<OrderList> callback) {
-        String sidStr = request.getSide() == null ? null : request.getSide().name();
+        Integer side = request.getSide() == null ? null : (int)(request.getSide().toValue());
         List<String> statusStrList = null;
         if (request.getStatus() != null)
             statusStrList = request.getStatus().stream().map(s -> s.name()).collect(Collectors.toList());
         binanceDexApi.getClosedOrders(request.getAddress(), request.getEnd(), request.getLimit(),
-                request.getLimit(), sidStr, request.getStart(), statusStrList, request.getSymbol(),
+                request.getLimit(), side, request.getStart(), statusStrList, request.getSymbol(),
                 request.getTotal()).enqueue(new BinanceDexApiCallbackAdapter<>(callback));
     }
 
@@ -139,11 +139,11 @@ public class BinanceDexApiAsyncRestClientImpl implements BinanceDexApiAsyncRestC
 
     @Override
     public void getTrades(TradesRequest request, BinanceDexApiCallback<TradePage> callback) {
-        String sideStr = request.getSide() == null ? null : request.getSide().name();
+        Integer side = request.getSide() == null ? null : (int)(request.getSide().toValue());
         binanceDexApi.getTrades(
                 request.getAddress(), request.getBuyerOrderId(),
                 request.getEnd(), request.getHeight(), request.getLimit(), request.getOffset(),
-                request.getQuoteAsset(), request.getSellerOrderId(), sideStr,
+                request.getQuoteAsset(), request.getSellerOrderId(), side,
                 request.getStart(), request.getSymbol(), request.getTotal()).enqueue(
                 new BinanceDexApiCallbackAdapter<>(callback));
     }
