@@ -55,7 +55,7 @@ public interface BinanceDexApi {
     @GET("api/v1/orders/closed")
     Call<OrderList> getClosedOrders(@Query("address") String address, @Query("end") Long end,
                                     @Query("limit") Integer limit, @Query("offset") Integer offset,
-                                    @Query("side") String side, @Query("start") Long start,
+                                    @Query("side") Integer side, @Query("start") Long start,
                                     @Query("status") List<String> status, @Query("symbol") String symbol,
                                     @Query("total") Integer total);
 
@@ -73,7 +73,7 @@ public interface BinanceDexApi {
                               @Query("buyerOrderId") String buyerOrderId, @Query("end") Long end,
                               @Query("height") Long height, @Query("limit") Integer limit,
                               @Query("offset") Integer offset, @Query("quoteAsset") String quoteAsset,
-                              @Query("sellerOrderId") String sellerOrderId, @Query("side") String side,
+                              @Query("sellerOrderId") String sellerOrderId, @Query("side") Integer side,
                               @Query("start") Long start, @Query("symbol") String symbol, @Query("total") Integer total);
 
     @GET("api/v1/transactions")
