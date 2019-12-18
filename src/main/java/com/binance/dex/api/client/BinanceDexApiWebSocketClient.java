@@ -1,6 +1,5 @@
 package com.binance.dex.api.client;
 
-import com.binance.dex.api.client.domain.Account;
 import com.binance.dex.api.client.domain.ws.AccountUpdateEvent;
 import com.binance.dex.api.client.domain.ws.OrdersUpdateEvent;
 
@@ -20,9 +19,5 @@ public interface BinanceDexApiWebSocketClient {
 
     void onAccountUpdateEvent(String address, WebSocketApiCallback<AccountUpdateEvent> callback);
 
-    void onAccountUpdateEvent(String address,String apiKey, WebSocketApiCallback<AccountUpdateEvent> callback);
-
     void onOrderUpdateEvent(String address, WebSocketApiCallback<OrdersUpdateEvent> callback);
-
-    void onOrderUpdateEvent(String address,String apiKey, WebSocketApiCallback<OrdersUpdateEvent> callback);
 }
