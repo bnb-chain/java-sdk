@@ -53,4 +53,8 @@ public class BinanceDexApiClientFactory {
         return new BinanceDexApiWebSocketClientImpl(baseUrl);
     }
 
+    public BinanceDexApiWebSocketClient newWebSocketClient(String baseUrl,String apiKey) {
+        return new BinanceDexApiWebSocketClientImpl(baseUrl,apiKey);
+    }
+
 }

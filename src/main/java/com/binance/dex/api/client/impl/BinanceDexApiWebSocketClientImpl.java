@@ -11,6 +11,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ public class BinanceDexApiWebSocketClientImpl implements BinanceDexApiWebSocketC
 
     private OkHttpClient client;
     private Map<WebSocket, SocketEntity> sockets;
+    private String apiKey;
 
     private String webSocketUrl = BinanceDexEnvironment.PROD.getStreamUrl();
 
@@ -35,6 +37,12 @@ public class BinanceDexApiWebSocketClientImpl implements BinanceDexApiWebSocketC
 
     public BinanceDexApiWebSocketClientImpl(String url) {
         this();
+        this.webSocketUrl = url;
+    }
+
+    public BinanceDexApiWebSocketClientImpl(String url,String apiKey) {
+        this();
+        this.apiKey = apiKey;
         this.webSocketUrl = url;
     }
 
@@ -72,26 +80,23 @@ public class BinanceDexApiWebSocketClientImpl implements BinanceDexApiWebSocketC
 
     @Override
     public void onUserEvent(String address, WebSocketApiCallback callback) {
-        final String channel = String.format("ws/%s", address);
+        String channel;
+        if(StringUtils.isNotBlank(this.apiKey)){
+            channel = String.format("ws/%s?apikey=%s",address,apiKey);
+        } else {
+            channel = String.format("ws/%s", address);
+        }
         createNewWebSocket(channel, new BinanceDexApiWebSocketListener(client, sockets, callback));
     }
 
-
-
     @Override
     public void onAccountUpdateEvent(String address, WebSocketApiCallback<AccountUpdateEvent> callback) {
-        final String channel = String.format("ws/%s", address);
-        WebSocketApiCallback<AccountUpdateEvent> onAccountCallBack = response -> {
-            if (response.getStream().equals("accounts")){
-                callback.onResponse(response);
-            }
-        };
-        createNewWebSocket(channel, new BinanceDexApiWebSocketListener(client, sockets, AccountUpdateEvent.class, onAccountCallBack));
-    }
-
-    @Override
-    public void onAccountUpdateEvent(String address, String apiKey,WebSocketApiCallback<AccountUpdateEvent> callback) {
-        final String channel = String.format("ws/%s?apikey=%s", address,apiKey);
+        String channel;
+        if(StringUtils.isNotBlank(this.apiKey)){
+            channel = String.format("ws/%s?apikey=%s",address,apiKey);
+        } else {
+            channel = String.format("ws/%s", address);
+        }
         WebSocketApiCallback<AccountUpdateEvent> onAccountCallBack = response -> {
             if (response.getStream().equals("accounts")){
                 callback.onResponse(response);
@@ -102,18 +107,12 @@ public class BinanceDexApiWebSocketClientImpl implements BinanceDexApiWebSocketC
 
     @Override
      public void onOrderUpdateEvent(String address, WebSocketApiCallback<OrdersUpdateEvent> callback) {
-        final String channel = String.format("ws/%s", address);
-        WebSocketApiCallback<OrdersUpdateEvent> onOrderCallBack = response -> {
-            if (response.getStream().equals("orders")){
-                callback.onResponse(response);
-            }
-        };
-        createNewWebSocket(channel, new BinanceDexApiWebSocketListener(client, sockets, OrdersUpdateEvent.class, onOrderCallBack));
-    }
-
-    @Override
-    public void onOrderUpdateEvent(String address,String apiKey, WebSocketApiCallback<OrdersUpdateEvent> callback) {
-        final String channel = String.format("ws/%s?apikey=%s", address,apiKey);
+        String channel;
+        if(StringUtils.isNotBlank(this.apiKey)){
+            channel = String.format("ws/%s?apikey=%s",address,apiKey);
+        } else {
+            channel = String.format("ws/%s", address);
+        }
         WebSocketApiCallback<OrdersUpdateEvent> onOrderCallBack = response -> {
             if (response.getStream().equals("orders")){
                 callback.onResponse(response);
