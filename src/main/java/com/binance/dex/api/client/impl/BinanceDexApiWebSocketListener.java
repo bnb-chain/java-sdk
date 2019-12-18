@@ -53,7 +53,7 @@ public class BinanceDexApiWebSocketListener<T> extends WebSocketListener {
 
     @Override
     public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-        log.error("API failed {}", webSocket.request().url());
+        log.error("API failed {}", webSocket.request().url(),t);
         if (response != null) {
             ResponseBody body = response.body();
             if (body != null) {
