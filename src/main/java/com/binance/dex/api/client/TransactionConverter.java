@@ -5,6 +5,8 @@ import com.binance.dex.api.client.domain.broadcast.*;
 import com.binance.dex.api.client.domain.broadcast.Burn;
 import com.binance.dex.api.client.domain.broadcast.CancelOrder;
 import com.binance.dex.api.client.domain.broadcast.CreateValidator;
+import com.binance.dex.api.client.domain.broadcast.MiniTokenIssue;
+import com.binance.dex.api.client.domain.broadcast.MiniTokenSetURI;
 import com.binance.dex.api.client.domain.broadcast.RemoveValidator;
 import com.binance.dex.api.client.domain.broadcast.Deposit;
 import com.binance.dex.api.client.domain.broadcast.Issue;
@@ -37,7 +39,7 @@ public class TransactionConverter {
 
     private String hrp;
 
-    public TransactionConverter(String hrp){
+    public TransactionConverter(String hrp) {
         this.hrp = hrp;
     }
 
@@ -64,7 +66,7 @@ public class TransactionConverter {
                         transaction.setResultData(Optional.ofNullable(txMessage.getTx_result()).map(TxResult::getData).orElse(null));
                         transaction.setSource(stdTx.getSource());
                         transaction.setSequence(stdSignature.getSequence());
-                        fillTagsAndEvents(txMessage.getTx_result(),transaction);
+                        fillTagsAndEvents(txMessage.getTx_result(), transaction);
                         return transaction;
                     }).filter(Objects::nonNull).collect(Collectors.toList());
         } catch (InvalidProtocolBufferException e) {
@@ -72,32 +74,32 @@ public class TransactionConverter {
         }
     }
 
-    public void fillTagsAndEvents(TxResult txResult,Transaction transaction){
+    public void fillTagsAndEvents(TxResult txResult, Transaction transaction) {
         boolean hasTags = txResult.getTags() != null && txResult.getTags().size() > 0;
         boolean hasEvents = txResult.getEvents() != null && txResult.getEvents().size() > 0
                 && txResult.getEvents().get(0).getAttributes() != null
                 && txResult.getEvents().get(0).getAttributes().size() > 0;
-        if(hasTags && !hasEvents){
+        if (hasTags && !hasEvents) {
             transaction.setTags(txResult.getTags());
             List<TxResult.Attribute> attributes = txResult.getTags().stream().map(this::convertOf).collect(Collectors.toList());
             TxResult.Event event = new TxResult.Event();
             event.setAttributes(attributes);
             transaction.setEvents(Collections.singletonList(event));
-        }else if(hasEvents && !hasTags){
+        } else if (hasEvents && !hasTags) {
             transaction.setEvents(txResult.getEvents());
             List<TxResult.Tag> tags = txResult.getEvents().get(0).getAttributes().stream().map(this::convertOf).collect(Collectors.toList());
             transaction.setTags(tags);
         }
     }
 
-    private TxResult.Attribute convertOf(TxResult.Tag tag){
+    private TxResult.Attribute convertOf(TxResult.Tag tag) {
         TxResult.Attribute attribute = new TxResult.Attribute();
         attribute.setKey(tag.getKey());
         attribute.setValue(tag.getValue());
         return attribute;
     }
 
-    private TxResult.Tag convertOf(TxResult.Attribute attribute){
+    private TxResult.Tag convertOf(TxResult.Attribute attribute) {
         TxResult.Tag tag = new TxResult.Tag();
         tag.setKey(attribute.getKey());
         tag.setValue(attribute.getValue());
@@ -164,6 +166,10 @@ public class TransactionConverter {
                     return convertClaimHashTimerLock(bytes);
                 case RefundHashTimerLockMsg:
                     return convertRefundHashTimerLock(bytes);
+                case MiniTokenIssue:
+                    return convertMiniTokenIssue(bytes);
+                case MiniTokenSetURI:
+                    return convertMiniTokenSetURI(bytes);
 
             }
             return null;
@@ -172,13 +178,14 @@ public class TransactionConverter {
         }
     }
 
+
     private Transaction convertRefundHashTimerLock(byte[] value) throws InvalidProtocolBufferException {
         byte[] array = new byte[value.length - 4];
         System.arraycopy(value, 4, array, 0, array.length);
         RefundHashTimerLockMsg refundHtlMsg = RefundHashTimerLockMsg.parseFrom(array);
 
         RefundHashTimerLock refundHashTimerLock = new RefundHashTimerLock();
-        refundHashTimerLock.setFrom(Crypto.encodeAddress(hrp,refundHtlMsg.getFrom().toByteArray()));
+        refundHashTimerLock.setFrom(Crypto.encodeAddress(hrp, refundHtlMsg.getFrom().toByteArray()));
         refundHashTimerLock.setSwapID(Hex.toHexString(refundHtlMsg.getSwapId().toByteArray()));
 
         Transaction transaction = new Transaction();
@@ -193,7 +200,7 @@ public class TransactionConverter {
         ClaimHashTimerLockMsg claimHtlMsg = ClaimHashTimerLockMsg.parseFrom(array);
 
         ClaimHashTimerLock claimHashTimerLock = new ClaimHashTimerLock();
-        claimHashTimerLock.setFrom(Crypto.encodeAddress(hrp,claimHtlMsg.getFrom().toByteArray()));
+        claimHashTimerLock.setFrom(Crypto.encodeAddress(hrp, claimHtlMsg.getFrom().toByteArray()));
         claimHashTimerLock.setSwapID(Hex.toHexString(claimHtlMsg.getSwapId().toByteArray()));
         claimHashTimerLock.setRandomNumber(Hex.toHexString(claimHtlMsg.getRandomNumber().toByteArray()));
 
@@ -209,7 +216,7 @@ public class TransactionConverter {
         DepositHashTimerLockMsg depositHtlMsg = DepositHashTimerLockMsg.parseFrom(array);
 
         DepositHashTimerLock depositHashTimerLock = new DepositHashTimerLock();
-        depositHashTimerLock.setFrom(Crypto.encodeAddress(hrp,depositHtlMsg.getFrom().toByteArray()));
+        depositHashTimerLock.setFrom(Crypto.encodeAddress(hrp, depositHtlMsg.getFrom().toByteArray()));
         depositHashTimerLock.setAmount(depositHtlMsg.getAmountList().stream().map(Token::of).collect(Collectors.toList()));
         depositHashTimerLock.setSwapID(Hex.toHexString(depositHtlMsg.getSwapId().toByteArray()));
 
@@ -226,8 +233,8 @@ public class TransactionConverter {
         HashTimerLockTransferMsg htlTransferMsg = HashTimerLockTransferMsg.parseFrom(array);
 
         HashTimerLockTransfer hashTimerLockTransfer = new HashTimerLockTransfer();
-        hashTimerLockTransfer.setFrom(Crypto.encodeAddress(hrp,htlTransferMsg.getFrom().toByteArray()));
-        hashTimerLockTransfer.setTo(Crypto.encodeAddress(hrp,htlTransferMsg.getTo().toByteArray()));
+        hashTimerLockTransfer.setFrom(Crypto.encodeAddress(hrp, htlTransferMsg.getFrom().toByteArray()));
+        hashTimerLockTransfer.setTo(Crypto.encodeAddress(hrp, htlTransferMsg.getTo().toByteArray()));
         hashTimerLockTransfer.setRecipientOtherChain(htlTransferMsg.getRecipientOtherChain());
         hashTimerLockTransfer.setSenderOtherChain(htlTransferMsg.getSenderOtherChain());
         hashTimerLockTransfer.setRandomNumberHash(Hex.toHexString(htlTransferMsg.getRandomNumberHash().toByteArray()));
@@ -248,7 +255,7 @@ public class TransactionConverter {
         System.arraycopy(value, 4, array, 0, array.length);
         com.binance.dex.api.proto.SetAccountFlag setAccountFlag = com.binance.dex.api.proto.SetAccountFlag.parseFrom(array);
         SetAccountFlag saf = new SetAccountFlag();
-        saf.setFromAddr(Crypto.encodeAddress(hrp,setAccountFlag.getFrom().toByteArray()));
+        saf.setFromAddr(Crypto.encodeAddress(hrp, setAccountFlag.getFrom().toByteArray()));
         saf.setFlags(setAccountFlag.getFlags());
         Transaction transaction = new Transaction();
         transaction.setTxType(TxType.SetAccountFlag);
@@ -261,7 +268,7 @@ public class TransactionConverter {
         System.arraycopy(value, 4, array, 0, array.length);
         TimeRelock timeRelock = TimeRelock.parseFrom(array);
         com.binance.dex.api.client.domain.broadcast.TimeRelock trl = new com.binance.dex.api.client.domain.broadcast.TimeRelock();
-        trl.setFromAddr(Crypto.encodeAddress(hrp,timeRelock.getFrom().toByteArray()));
+        trl.setFromAddr(Crypto.encodeAddress(hrp, timeRelock.getFrom().toByteArray()));
         trl.setLockId(timeRelock.getTimeLockId());
         trl.setLockTime(Date.from(Instant.ofEpochSecond(timeRelock.getLockTime())));
         trl.setDescription(timeRelock.getDescription());
@@ -283,7 +290,7 @@ public class TransactionConverter {
         System.arraycopy(value, 4, array, 0, array.length);
         TimeUnlock timeUnlock = TimeUnlock.parseFrom(array);
         com.binance.dex.api.client.domain.broadcast.TimeUnlock tul = new com.binance.dex.api.client.domain.broadcast.TimeUnlock();
-        tul.setFromAddr(Crypto.encodeAddress(hrp,timeUnlock.getFrom().toByteArray()));
+        tul.setFromAddr(Crypto.encodeAddress(hrp, timeUnlock.getFrom().toByteArray()));
         tul.setLockId(timeUnlock.getTimeLockId());
 
         Transaction transaction = new Transaction();
@@ -297,7 +304,7 @@ public class TransactionConverter {
         System.arraycopy(value, 4, array, 0, array.length);
         TimeLock timeLock = TimeLock.parseFrom(array);
         com.binance.dex.api.client.domain.broadcast.TimeLock tl = new com.binance.dex.api.client.domain.broadcast.TimeLock();
-        tl.setFromAddr(Crypto.encodeAddress(hrp,timeLock.getFrom().toByteArray()));
+        tl.setFromAddr(Crypto.encodeAddress(hrp, timeLock.getFrom().toByteArray()));
         tl.setDescription(timeLock.getDescription());
         tl.setLockTime(Date.from(Instant.ofEpochSecond(timeLock.getLockTime())));
         List<Token> amount = timeLock.getAmountList().stream().map(token -> {
@@ -507,10 +514,10 @@ public class TransactionConverter {
 
         Deposit deposit = new Deposit();
         deposit.setProposalId(depositMessage.getProposalId());
-        deposit.setDepositer(Crypto.encodeAddress(hrp,depositMessage.getDepositer().toByteArray()));
-        if(null != depositMessage.getAmountList()){
+        deposit.setDepositer(Crypto.encodeAddress(hrp, depositMessage.getDepositer().toByteArray()));
+        if (null != depositMessage.getAmountList()) {
             deposit.setAmount(depositMessage.getAmountList().stream()
-            .map(com.binance.dex.api.client.encoding.message.Token::of).collect(Collectors.toList()));
+                    .map(com.binance.dex.api.client.encoding.message.Token::of).collect(Collectors.toList()));
         }
         Transaction transaction = new Transaction();
         transaction.setTxType(TxType.DEPOSIT);
@@ -525,8 +532,8 @@ public class TransactionConverter {
         RealCreateValidator realCreateValidator = RealCreateValidator.parseFrom(array);
 
         CreateValidator createValidator = new CreateValidator();
-        createValidator.setDelegatorAddress(Crypto.encodeAddress(hrp,realCreateValidator.getCreateValidator().getDelegatorAddress().toByteArray()));
-        createValidator.setValidatorAddress(Crypto.encodeAddress(hrp,realCreateValidator.getCreateValidator().getValidatorAddress().toByteArray()));
+        createValidator.setDelegatorAddress(Crypto.encodeAddress(hrp, realCreateValidator.getCreateValidator().getDelegatorAddress().toByteArray()));
+        createValidator.setValidatorAddress(Crypto.encodeAddress(hrp, realCreateValidator.getCreateValidator().getValidatorAddress().toByteArray()));
         createValidator.setDelegation(com.binance.dex.api.client.encoding.message.Token.of(realCreateValidator.getCreateValidator().getDelegation()));
         createValidator.setProposalId(realCreateValidator.getProposalId());
 
@@ -542,9 +549,9 @@ public class TransactionConverter {
         com.binance.dex.api.proto.RemoveValidator removeValidatorMessage = com.binance.dex.api.proto.RemoveValidator.parseFrom(array);
 
         RemoveValidator removeValidator = new RemoveValidator();
-        removeValidator.setLauncherAddr(Crypto.encodeAddress(hrp,removeValidatorMessage.getLauncherAddr().toByteArray()));
-        removeValidator.setValAddr(Crypto.encodeAddress(hrp,removeValidatorMessage.getValAddr().toByteArray()));
-        removeValidator.setValConsAddr(Crypto.encodeAddress(hrp,removeValidatorMessage.getValConsAddr().toByteArray()));
+        removeValidator.setLauncherAddr(Crypto.encodeAddress(hrp, removeValidatorMessage.getLauncherAddr().toByteArray()));
+        removeValidator.setValAddr(Crypto.encodeAddress(hrp, removeValidatorMessage.getValAddr().toByteArray()));
+        removeValidator.setValConsAddr(Crypto.encodeAddress(hrp, removeValidatorMessage.getValConsAddr().toByteArray()));
         removeValidator.setProposalId(removeValidatorMessage.getProposalId());
 
         Transaction transaction = new Transaction();
@@ -564,7 +571,7 @@ public class TransactionConverter {
         listing.setBaseAssetSymbol(listMessage.getBaseAssetSymbol());
         listing.setQuoteAssetSymbol(listMessage.getQuoteAssetSymbol());
         listing.setInitPrice(listMessage.getInitPrice());
-        listing.setFromAddr(Crypto.encodeAddress(hrp,listMessage.getFrom().toByteArray()));
+        listing.setFromAddr(Crypto.encodeAddress(hrp, listMessage.getFrom().toByteArray()));
 
         Transaction transaction = new Transaction();
         transaction.setTxType(TxType.LISTING);
@@ -573,4 +580,41 @@ public class TransactionConverter {
 
     }
 
+
+    private Transaction convertMiniTokenIssue(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.MiniTokenIssue issueMessage = com.binance.dex.api.proto.MiniTokenIssue.parseFrom(array);
+
+        MiniTokenIssue issue = new MiniTokenIssue();
+        issue.setFrom(Crypto.encodeAddress(hrp, issueMessage.getFrom().toByteArray()));
+        issue.setName(issueMessage.getName());
+        issue.setSymbol(issueMessage.getSymbol());
+        issue.setMaxTotalSupply(issueMessage.getMaxTotalSupply());
+        issue.setTotalSupply(issueMessage.getTotalSupply());
+        issue.setMintable(issueMessage.getMintable());
+        issue.setTokenURI(issueMessage.getTokenUri());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.MINI_TOKEN_ISSUE);
+        transaction.setRealTx(issue);
+        return transaction;
+    }
+
+
+    private Transaction convertMiniTokenSetURI(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.MiniTokenSetURI uriMessage = com.binance.dex.api.proto.MiniTokenSetURI.parseFrom(array);
+
+        MiniTokenSetURI setURI = new MiniTokenSetURI();
+        setURI.setFrom(Crypto.encodeAddress(hrp, uriMessage.getFrom().toByteArray()));
+        setURI.setSymbol(uriMessage.getSymbol());
+        setURI.setTokenURI(uriMessage.getTokenUri());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.MINI_TOEKN_SET_URI);
+        transaction.setRealTx(setURI);
+        return transaction;
+    }
 }

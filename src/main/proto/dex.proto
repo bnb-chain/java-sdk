@@ -346,3 +346,22 @@ message RefundHashTimerLockMsg {
     bytes from = 1;
     bytes swap_id = 2;
 }
+
+//mini token issue
+message MiniTokenIssue {
+    //    1CE8D28B // hardcoded, object type prefix in 4 bytes
+    bytes  from = 1; // issue token owner
+    string name = 2;
+    string symbol = 3;
+    int64  max_total_supply = 4;
+    int64  total_supply = 5;
+    bool   mintable = 6;
+    string token_uri = 7;
+}
+
+message MiniTokenSetURI {
+    //    5b375246 // hardcoded, object type prefix in 4 bytes
+    bytes  from = 1; // issue token owner
+    string symbol = 2;
+    string token_uri = 3;
+}
