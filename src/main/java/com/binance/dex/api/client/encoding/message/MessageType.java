@@ -36,7 +36,7 @@ public enum MessageType {
 
     //mini token
     MiniTokenIssue("1CE8D28B"),
-    MiniTokenSetURI("5b375246");
+    MiniTokenSetURI("5B375246");
     private byte[] typePrefixBytes;
 
     MessageType(String typePrefix) {
