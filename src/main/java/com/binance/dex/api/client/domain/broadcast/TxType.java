@@ -24,5 +24,6 @@ public enum TxType {
     REFUND_HTL,
     DEPOSIT_HTL,
     MINI_TOKEN_ISSUE,
-    MINI_TOEKN_SET_URI
+    MINI_TOKEN_SET_URI,
+    MINI_TOKEN_LIST
 }

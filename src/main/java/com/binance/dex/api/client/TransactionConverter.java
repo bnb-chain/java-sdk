@@ -170,6 +170,8 @@ public class TransactionConverter {
                     return convertMiniTokenIssue(bytes);
                 case MiniTokenSetURI:
                     return convertMiniTokenSetURI(bytes);
+                case MiniTokenList:
+                    return convertMiniTokenList(bytes);
 
             }
             return null;
@@ -613,8 +615,25 @@ public class TransactionConverter {
         setURI.setTokenURI(uriMessage.getTokenUri());
 
         Transaction transaction = new Transaction();
-        transaction.setTxType(TxType.MINI_TOEKN_SET_URI);
+        transaction.setTxType(TxType.MINI_TOKEN_SET_URI);
         transaction.setRealTx(setURI);
+        return transaction;
+    }
+
+    private Transaction convertMiniTokenList(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.MiniTokenList listMessage = com.binance.dex.api.proto.MiniTokenList.parseFrom(array);
+
+        MiniTokenListing listing = new MiniTokenListing();
+        listing.setFromAddr(Crypto.encodeAddress(hrp, listMessage.getFrom().toByteArray()));
+        listing.setBaseAssetSymbol(listMessage.getBaseAssetSymbol());
+        listing.setQuoteAssetSymbol(listMessage.getQuoteAssetSymbol());
+        listing.setInitPrice(listMessage.getInitPrice());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.MINI_TOKEN_LIST);
+        transaction.setRealTx(listing);
         return transaction;
     }
 }

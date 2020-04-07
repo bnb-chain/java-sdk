@@ -31,6 +31,13 @@ public class LocalEnvironmentExample {
         transactions = binanceDexNodeApi.getBlockTransactions(height);
         Assert.assertNotNull(transactions);
         Assert.assertTrue(transactions.size() == 1);
-        Assert.assertEquals(transactions.get(0).getTxType(), TxType.MINI_TOEKN_SET_URI);
+        Assert.assertEquals(transactions.get(0).getTxType(), TxType.MINI_TOKEN_SET_URI);
+
+
+        height = 55588L;
+        transactions = binanceDexNodeApi.getBlockTransactions(height);
+        Assert.assertNotNull(transactions);
+        Assert.assertTrue(transactions.size() == 1);
+        Assert.assertEquals(transactions.get(0).getTxType(), TxType.MINI_TOKEN_LIST);
     }
 }

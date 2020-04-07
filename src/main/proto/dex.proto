@@ -365,3 +365,11 @@ message MiniTokenSetURI {
     string symbol = 2;
     string token_uri = 3;
 }
+
+message MiniTokenList {
+    //    XXX // hardcoded, object type prefix in 4 bytes
+    bytes   from  = 1;
+    string  base_asset_symbol = 2;
+    string  quote_asset_symbol = 3;
+    int64   init_price = 4;
+}
