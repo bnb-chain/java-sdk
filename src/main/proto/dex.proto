@@ -360,14 +360,14 @@ message MiniTokenIssue {
 }
 
 message MiniTokenSetURI {
-    //    5b375246 // hardcoded, object type prefix in 4 bytes
+    //    5B375246 // hardcoded, object type prefix in 4 bytes
     bytes  from = 1; // issue token owner
     string symbol = 2;
     string token_uri = 3;
 }
 
 message MiniTokenList {
-    //    XXX // hardcoded, object type prefix in 4 bytes
+    //    4C264019 // hardcoded, object type prefix in 4 bytes
     bytes   from  = 1;
     string  base_asset_symbol = 2;
     string  quote_asset_symbol = 3;
