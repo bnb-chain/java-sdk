@@ -23,13 +23,13 @@ public class MiniTokenIssue extends Issue {
     @Override
     public String toString() {
         return "MiniTokenIssue{" +
-                "from='" + from + '\'' +
-                ", name='" + name + '\'' +
-                ", symbol='" + symbol + '\'' +
+                "from='" + super.getFrom() + '\'' +
+                ", name='" + super.getName() + '\'' +
+                ", symbol='" + super.getSymbol() + '\'' +
                 ", maxTotalSupply=" + maxTotalSupply +
-                ", totalSupply=" + totalSupply +
+                ", totalSupply=" + super.getTotalSupply() +
                 ", tokenURI=" + tokenURI +
-                ", mintable=" + mintable +
+                ", mintable=" + super.getMintable() +
                 '}';
     }
 

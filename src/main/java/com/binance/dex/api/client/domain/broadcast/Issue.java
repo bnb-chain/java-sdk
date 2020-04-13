@@ -2,11 +2,11 @@ package com.binance.dex.api.client.domain.broadcast;
 
 public class Issue {
 
-    protected String from;
-    protected String name;
-    protected String symbol;
-    protected Long totalSupply;
-    protected Boolean mintable;
+    private String from;
+    private String name;
+    private String symbol;
+    private Long totalSupply;
+    private Boolean mintable;
 
     public String getFrom() {
         return from;

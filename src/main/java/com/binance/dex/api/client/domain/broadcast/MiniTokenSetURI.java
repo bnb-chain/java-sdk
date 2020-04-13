@@ -2,9 +2,9 @@ package com.binance.dex.api.client.domain.broadcast;
 
 public class MiniTokenSetURI {
 
-    protected String from;
-    protected String symbol;
-    protected String tokenURI;
+    private String from;
+    private String symbol;
+    private String tokenURI;
 
     public String getFrom() {
         return from;
