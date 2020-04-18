@@ -2,8 +2,14 @@ package com.binance.dex.api.client.encoding.message;
 
 import com.binance.dex.api.client.Wallet;
 import com.binance.dex.api.client.domain.broadcast.*;
+import com.binance.dex.api.client.domain.sidechain.*;
 import com.binance.dex.api.client.encoding.Crypto;
 import com.binance.dex.api.client.encoding.EncodeUtils;
+import com.binance.dex.api.client.encoding.amino.Amino;
+import com.binance.dex.api.client.encoding.amino.WireType;
+import com.binance.dex.api.client.encoding.message.sidechain.SideChainClassConverter;
+import com.binance.dex.api.client.encoding.message.sidechain.transaction.*;
+import com.binance.dex.api.client.encoding.message.sidechain.value.*;
 import com.binance.dex.api.proto.StdSignature;
 import com.binance.dex.api.proto.StdTx;
 import com.google.common.annotations.VisibleForTesting;
@@ -28,9 +34,12 @@ public class TransactionRequestAssembler {
     private Wallet wallet;
     private TransactionOption options;
 
+    private final Amino amino;
+
     public TransactionRequestAssembler(Wallet wallet, TransactionOption options) {
         this.wallet = wallet;
         this.options = options;
+        this.amino = new Amino();
     }
 
     public static long doubleToLong(String d) {
@@ -50,6 +59,23 @@ public class TransactionRequestAssembler {
     }
 
     @VisibleForTesting
+    byte[] signTx(BinanceDexTransactionMessage msg) throws IOException, NoSuchAlgorithmException {
+        return sign(assembleMessage4Sigh(msg));
+    }
+
+    private  <T> BinanceDexTransactionMessage assembleMessage4Sigh(T t){
+        if (WireType.isRegistered(t.getClass())){
+            return new TransactionMessageWithType<T>(WireType.getRegisteredTypeName(t.getClass()), t);
+        }else{
+            if (!BinanceDexTransactionMessage.class.isAssignableFrom(t.getClass())){
+                throw new IllegalStateException("sign message should implement BinanceDexTransactionMessage");
+            }else{
+                return ((BinanceDexTransactionMessage) t);
+            }
+        }
+    }
+
+    @VisibleForTesting
     byte[] sign(BinanceDexTransactionMessage msg)
             throws NoSuchAlgorithmException, IOException {
         SignData sd = new SignData();
@@ -64,6 +90,8 @@ public class TransactionRequestAssembler {
         if (wallet.getEcKey() == null && wallet.getLedgerKey() != null) {
             return Crypto.sign(EncodeUtils.toJsonEncodeBytes(sd), wallet.getLedgerKey());
         }
+
+        String d = new String(EncodeUtils.toJsonEncodeBytes(sd));
         return Crypto.sign(EncodeUtils.toJsonEncodeBytes(sd), wallet.getEcKey());
     }
 
@@ -549,6 +577,105 @@ public class TransactionRequestAssembler {
         builder.setSwapId(ByteString.copyFrom(Hex.decode(msg.getSwapId())));
         com.binance.dex.api.proto.RefundHashTimerLockMsg proto = builder.build();
         return EncodeUtils.aminoWrap(proto.toByteArray(), MessageType.RefundHashTimerLockMsg.getTypePrefixBytes(), false);
+    }
+
+    @VisibleForTesting
+    CreateSideChainValidatorMessage createSideChainValidatorMessage(CreateSideChainValidator createSideChainValidator){
+        CreateSideChainValidatorMessage message = new CreateSideChainValidatorMessage();
+
+        if (createSideChainValidator.getDescription() != null){
+            message.setDescription(SideChainClassConverter.convert(createSideChainValidator.getDescription()));
+        }
+        if (createSideChainValidator.getCommission() != null){
+            message.setCommission(SideChainClassConverter.convert(createSideChainValidator.getCommission()));
+        }
+
+        message.setDelegatorAddr(AddressValue.from(createSideChainValidator.getDelegatorAddr()));
+
+        if (createSideChainValidator.getDelegation() != null){
+            message.setDelegation(SideChainClassConverter.convert(createSideChainValidator.getDelegation()));
+        }
+
+        message.setSideChainId(createSideChainValidator.getSideChainId());
+        message.setSideConsAddr(decodeHexAddress(createSideChainValidator.getSideConsAddr()));
+        message.setSideFeeAddr(decodeHexAddress(createSideChainValidator.getSideFeeAddr()));
+        return message;
+    }
+
+    @VisibleForTesting
+    byte[] encodeCreateSideChainValidatorMessage(CreateSideChainValidatorMessage message) throws IOException {
+        return amino.encode(message, MessageType.CreateSideChainValidator.getTypePrefixBytes(), false);
+    }
+
+    @VisibleForTesting
+    public String buildCreateSideChainValidatorPayload(CreateSideChainValidator createSideChainValidator) throws IOException, NoSuchAlgorithmException {
+        CreateSideChainValidatorMessage message = createSideChainValidatorMessage(createSideChainValidator);
+        message.setValidatorOperatorAddr(AddressValue.from(wallet.getAddress()));
+        byte[] msg = encodeCreateSideChainValidatorMessage(message);
+        byte[] signature = encodeSignature(signTx(message));
+        byte[] stdTx = encodeStdTx(msg, signature);
+        return EncodeUtils.bytesToHex(stdTx);
+    }
+
+    @VisibleForTesting
+    EditSideChainValidatorMessage createEditSideChainValidatorMessage(EditSideChainValidator editSideChainValidator){
+        EditSideChainValidatorMessage message = new EditSideChainValidatorMessage();
+
+        if (editSideChainValidator.getDescription() != null){
+            message.setDescription(SideChainClassConverter.convert(editSideChainValidator.getDescription()));
+        }
+
+        message.setCommissionRate(Dec.newInstance(editSideChainValidator.getCommissionRate()));
+        message.setSideChainId(editSideChainValidator.getSideChainId());
+        message.setSideFeeAddr(decodeHexAddress(editSideChainValidator.getSideFeeAddr()));
+
+        return message;
+    }
+
+    @VisibleForTesting
+    byte[] encodeEditSideChainValidatorMessage(EditSideChainValidatorMessage message) throws IOException {
+        return amino.encode(message, MessageType.EditSideChainValidator.getTypePrefixBytes(), false);
+    }
+
+    public String buildEditSideChainValidatorPayload(EditSideChainValidator editSideChainValidator) throws IOException, NoSuchAlgorithmException {
+        EditSideChainValidatorMessage message = createEditSideChainValidatorMessage(editSideChainValidator);
+        message.setValidatorOperatorAddress(AddressValue.from(wallet.getAddress()));
+        byte[] msg = encodeEditSideChainValidatorMessage(message);
+        byte[] signature = encodeSignature(signTx(message));
+        byte[] stdTx = encodeStdTx(msg, signature);
+        return EncodeUtils.bytesToHex(stdTx);
+    }
+
+    public String buildSideChainDelegatePayload(SideChainDelegate sideChainDelegate) throws IOException, NoSuchAlgorithmException {
+        SideChainDelegateMessage message = SideChainClassConverter.convert(sideChainDelegate);
+        byte[] msg = amino.encode(message, MessageType.SideChainDelegate.getTypePrefixBytes(), false);
+        byte[] signature = encodeSignature(signTx(message));
+        byte[] stdTx = encodeStdTx(msg, signature);
+        return EncodeUtils.bytesToHex(stdTx);
+    }
+
+    public String buildSideChainRedelegatePayload(SideChainRedelegate sideChainRedelegate) throws IOException, NoSuchAlgorithmException {
+        SideChainRedelegateMessage message = SideChainClassConverter.convert(sideChainRedelegate);
+        byte[] msg = amino.encode(message, MessageType.SideChainRedelegate.getTypePrefixBytes(), false);
+        byte[] signature = encodeSignature(signTx(message));
+        byte[] stdTx = encodeStdTx(msg, signature);
+        return EncodeUtils.bytesToHex(stdTx);
+    }
+
+    public String buildSideChainUndelegatePayload(SideChainUnBond sideChainUndelegate) throws IOException, NoSuchAlgorithmException {
+        SideChainUndelegateMessage message = SideChainClassConverter.convert(sideChainUndelegate);
+        byte[] msg = amino.encode(message, MessageType.SideChainUndelegate.getTypePrefixBytes(), false);
+        byte[] signature = encodeSignature(signTx(message));
+        byte[] stdTx = encodeStdTx(msg, signature);
+        return EncodeUtils.bytesToHex(stdTx);
+    }
+
+    private byte[] decodeHexAddress(String address){
+        String addr = address;
+        if (addr.startsWith("0x")){
+            addr = address.substring(2);
+        }
+        return Hex.decode(addr);
     }
 
 }

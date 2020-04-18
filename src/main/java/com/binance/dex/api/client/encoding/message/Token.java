@@ -3,6 +3,7 @@ package com.binance.dex.api.client.encoding.message;
 import com.binance.dex.api.client.BinanceDexConstants;
 import com.binance.dex.api.proto.Send;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -24,6 +25,14 @@ public class Token {
         token.setDenom(sendToken.getDenom());
         token.setAmount(sendToken.getAmount());
         return token;
+    }
+
+    public Token() {
+    }
+
+    public Token(String denom, Long amount) {
+        this.denom = denom;
+        this.amount = amount;
     }
 
     public String getDenom() {

@@ -2,6 +2,7 @@ package com.binance.dex.api.client.encoding;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Charsets;
 import com.google.protobuf.CodedOutputStream;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -34,7 +35,7 @@ public class EncodeUtils {
     }
 
     public static byte[] toJsonEncodeBytes(Object object) throws JsonProcessingException {
-        return toJsonStringSortKeys(object).getBytes(Charset.forName("UTF-8"));
+        return toJsonStringSortKeys(object).getBytes(Charsets.UTF_8);
     }
 
     public static byte[] aminoWrap(byte[] raw, byte[] typePrefix, boolean isPrefixLength) throws IOException {
@@ -66,6 +67,10 @@ public class EncodeUtils {
         ByteBuffer buffer = ByteBuffer.allocate(8);
         buffer.putLong(x);
         return buffer.array();
+    }
+
+    public static ObjectMapper getObjectMapper() {
+        return OBJECT_MAPPER;
     }
 
 }

@@ -32,7 +32,12 @@ public enum MessageType {
     HashTimerLockTransferMsg("B33F9A24"),
     DepositHashTimerLockMsg("63986496"),
     ClaimHashTimerLockMsg("C1665300"),
-    RefundHashTimerLockMsg("3454A27C");
+    RefundHashTimerLockMsg("3454A27C"),
+    CreateSideChainValidator("D17201E5"),
+    EditSideChainValidator("264CC57B"),
+    SideChainDelegate("E3A07FD2"),
+    SideChainRedelegate("E3CED364"),
+    SideChainUndelegate("514F7E0E");
     private byte[] typePrefixBytes;
 
     MessageType(String typePrefix) {

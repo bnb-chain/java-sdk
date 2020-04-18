@@ -7,6 +7,7 @@ option java_outer_classname = "Transaction";
 
 package transaction;
 import "types.proto";
+import "google/protobuf/timestamp.proto";
 
 // please note the field name is the JSON name.
 message StdTx {

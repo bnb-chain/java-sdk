@@ -7,6 +7,7 @@ import com.binance.dex.api.client.domain.request.ClosedOrdersRequest;
 import com.binance.dex.api.client.domain.request.OpenOrdersRequest;
 import com.binance.dex.api.client.domain.request.TradesRequest;
 import com.binance.dex.api.client.domain.request.TransactionsRequest;
+import com.binance.dex.api.client.domain.sidechain.*;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -157,4 +158,57 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
     default List<TransactionMetadata> unfreeze(TokenUnfreeze unfreeze, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
         throw new UnsupportedOperationException();
     }
+
+    default List<TransactionMetadata> createSideChainValidator(CreateSideChainValidator createSideChainValidator, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException  {
+        throw new UnsupportedOperationException();
+    }
+
+    default List<TransactionMetadata> editSideChainValidator(EditSideChainValidator editSideChainValidator, Wallet wallet, TransactionOption option, boolean synv) throws IOException, NoSuchAlgorithmException {
+        throw new UnsupportedOperationException();
+    }
+
+    default List<TransactionMetadata> sideChainDelegate(SideChainDelegate sideChainDelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        throw new UnsupportedOperationException();
+    }
+
+    default List<TransactionMetadata> sideChainRedelagate(SideChainRedelegate sideChainRedelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        throw new UnsupportedOperationException();
+    }
+
+    default List<TransactionMetadata> sideChainUnbond(SideChainUnBond sideChainUndelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        throw new UnsupportedOperationException();
+    }
+
+    default SideChainValidator getSideChainValidator(String sideChainId, byte[] validatorAddress) throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    default List<SideChainValidator> getSideChainTopValidators(String sideChainId, int top) throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    default SideChainDelegation getSideChainDelegation(String sideChainId, byte[] delegatorAddress, byte[] validatorAddress) throws IOException  {
+        throw new UnsupportedOperationException();
+    }
+
+    default List<SideChainDelegation> getSideChainDelegations(String sideChainId, byte[] delegatorAddress) throws IOException  {
+        throw new UnsupportedOperationException();
+    }
+
+    default SideChainRedelegation getSideChainRedelegation(String sideChainId, byte[] delegatorAddress, byte[] srcValidatorAddress, byte[] dstValidatorAddress) throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    default List<SideChainRedelegation> getSideChainRedelegations(String sideChainId, byte[] delegatorAddress) throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    default SideChainUnBondingDelegation getSideChainUnBondingDelegation(String sideChainId, byte[] delegatorAddress, byte[] validatorAddress) throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    default List<SideChainUnBondingDelegation> getSideChainUnBondingDelegations(String sideChainId, byte[] delegatorAddress) throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
 }
