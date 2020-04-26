@@ -5,6 +5,7 @@ import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Utils;
 import org.bitcoinj.crypto.*;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -183,4 +184,17 @@ public class Crypto {
             super(s);
         }
     }
+
+    public static String encodeEthAddress(byte[] address){
+        return "0x" + Hex.toHexString(address);
+    }
+
+    public static byte[] decodeEthAddress(String address){
+        String addr = address;
+        if (addr.startsWith("0x")){
+            addr = address.substring(2);
+        }
+        return Hex.decode(addr);
+    }
+
 }

@@ -34,7 +34,7 @@ public class Amino {
      *
      * @param name the name
      */
-    public byte[] nameToDisamb(String name){
+    public byte[] nameToDisamb(String name) throws NoSuchAlgorithmException {
         return nameToDisambPrefix(name).getDisamb();
     }
 
@@ -43,11 +43,11 @@ public class Amino {
      *
      * @param name the name
      */
-    public byte[] nameToPrefix(String name) {
+    public byte[] nameToPrefix(String name) throws NoSuchAlgorithmException {
         return nameToDisambPrefix(name).getPrefix();
     }
 
-    public String nameToPrefixString(String name) {
+    public String nameToPrefixString(String name) throws NoSuchAlgorithmException {
         return Hex.toHexString(nameToDisambPrefix(name).getPrefix());
     }
 
@@ -57,14 +57,10 @@ public class Amino {
      * @param name the name
      * @see DisambPrefix
      */
-    public DisambPrefix nameToDisambPrefix(String name) {
+    public DisambPrefix nameToDisambPrefix(String name) throws NoSuchAlgorithmException {
         DisambPrefix disambPrefix = new DisambPrefix();
         byte[] nameHash = new byte[0];
-        try {
-            nameHash = dropLeadingZero(AminoHashing.sha256(name));
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        nameHash = dropLeadingZero(AminoHashing.sha256(name));
         disambPrefix.setDisamb(Arrays.copyOfRange(nameHash, 0, disambiguationByteSize));
 
         byte[] rest = Arrays.copyOfRange(nameHash, disambiguationByteSize, nameHash.length);
@@ -162,6 +158,12 @@ public class Amino {
 
             if (field.getT() instanceof Long){
                 encodeInt64(index, ((Long) field.getT()), outputStream);
+                continue;
+            }
+
+            if (field.getT() instanceof Integer){
+                encodeInt32(index, (Integer) field.getT(), outputStream);
+                continue;
             }
         }
     }
@@ -315,6 +317,11 @@ public class Amino {
         outputStream.writeInt64NoTag(value);
     }
 
+    private void encodeInt32(int fieldIndex, int value, CodedOutputStream outputStream) throws IOException {
+        outputStream.writeTag(fieldIndex, WireType.VARINT);
+        outputStream.writeInt32NoTag(value);
+    }
+
     private void encodeUInt32Bare(int value, CodedOutputStream codedOutputStream) throws IOException {
         codedOutputStream.writeUInt32NoTag(value);
     }
@@ -362,6 +369,13 @@ public class Amino {
             if (iterateField.getT() instanceof Long){
                 size += computeTagSize(index, WireType.VARINT);
                 size += computeInt64Size(((Long) iterateField.getT()));
+                continue;
+            }
+
+            if (iterateField.getT() instanceof Integer){
+                size += computeTagSize(index, WireType.VARINT);
+                size += computeInt32Size((Integer) iterateField.getT());
+                continue;
             }
         }
 

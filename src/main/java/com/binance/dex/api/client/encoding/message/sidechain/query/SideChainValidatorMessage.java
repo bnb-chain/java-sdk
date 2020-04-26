@@ -3,7 +3,7 @@ package com.binance.dex.api.client.encoding.message.sidechain.query;
 import com.binance.dex.api.client.encoding.amino.AminoField;
 import com.binance.dex.api.client.encoding.amino.AminoSerializable;
 import com.binance.dex.api.client.encoding.message.sidechain.value.CommissionValue;
-import com.binance.dex.api.client.encoding.message.sidechain.value.Dec;
+import com.binance.dex.api.client.encoding.message.common.Dec;
 import com.binance.dex.api.client.encoding.message.sidechain.value.DescriptionValue;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Hex;

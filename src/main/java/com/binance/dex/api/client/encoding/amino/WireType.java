@@ -1,11 +1,14 @@
 package com.binance.dex.api.client.encoding.amino;
 
 import com.binance.dex.api.client.encoding.amino.types.PubKeyEd25519;
+import com.binance.dex.api.client.encoding.message.bridge.BindMsgMessage;
+import com.binance.dex.api.client.encoding.message.bridge.ClaimMsgMessage;
+import com.binance.dex.api.client.encoding.message.bridge.TransferOutMsgMessage;
 import com.binance.dex.api.client.encoding.message.sidechain.transaction.*;
 import org.bouncycastle.util.encoders.Hex;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Fitz.Lu
@@ -13,23 +16,20 @@ import java.util.Map;
  **/
 public class WireType {
 
-    private static final HashMap<Class<?>, String> aminoType;
-    private static final HashMap<String, Class<?>> typePrefixMap;
+    private static final HashMap<Class<?>, String> classToTypeName = new HashMap<>();
 
     static {
-        aminoType = new HashMap<>();
-        aminoType.put(PubKeyEd25519.class, "tendermint/PubKeyEd25519");
-        aminoType.put(CreateSideChainValidatorMessage.class, "cosmos-sdk/MsgCreateSideChainValidator");
-        aminoType.put(EditSideChainValidatorMessage.class, "cosmos-sdk/MsgEditSideChainValidator");
-        aminoType.put(SideChainDelegateMessage.class, "cosmos-sdk/MsgSideChainDelegate");
-        aminoType.put(SideChainRedelegateMessage.class, "cosmos-sdk/MsgSideChainRedelegate");
-        aminoType.put(SideChainUndelegateMessage.class, "cosmos-sdk/MsgSideChainUndelegate");
+        classToTypeName.put(PubKeyEd25519.class, "tendermint/PubKeyEd25519");
 
-        typePrefixMap = new HashMap<>();
-        Amino amino = new Amino();
-        for (Map.Entry<Class<?>, String> entry : aminoType.entrySet()) {
-            typePrefixMap.put(amino.nameToPrefixString(entry.getValue()), entry.getKey());
-        }
+        classToTypeName.put(CreateSideChainValidatorMessage.class, "cosmos-sdk/MsgCreateSideChainValidator");
+        classToTypeName.put(EditSideChainValidatorMessage.class, "cosmos-sdk/MsgEditSideChainValidator");
+        classToTypeName.put(SideChainDelegateMessage.class, "cosmos-sdk/MsgSideChainDelegate");
+        classToTypeName.put(SideChainRedelegateMessage.class, "cosmos-sdk/MsgSideChainRedelegate");
+        classToTypeName.put(SideChainUndelegateMessage.class, "cosmos-sdk/MsgSideChainUndelegate");
+
+        classToTypeName.put(TransferOutMsgMessage.class, "bridge/TransferOutMsg");
+        classToTypeName.put(BindMsgMessage.class, "bridge/BindMsg");
+        classToTypeName.put(ClaimMsgMessage.class, "oracle/ClaimMsg");
     }
 
     public static int VARINT = 0;   //int32, int64, uint32, uint64, sint32, sint64, bool, enum
@@ -40,16 +40,31 @@ public class WireType {
 
     public static int BIT_32 = 5;   //	fixed32, sfixed32, float
 
+
     public static boolean isRegistered(Class<?> clazz){
-        return aminoType.containsKey(clazz);
+        return classToTypeName.containsKey(clazz);
     }
 
     public static boolean isRegistered(byte[] typePrefix){
-        return typePrefixMap.containsKey(Hex.toHexString(typePrefix));
+        String typeHex = Hex.toHexString(typePrefix);
+        for (String value : classToTypeName.values()) {
+            if (typeHex.equals(value)){
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    public static String getRegisteredTypeName(Class<?> clazz){
-        return aminoType.get(clazz);
+    public static String getRegisteredTypeName(Class<?> clazz) {
+        return classToTypeName.get(clazz);
+    }
+
+    public static byte[] getTypePrefix(Class<?> clazz) throws IllegalStateException, NoSuchAlgorithmException {
+        if (!isRegistered(clazz)){
+            throw new IllegalStateException("class " + clazz.getCanonicalName() + " has not been registered into amino");
+        }
+        return InternalAmino.get().nameToPrefix(getRegisteredTypeName(clazz));
     }
 
 }

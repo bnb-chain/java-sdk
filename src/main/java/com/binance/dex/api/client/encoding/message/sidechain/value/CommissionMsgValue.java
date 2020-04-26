@@ -2,6 +2,7 @@ package com.binance.dex.api.client.encoding.message.sidechain.value;
 
 import com.binance.dex.api.client.encoding.amino.AminoField;
 import com.binance.dex.api.client.encoding.amino.AminoSerializable;
+import com.binance.dex.api.client.encoding.message.common.Dec;
 import com.binance.dex.api.client.encoding.serializer.DecToStringSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

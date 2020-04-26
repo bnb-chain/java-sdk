@@ -3,11 +3,11 @@ package com.binance.dex.api.client.encoding.message.sidechain.transaction;
 import com.binance.dex.api.client.encoding.amino.AminoField;
 import com.binance.dex.api.client.encoding.amino.AminoSerializable;
 import com.binance.dex.api.client.encoding.message.BinanceDexTransactionMessage;
-import com.binance.dex.api.client.encoding.message.sidechain.value.AddressValue;
-import com.binance.dex.api.client.encoding.message.sidechain.value.Dec;
+import com.binance.dex.api.client.encoding.message.common.Bech32AddressValue;
+import com.binance.dex.api.client.encoding.message.common.Dec;
 import com.binance.dex.api.client.encoding.message.sidechain.value.DescriptionValue;
+import com.binance.dex.api.client.encoding.serializer.Bech32AddressValueToStringSerializer;
 import com.binance.dex.api.client.encoding.serializer.DecToStringSerializer;
-import com.binance.dex.api.client.encoding.serializer.ValAddressValueToStringSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -27,8 +27,8 @@ public class EditSideChainValidatorMessage implements BinanceDexTransactionMessa
     private DescriptionValue description;
 
     @JsonProperty(value = "address")
-    @JsonSerialize(using = ValAddressValueToStringSerializer.class)
-    private AddressValue validatorOperatorAddress;
+    @JsonSerialize(using = Bech32AddressValueToStringSerializer.class)
+    private Bech32AddressValue validatorOperatorAddress;
 
     @JsonProperty(value = "commission_rate")
     @JsonSerialize(using = DecToStringSerializer.class)
@@ -39,6 +39,29 @@ public class EditSideChainValidatorMessage implements BinanceDexTransactionMessa
 
     @JsonProperty(value = "side_fee_addr")
     private byte[] sideFeeAddr;
+
+    @Override
+    public void setValueByFieldIndex(int fieldIndex, Object value) {
+        switch (fieldIndex) {
+            case 1:
+                description = ((DescriptionValue) value);
+                break;
+            case 2:
+                validatorOperatorAddress = ((Bech32AddressValue) value);
+                break;
+            case 3:
+                commissionRate = ((Dec) value);
+                break;
+            case 4:
+                sideChainId = ((String) value);
+                break;
+            case 5:
+                sideFeeAddr = ((byte[]) value);
+                break;
+            default:
+                break;
+        }
+    }
 
     public EditSideChainValidatorMessage() {
     }
@@ -51,11 +74,11 @@ public class EditSideChainValidatorMessage implements BinanceDexTransactionMessa
         this.description = description;
     }
 
-    public AddressValue getValidatorOperatorAddress() {
+    public Bech32AddressValue getValidatorOperatorAddress() {
         return validatorOperatorAddress;
     }
 
-    public void setValidatorOperatorAddress(AddressValue validatorOperatorAddress) {
+    public void setValidatorOperatorAddress(Bech32AddressValue validatorOperatorAddress) {
         this.validatorOperatorAddress = validatorOperatorAddress;
     }
 
@@ -84,6 +107,11 @@ public class EditSideChainValidatorMessage implements BinanceDexTransactionMessa
     }
 
     @Override
+    public boolean useAminoJson() {
+        return true;
+    }
+
+    @Override
     public AminoSerializable newAminoMessage() {
         return new EditSideChainValidatorMessage();
     }
@@ -92,16 +120,11 @@ public class EditSideChainValidatorMessage implements BinanceDexTransactionMessa
     public ArrayList<AminoField<?>> IterateFields() {
         return AminoField.newFieldsBuilder()
                 .addField(DescriptionValue.class, description, description == null)
-                .addField(AddressValue.class, validatorOperatorAddress, validatorOperatorAddress == null || validatorOperatorAddress.isDefaultOrEmpty())
+                .addField(Bech32AddressValue.class, validatorOperatorAddress, validatorOperatorAddress == null || validatorOperatorAddress.isDefaultOrEmpty())
                 .addField(Dec.class, commissionRate, commissionRate == null || commissionRate.isDefaultOrEmpty())
                 .addField(String.class, sideChainId, StringUtils.isEmpty(sideChainId))
                 .addField(byte[].class, sideFeeAddr, sideFeeAddr == null || sideFeeAddr.length == 0)
                 .build();
-    }
-
-    @Override
-    public void setValueByFieldIndex(int fieldIndex, Object value) {
-
     }
 
 }

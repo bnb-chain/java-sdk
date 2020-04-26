@@ -3,10 +3,9 @@ package com.binance.dex.api.client.encoding.message.sidechain.transaction;
 import com.binance.dex.api.client.encoding.amino.AminoField;
 import com.binance.dex.api.client.encoding.amino.AminoSerializable;
 import com.binance.dex.api.client.encoding.message.BinanceDexTransactionMessage;
-import com.binance.dex.api.client.encoding.message.sidechain.value.AddressValue;
-import com.binance.dex.api.client.encoding.message.sidechain.value.CoinValue;
-import com.binance.dex.api.client.encoding.serializer.AccAddressValueToStringSerializer;
-import com.binance.dex.api.client.encoding.serializer.ValAddressValueToStringSerializer;
+import com.binance.dex.api.client.encoding.message.common.Bech32AddressValue;
+import com.binance.dex.api.client.encoding.message.common.CoinValueStr;
+import com.binance.dex.api.client.encoding.serializer.Bech32AddressValueToStringSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -23,19 +22,19 @@ import java.util.ArrayList;
 public class SideChainRedelegateMessage implements BinanceDexTransactionMessage, AminoSerializable {
 
     @JsonProperty(value = "delegator_addr")
-    @JsonSerialize(using = AccAddressValueToStringSerializer.class)
-    private AddressValue delegatorAddress;
+    @JsonSerialize(using = Bech32AddressValueToStringSerializer.class)
+    private Bech32AddressValue delegatorAddress;
 
     @JsonProperty(value = "validator_src_addr")
-    @JsonSerialize(using = ValAddressValueToStringSerializer.class)
-    private AddressValue srcValidatorAddress;
+    @JsonSerialize(using = Bech32AddressValueToStringSerializer.class)
+    private Bech32AddressValue srcValidatorAddress;
 
     @JsonProperty(value = "validator_dst_addr")
-    @JsonSerialize(using = ValAddressValueToStringSerializer.class)
-    private AddressValue dstValidatorAddress;
+    @JsonSerialize(using = Bech32AddressValueToStringSerializer.class)
+    private Bech32AddressValue dstValidatorAddress;
 
     @JsonProperty(value = "amount")
-    private CoinValue amount;
+    private CoinValueStr amount;
 
     @JsonProperty(value = "side_chain_id")
     private String sideChainId;
@@ -51,10 +50,10 @@ public class SideChainRedelegateMessage implements BinanceDexTransactionMessage,
     @Override
     public ArrayList<AminoField<?>> IterateFields() {
         return AminoField.newFieldsBuilder()
-                .addField(AddressValue.class, delegatorAddress, delegatorAddress == null || delegatorAddress.isDefaultOrEmpty())
-                .addField(AddressValue.class, srcValidatorAddress, srcValidatorAddress == null || srcValidatorAddress.isDefaultOrEmpty())
-                .addField(AddressValue.class, dstValidatorAddress, dstValidatorAddress == null || dstValidatorAddress.isDefaultOrEmpty())
-                .addField(CoinValue.class, amount, amount == null)
+                .addField(Bech32AddressValue.class, delegatorAddress, delegatorAddress == null || delegatorAddress.isDefaultOrEmpty())
+                .addField(Bech32AddressValue.class, srcValidatorAddress, srcValidatorAddress == null || srcValidatorAddress.isDefaultOrEmpty())
+                .addField(Bech32AddressValue.class, dstValidatorAddress, dstValidatorAddress == null || dstValidatorAddress.isDefaultOrEmpty())
+                .addField(CoinValueStr.class, amount, amount == null)
                 .addField(String.class, sideChainId, StringUtils.isEmpty(sideChainId))
                 .build();
     }
@@ -63,16 +62,16 @@ public class SideChainRedelegateMessage implements BinanceDexTransactionMessage,
     public void setValueByFieldIndex(int fieldIndex, Object value) {
         switch (fieldIndex) {
             case 1:
-                delegatorAddress = ((AddressValue) value);
+                delegatorAddress = ((Bech32AddressValue) value);
                 break;
             case 2:
-                srcValidatorAddress = ((AddressValue) value);
+                srcValidatorAddress = ((Bech32AddressValue) value);
                 break;
             case 3:
-                dstValidatorAddress = ((AddressValue) value);
+                dstValidatorAddress = ((Bech32AddressValue) value);
                 break;
             case 4:
-                amount = ((CoinValue) value);
+                amount = ((CoinValueStr) value);
                 break;
             case 5:
                 sideChainId = ((String) value);
@@ -82,35 +81,40 @@ public class SideChainRedelegateMessage implements BinanceDexTransactionMessage,
         }
     }
 
-    public AddressValue getDelegatorAddress() {
+    @Override
+    public boolean useAminoJson() {
+        return true;
+    }
+
+    public Bech32AddressValue getDelegatorAddress() {
         return delegatorAddress;
     }
 
-    public void setDelegatorAddress(AddressValue delegatorAddress) {
+    public void setDelegatorAddress(Bech32AddressValue delegatorAddress) {
         this.delegatorAddress = delegatorAddress;
     }
 
-    public AddressValue getSrcValidatorAddress() {
+    public Bech32AddressValue getSrcValidatorAddress() {
         return srcValidatorAddress;
     }
 
-    public void setSrcValidatorAddress(AddressValue srcValidatorAddress) {
+    public void setSrcValidatorAddress(Bech32AddressValue srcValidatorAddress) {
         this.srcValidatorAddress = srcValidatorAddress;
     }
 
-    public AddressValue getDstValidatorAddress() {
+    public Bech32AddressValue getDstValidatorAddress() {
         return dstValidatorAddress;
     }
 
-    public void setDstValidatorAddress(AddressValue dstValidatorAddress) {
+    public void setDstValidatorAddress(Bech32AddressValue dstValidatorAddress) {
         this.dstValidatorAddress = dstValidatorAddress;
     }
 
-    public CoinValue getAmount() {
+    public CoinValueStr getAmount() {
         return amount;
     }
 
-    public void setAmount(CoinValue amount) {
+    public void setAmount(CoinValueStr amount) {
         this.amount = amount;
     }
 

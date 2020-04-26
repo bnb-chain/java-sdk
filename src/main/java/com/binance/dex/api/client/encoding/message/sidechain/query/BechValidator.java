@@ -1,8 +1,8 @@
 package com.binance.dex.api.client.encoding.message.sidechain.query;
 
-import com.binance.dex.api.client.domain.sidechain.Commission;
-import com.binance.dex.api.client.domain.sidechain.Description;
-import com.binance.dex.api.client.domain.sidechain.SideChainValidator;
+import com.binance.dex.api.client.domain.stake.Commission;
+import com.binance.dex.api.client.domain.stake.Description;
+import com.binance.dex.api.client.domain.stake.sidechain.SideChainValidator;
 import com.binance.dex.api.client.encoding.Crypto;
 import com.binance.dex.api.client.encoding.amino.Amino;
 import com.binance.dex.api.client.encoding.message.sidechain.value.DescriptionValue;
@@ -122,10 +122,10 @@ public class BechValidator {
     public SideChainValidator toSideChainValidator() {
         SideChainValidator validator = new SideChainValidator();
         if (feeAddr != null) {
-            validator.setFeeAddr(Crypto.decodeAddress(feeAddr));
+            validator.setFeeAddr(feeAddr);
         }
         if (operatorAddr != null) {
-            validator.setOperatorAddr(Crypto.decodeAddress(operatorAddr));
+            validator.setOperatorAddr(operatorAddr);
         }
         if (consPubKey != null) {
             try {
@@ -164,14 +164,14 @@ public class BechValidator {
 
         if (!StringUtils.isEmpty(sideChainId)) {
             if (distributionAddr != null) {
-                validator.setDistributionAddr(distributionAddr.getBytes());
+                validator.setDistributionAddr(distributionAddr);
             }
             validator.setSideChainId(sideChainId);
             if (sideConsAddr != null) {
-                validator.setSideConsAddr(sideConsAddr.getBytes());
+                validator.setSideConsAddr(sideConsAddr);
             }
             if (sideFeeAddr != null) {
-                validator.setSideFeeAddr(sideFeeAddr.getBytes());
+                validator.setSideFeeAddr(sideFeeAddr);
             }
         }
 

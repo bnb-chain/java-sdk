@@ -1,14 +1,18 @@
 package com.binance.dex.api.client;
 
 import com.binance.dex.api.client.domain.*;
+import com.binance.dex.api.client.domain.bridge.TransferIn;
 import com.binance.dex.api.client.domain.broadcast.*;
 import com.binance.dex.api.client.domain.broadcast.Transaction;
+import com.binance.dex.api.client.domain.oracle.Prophecy;
 import com.binance.dex.api.client.domain.request.ClosedOrdersRequest;
 import com.binance.dex.api.client.domain.request.OpenOrdersRequest;
 import com.binance.dex.api.client.domain.request.TradesRequest;
 import com.binance.dex.api.client.domain.request.TransactionsRequest;
-import com.binance.dex.api.client.domain.sidechain.*;
+import com.binance.dex.api.client.domain.stake.Pool;
+import com.binance.dex.api.client.domain.stake.sidechain.*;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -159,56 +163,55 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
         throw new UnsupportedOperationException();
     }
 
-    default List<TransactionMetadata> createSideChainValidator(CreateSideChainValidator createSideChainValidator, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException  {
-        throw new UnsupportedOperationException();
-    }
+    List<TransactionMetadata> createSideChainValidator(CreateSideChainValidator createSideChainValidator, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
 
-    default List<TransactionMetadata> editSideChainValidator(EditSideChainValidator editSideChainValidator, Wallet wallet, TransactionOption option, boolean synv) throws IOException, NoSuchAlgorithmException {
-        throw new UnsupportedOperationException();
-    }
+    List<TransactionMetadata> editSideChainValidator(EditSideChainValidator editSideChainValidator, Wallet wallet, TransactionOption option, boolean synv) throws IOException, NoSuchAlgorithmException ;
 
-    default List<TransactionMetadata> sideChainDelegate(SideChainDelegate sideChainDelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
-        throw new UnsupportedOperationException();
-    }
+    List<TransactionMetadata> sideChainDelegate(SideChainDelegate sideChainDelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
 
-    default List<TransactionMetadata> sideChainRedelagate(SideChainRedelegate sideChainRedelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
-        throw new UnsupportedOperationException();
-    }
+    List<TransactionMetadata> sideChainRedelagate(SideChainRedelegate sideChainRedelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
 
-    default List<TransactionMetadata> sideChainUnbond(SideChainUnBond sideChainUndelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
-        throw new UnsupportedOperationException();
-    }
+    List<TransactionMetadata> sideChainUnbond(SideChainUnBond sideChainUndelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
 
-    default SideChainValidator getSideChainValidator(String sideChainId, byte[] validatorAddress) throws IOException {
-        throw new UnsupportedOperationException();
-    }
+    SideChainValidator getSideChainValidator(String sideChainId, String validatorAddress) throws IOException;
 
-    default List<SideChainValidator> getSideChainTopValidators(String sideChainId, int top) throws IOException {
-        throw new UnsupportedOperationException();
-    }
+    List<SideChainValidator> getSideChainTopValidators(String sideChainId, int top) throws IOException ;
 
-    default SideChainDelegation getSideChainDelegation(String sideChainId, byte[] delegatorAddress, byte[] validatorAddress) throws IOException  {
-        throw new UnsupportedOperationException();
-    }
+    SideChainDelegation getSideChainDelegation(String sideChainId, String delegatorAddress, String validatorAddress) throws IOException;
 
-    default List<SideChainDelegation> getSideChainDelegations(String sideChainId, byte[] delegatorAddress) throws IOException  {
-        throw new UnsupportedOperationException();
-    }
+    List<SideChainDelegation> getSideChainDelegations(String sideChainId, String delegatorAddress) throws IOException;
 
-    default SideChainRedelegation getSideChainRedelegation(String sideChainId, byte[] delegatorAddress, byte[] srcValidatorAddress, byte[] dstValidatorAddress) throws IOException {
-        throw new UnsupportedOperationException();
-    }
+    SideChainRedelegation getSideChainRedelegation(String sideChainId, String delegatorAddress, String srcValidatorAddress, String dstValidatorAddress) throws IOException;
 
-    default List<SideChainRedelegation> getSideChainRedelegations(String sideChainId, byte[] delegatorAddress) throws IOException {
-        throw new UnsupportedOperationException();
-    }
+    List<SideChainRedelegation> getSideChainRedelegations(String sideChainId, String delegatorAddress) throws IOException;
 
-    default SideChainUnBondingDelegation getSideChainUnBondingDelegation(String sideChainId, byte[] delegatorAddress, byte[] validatorAddress) throws IOException {
-        throw new UnsupportedOperationException();
-    }
+    UnBondingDelegation getSideChainUnBondingDelegation(String sideChainId, String delegatorAddress, String validatorAddress) throws IOException;
 
-    default List<SideChainUnBondingDelegation> getSideChainUnBondingDelegations(String sideChainId, byte[] delegatorAddress) throws IOException {
-        throw new UnsupportedOperationException();
-    }
+    List<UnBondingDelegation> getSideChainUnBondingDelegations(String sideChainId, String delegatorAddress) throws IOException;
+
+    List<UnBondingDelegation> getSideChainUnBondingDelegationsByValidator(String sideChainId, String validatorAddress)  throws IOException ;
+
+    List<SideChainRedelegation> getSideChainRedelegationsByValidator(String sideChainId, String validatorAddress) throws IOException;
+
+    Pool getSideChainPool(String sideChainId) throws IOException;
+
+    long getAllSideChainValidatorsCount(String sideChainId, boolean jailInvolved) throws IOException;
+
+    List<TransactionMetadata> claim(int claimType, String claim, long sequence, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
+
+    @Nullable
+    Prophecy getProphecy(int claimType, long sequence) throws IOException;
+
+    long getCurrentSequence(int claimType);
+
+    List<TransactionMetadata> transferIn(long sequence, TransferIn transferIn, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
+
+    List<TransactionMetadata> transferOut(String toAddress, com.binance.dex.api.client.encoding.message.Token amount, long expireTimeInSeconds, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
+
+    List<TransactionMetadata> bind(String symbol, long amount, String contractAddress, int contractDecimal, long expireTimeInSeconds, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
+
+    List<TransactionMetadata> updateTransferOut(long sequence, String refundAddress, com.binance.dex.api.client.encoding.message.Token amount, int refundReason, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
+
+    List<TransactionMetadata> updateBind(long sequence, String symbol, String contractAddress, int status, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
 
 }

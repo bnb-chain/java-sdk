@@ -10,7 +10,9 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder(alphabetic = true)
 public class Token {
+    @JsonProperty(value = "denom")
     private String denom;
+    @JsonProperty(value = "amount")
     private Long amount;
 
     public static Token of(com.binance.dex.api.proto.Token source) {

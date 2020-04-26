@@ -1,6 +1,8 @@
 package com.binance.dex.api.client;
 
 import com.binance.dex.api.client.domain.*;
+import com.binance.dex.api.client.domain.bridge.Bind;
+import com.binance.dex.api.client.domain.bridge.TransferOut;
 import com.binance.dex.api.client.domain.broadcast.*;
 import com.binance.dex.api.client.domain.broadcast.Burn;
 import com.binance.dex.api.client.domain.broadcast.CancelOrder;
@@ -17,10 +19,20 @@ import com.binance.dex.api.client.domain.broadcast.TokenUnfreeze;
 import com.binance.dex.api.client.domain.broadcast.Transaction;
 import com.binance.dex.api.client.domain.broadcast.Vote;
 import com.binance.dex.api.client.domain.jsonrpc.TxResult;
+import com.binance.dex.api.client.domain.oracle.ClaimMsg;
+import com.binance.dex.api.client.domain.stake.Commission;
+import com.binance.dex.api.client.domain.stake.Description;
+import com.binance.dex.api.client.domain.stake.sidechain.*;
+import com.binance.dex.api.client.encoding.ByteUtil;
 import com.binance.dex.api.client.encoding.Crypto;
+import com.binance.dex.api.client.encoding.amino.Amino;
 import com.binance.dex.api.client.encoding.message.InputOutput;
 import com.binance.dex.api.client.encoding.message.MessageType;
 import com.binance.dex.api.client.encoding.message.Token;
+import com.binance.dex.api.client.encoding.message.bridge.BindMsgMessage;
+import com.binance.dex.api.client.encoding.message.bridge.ClaimMsgMessage;
+import com.binance.dex.api.client.encoding.message.bridge.TransferOutMsgMessage;
+import com.binance.dex.api.client.encoding.message.sidechain.transaction.*;
 import com.binance.dex.api.proto.*;
 import com.binance.dex.api.proto.TimeLock;
 import com.binance.dex.api.proto.TimeRelock;
@@ -28,6 +40,7 @@ import com.binance.dex.api.proto.TimeUnlock;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bouncycastle.util.encoders.Hex;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 import java.util.List;
@@ -37,8 +50,13 @@ public class TransactionConverter {
 
     private String hrp;
 
-    public TransactionConverter(String hrp){
+    private String valHrp;
+
+    private final Amino amino = new Amino();
+
+    public TransactionConverter(String hrp, String valHrp){
         this.hrp = hrp;
+        this.valHrp = valHrp;
     }
 
     public List<Transaction> convert(com.binance.dex.api.client.domain.jsonrpc.BlockInfoResult.Transaction txMessage) {
@@ -164,13 +182,294 @@ public class TransactionConverter {
                     return convertClaimHashTimerLock(bytes);
                 case RefundHashTimerLockMsg:
                     return convertRefundHashTimerLock(bytes);
-
+                case CreateSideChainValidator:
+                    return convertCreateSideChainValidator(bytes);
+                case EditSideChainValidator:
+                    return convertEditSideChainValidator(bytes);
+                case SideChainDelegate:
+                    return convertSideChainDelegate(bytes);
+                case SideChainRedelegate:
+                    return convertSideChainRedelegate(bytes);
+                case SideChainUndelegate:
+                    return convertSideChainUnBond(bytes);
+                case Claim:
+                    //transfer in,  update transfer out, update bind
+                    return convertClaimMsg(bytes);
+                case TransferOut:
+                    return convertTransferOutMsg(bytes);
+                case Bind:
+                    return convertBindMsg(bytes);
             }
             return null;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
+    private Transaction convertBindMsg(byte[] value) throws IOException {
+        byte[] raw = ByteUtil.cut(value, 4);
+        BindMsgMessage message = new BindMsgMessage();
+        amino.decodeBare(raw, message);
+
+        Bind bind = new Bind();
+        if (message.getFrom() != null && message.getFrom().getRaw() != null){
+            bind.setFrom(Crypto.encodeAddress(hrp, message.getFrom().getRaw()));
+        }
+        bind.setSymbol(message.getSymbol());
+        bind.setAmount(message.getAmount());
+        if (message.getContractAddress() != null) {
+            bind.setContractAddress(message.getContractAddress().getAddress());
+        }
+        bind.setContractDecimal(message.getContractDecimal());
+        bind.setExpireTime(message.getExpireTime());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.BIND);
+        transaction.setRealTx(bind);
+
+        return transaction;
+    }
+
+    private Transaction convertTransferOutMsg(byte[] value) throws IOException {
+        byte[] raw = ByteUtil.cut(value, 4);
+        TransferOutMsgMessage message = new TransferOutMsgMessage();
+        amino.decodeBare(raw, message);
+
+        TransferOut transferOut = new TransferOut();
+        if (message.getFrom() != null && message.getFrom().getRaw() != null){
+            transferOut.setFrom(Crypto.encodeAddress(hrp, message.getFrom().getRaw()));
+        }
+        if (message.getToAddress() != null){
+            transferOut.setToAddress(message.getToAddress().getAddress());
+        }
+
+        Token token = new Token();
+        if (message.getAmount() != null){
+            token.setAmount(message.getAmount().getAmount());
+            token.setDenom(message.getAmount().getDenom());
+        }
+        transferOut.setAmount(token);
+
+        transferOut.setExpireTime(message.getExpireTime());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.TRANSFER_OUT);
+        transaction.setRealTx(transferOut);
+
+        return transaction;
+    }
+
+    private Transaction convertClaimMsg(byte[] value) throws IOException {
+        byte[] raw = ByteUtil.cut(value, 4);
+        ClaimMsgMessage message = new ClaimMsgMessage();
+        amino.decodeBare(raw, message);
+        ClaimMsg claimMsg = new ClaimMsg();
+        claimMsg.setClaimType(message.getClaimType());
+        claimMsg.setSequence(message.getSequence());
+        claimMsg.setClaim(message.getClaim());
+        if (message.getValidatorAddress().getRaw() != null) {
+            claimMsg.setValidatorAddress(Crypto.encodeAddress(valHrp, message.getValidatorAddress().getRaw()));
+        }
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.CLAIM);
+        transaction.setRealTx(claimMsg);
+
+        return transaction;
+    }
+
+    private Transaction convertSideChainUnBond(byte[] value) throws IOException {
+        byte[] raw = ByteUtil.cut(value, 4);
+        SideChainUndelegateMessage message = new SideChainUndelegateMessage();
+        amino.decodeBare(raw, message);
+
+        SideChainUnBond unBond = new SideChainUnBond();
+
+        if (message.getDelegatorAddress() != null && message.getDelegatorAddress().getRaw() != null){
+            unBond.setDelegatorAddress(Crypto.encodeAddress(hrp, message.getDelegatorAddress().getRaw()));
+        }
+
+        if (message.getValidatorAddress() != null && message.getValidatorAddress().getRaw() != null){
+            unBond.setValidatorAddress(Crypto.encodeAddress(valHrp, message.getValidatorAddress().getRaw()));
+        }
+
+        Token amount = new Token();
+        if (message.getAmount() != null){
+            amount.setAmount(message.getAmount().getAmount());
+            amount.setDenom(message.getAmount().getDenom());
+        }
+        unBond.setAmount(amount);
+
+        unBond.setSideChainId(message.getSideChainId());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.SIDECHAIN_UNBOND);
+        transaction.setRealTx(unBond);
+
+        return transaction;
+    }
+
+    private Transaction convertSideChainRedelegate(byte[] value) throws IOException {
+        byte[] raw = ByteUtil.cut(value, 4);
+        SideChainRedelegateMessage message = new SideChainRedelegateMessage();
+        amino.decodeBare(raw, message);
+
+        SideChainRedelegate redelegate = new SideChainRedelegate();
+        if (message.getDelegatorAddress() != null && message.getDelegatorAddress().getRaw() != null){
+            redelegate.setDelegatorAddress(Crypto.encodeAddress(hrp, message.getDelegatorAddress().getRaw()));
+        }
+
+        if (message.getSrcValidatorAddress() != null && message.getSrcValidatorAddress().getRaw() != null){
+            redelegate.setSrcValidatorAddress(Crypto.encodeAddress(valHrp, message.getSrcValidatorAddress().getRaw()));
+        }
+
+        if (message.getDstValidatorAddress() != null && message.getDstValidatorAddress().getRaw() != null){
+            redelegate.setDstValidatorAddress(Crypto.encodeAddress(valHrp, message.getDstValidatorAddress().getRaw()));
+        }
+
+        Token amount = new Token();
+        if (message.getAmount() != null){
+            amount.setAmount(message.getAmount().getAmount());
+            amount.setDenom(message.getAmount().getDenom());
+        }
+        redelegate.setAmount(amount);
+
+        redelegate.setSideChainId(message.getSideChainId());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.SIDECHAIN_REDELEGATE);
+        transaction.setRealTx(redelegate);
+
+        return transaction;
+    }
+
+    private Transaction convertSideChainDelegate(byte[] value) throws IOException {
+        byte[] raw = ByteUtil.cut(value, 4);
+        SideChainDelegateMessage message = new SideChainDelegateMessage();
+        amino.decodeBare(raw, message);
+
+        SideChainDelegate sideChainDelegate = new SideChainDelegate();
+        if (message.getDelegatorAddress() != null && message.getDelegatorAddress().getRaw() != null){
+            sideChainDelegate.setDelegatorAddress(Crypto.encodeAddress(hrp, message.getDelegatorAddress().getRaw()));
+        }
+
+        if (message.getValidatorAddress() != null && message.getValidatorAddress().getRaw() != null){
+            sideChainDelegate.setValidatorAddress(Crypto.encodeAddress(valHrp, message.getValidatorAddress().getRaw()));
+        }
+
+        Token token = new Token();
+        if (message.getDelegation() != null){
+            token.setDenom(message.getDelegation().getDenom());
+            token.setAmount(message.getDelegation().getAmount());
+        }
+        sideChainDelegate.setDelegation(token);
+
+        sideChainDelegate.setSideChainId(message.getSideChainId());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.SIDECHAIN_DELEGATE);
+        transaction.setRealTx(sideChainDelegate);
+
+        return transaction;
+    }
+
+    private Transaction convertEditSideChainValidator(byte[] value) throws IOException {
+        byte[] raw = ByteUtil.cut(value, 4);
+        EditSideChainValidatorMessage message = new EditSideChainValidatorMessage();
+        amino.decodeBare(raw, message);
+
+        EditSideChainValidator editSideChainValidator = new EditSideChainValidator();
+
+        Description description = new Description();
+        if (message.getDescription() != null){
+            description.setMoniker(message.getDescription().getMoniker());
+            description.setDetails(message.getDescription().getDetails());
+            description.setIdentity(message.getDescription().getIdentity());
+            description.setWebsite(message.getDescription().getWebsite());
+        }
+        editSideChainValidator.setDescription(description);
+
+        if (message.getValidatorOperatorAddress() != null && message.getValidatorOperatorAddress().getRaw() != null){
+            editSideChainValidator.setValidatorAddress(Crypto.encodeAddress(valHrp, message.getValidatorOperatorAddress().getRaw()));
+        }
+
+        if (message.getCommissionRate() != null){
+            editSideChainValidator.setCommissionRate(message.getCommissionRate().getValue());
+        }
+
+        editSideChainValidator.setSideChainId(message.getSideChainId());
+
+        if (message.getSideFeeAddr() != null) {
+            editSideChainValidator.setSideFeeAddr("0x" + Hex.toHexString(message.getSideFeeAddr()));
+        }
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.EDIT_SIDECHAIN_VALIDATOR);
+        transaction.setRealTx(editSideChainValidator);
+
+        return transaction;
+    }
+
+    private Transaction convertCreateSideChainValidator(byte[] value) throws IOException {
+        byte[] raw = ByteUtil.cut(value, 4);
+        CreateSideChainValidatorMessage message = new CreateSideChainValidatorMessage();
+        amino.decodeBare(raw, message);
+
+        CreateSideChainValidator createSideChainValidator = new CreateSideChainValidator();
+
+        Description description = new Description();
+        if (message.getDescription() != null){
+            description.setMoniker(message.getDescription().getMoniker());
+            description.setDetails(message.getDescription().getDetails());
+            description.setIdentity(message.getDescription().getIdentity());
+            description.setWebsite(message.getDescription().getWebsite());
+        }
+        createSideChainValidator.setDescription(description);
+
+        Commission commission = new Commission();
+        if (message.getCommission() != null){
+            try {
+                commission.setRate(message.getCommission().getRate().getValue());
+                commission.setMaxRate(message.getCommission().getMaxRate().getValue());
+                commission.setMaxChangeRate(message.getCommission().getMaxChangeRate().getValue());
+            }catch (NullPointerException e){
+                //ignore
+            }
+        }
+        createSideChainValidator.setCommission(commission);
+
+        if (message.getDelegatorAddr() != null && message.getDelegatorAddr().getRaw() != null){
+            createSideChainValidator.setDelegatorAddr(Crypto.encodeAddress(hrp, message.getDelegatorAddr().getRaw()));
+        }
+
+        if (message.getValidatorOperatorAddr() != null && message.getValidatorOperatorAddr().getRaw() != null){
+            createSideChainValidator.setValidatorAddr(Crypto.encodeAddress(valHrp, message.getValidatorOperatorAddr().getRaw()));
+        }
+
+        Token delegation = new Token();
+        if (message.getDelegation() != null){
+            delegation.setAmount(message.getDelegation().getAmount());
+            delegation.setDenom(message.getDelegation().getDenom());
+        }
+        createSideChainValidator.setDelegation(delegation);
+
+        createSideChainValidator.setSideChainId(message.getSideChainId());
+
+        if (message.getSideConsAddr() != null) {
+            createSideChainValidator.setSideConsAddr("0x" + Hex.toHexString(message.getSideConsAddr()));
+        }
+
+        if (message.getSideFeeAddr() != null) {
+            createSideChainValidator.setSideFeeAddr("0x" + Hex.toHexString(message.getSideFeeAddr()));
+        }
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.CREATE_SIDECHAIN_VALIDATOR);
+        transaction.setRealTx(createSideChainValidator);
+        return transaction;
+    }
+
+
 
     private Transaction convertRefundHashTimerLock(byte[] value) throws InvalidProtocolBufferException {
         byte[] array = new byte[value.length - 4];

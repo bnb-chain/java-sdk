@@ -9,14 +9,16 @@ public class BinanceDexEnvironment {
             "wss://dex.binance.org/api",
             "https://dataseed1.ninicoin.io",
             "wss://dataseed1.ninicoin.io/websocket",
-            "bnb"
+            "bnb",
+            "bva"
     );
     public static final BinanceDexEnvironment TEST_NET = new BinanceDexEnvironment(
             "https://testnet-dex.binance.org",
             "wss://testnet-dex.binance.org/api",
             "http://data-seed-pre-0-s3.binance.org",
             "wss://data-seed-pre-0-s3.binance.org/websocket",
-            "tbnb"
+            "tbnb",
+            "tbva"
     );
 
     // Rest API base URL
@@ -29,13 +31,16 @@ public class BinanceDexEnvironment {
     private String wsBaseUrl;
     // Address human readable part prefix
     private String hrp;
+    // Address human readable part prefix for validator
+    private String valHrp;
 
-    public BinanceDexEnvironment(String baseUrl, String streamUrl, String nodeUrl, String wsBaseUrl, String hrp) {
+    public BinanceDexEnvironment(String baseUrl, String streamUrl, String nodeUrl, String wsBaseUrl, String hrp, String valHrp) {
         this.baseUrl = baseUrl;
         this.streamUrl = streamUrl;
         this.nodeUrl = nodeUrl;
         this.wsBaseUrl = wsBaseUrl;
         this.hrp = hrp;
+        this.valHrp = valHrp;
     }
 
     public String getBaseUrl() {
@@ -52,6 +57,10 @@ public class BinanceDexEnvironment {
 
     public String getHrp() {
         return hrp;
+    }
+
+    public String getValHrp() {
+        return valHrp;
     }
 
     @Override

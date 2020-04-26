@@ -5,7 +5,7 @@
 
     <groupId>com.binance.dex.api</groupId>
     <artifactId>binance-dex-api-client</artifactId>
-    <version>1.0.6</version>
+    <version>1.1.0</version>
 
     <properties>
         <com.squareup.retrofit2.version>2.6.0</com.squareup.retrofit2.version>

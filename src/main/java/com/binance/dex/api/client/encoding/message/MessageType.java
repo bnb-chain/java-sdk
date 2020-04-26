@@ -37,7 +37,10 @@ public enum MessageType {
     EditSideChainValidator("264CC57B"),
     SideChainDelegate("E3A07FD2"),
     SideChainRedelegate("E3CED364"),
-    SideChainUndelegate("514F7E0E");
+    SideChainUndelegate("514F7E0E"),
+    Claim("175A0521"),
+    TransferOut("800819C0"),
+    Bind("B9AE640C");
     private byte[] typePrefixBytes;
 
     MessageType(String typePrefix) {

@@ -1,60 +1,68 @@
 package com.binance.dex.api.client.encoding.message.sidechain.query;
 
-import com.binance.dex.api.client.encoding.amino.AminoField;
-import com.binance.dex.api.client.encoding.amino.AminoSerializable;
-import com.binance.dex.api.client.encoding.message.sidechain.value.CoinValue;
-import com.binance.dex.api.client.encoding.message.sidechain.value.Dec;
-import com.binance.dex.api.client.encoding.message.sidechain.value.TimestampValue;
-
-import java.util.ArrayList;
+import com.binance.dex.api.client.encoding.message.common.CoinValue;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * @author Fitz.Lu
  **/
-public class SideChainRedelegationMessage implements AminoSerializable {
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonPropertyOrder(alphabetic = true)
+public class SideChainRedelegationMessage {
 
-    private byte[] delegatorAddress;
+    @JsonProperty(value = "delegator_addr")
+    private String delegatorAddress;
 
-    private byte[] srcValidatorAddress;
+    @JsonProperty(value = "validator_src_addr")
+    private String srcValidatorAddress;
 
-    private byte[] dstValidatorAddress;
+    @JsonProperty(value = "validator_dst_addr")
+    private String dstValidatorAddress;
 
+    @JsonProperty(value = "creation_height")
     private long createHeight;
 
-    private TimestampValue minTime = new TimestampValue();
+    @JsonProperty(value = "min_time")
+    private String minTime;
 
-    private CoinValue initialBalance = new CoinValue();
+    @JsonProperty(value = "initial_balance")
+    private CoinValue initialBalance;
 
-    private CoinValue balance = new CoinValue();
+    @JsonProperty(value = "balance")
+    private CoinValue balance;
 
-    private Dec srcShares = new Dec();
+    @JsonProperty(value = "shares_src")
+    private long srcShares;
 
-    private Dec dstShare = new Dec();
+    @JsonProperty(value = "shares_dst")
+    private long dstShare;
 
     public SideChainRedelegationMessage() {
     }
 
-    public byte[] getDelegatorAddress() {
+    public String getDelegatorAddress() {
         return delegatorAddress;
     }
 
-    public void setDelegatorAddress(byte[] delegatorAddress) {
+    public void setDelegatorAddress(String delegatorAddress) {
         this.delegatorAddress = delegatorAddress;
     }
 
-    public byte[] getSrcValidatorAddress() {
+    public String getSrcValidatorAddress() {
         return srcValidatorAddress;
     }
 
-    public void setSrcValidatorAddress(byte[] srcValidatorAddress) {
+    public void setSrcValidatorAddress(String srcValidatorAddress) {
         this.srcValidatorAddress = srcValidatorAddress;
     }
 
-    public byte[] getDstValidatorAddress() {
+    public String getDstValidatorAddress() {
         return dstValidatorAddress;
     }
 
-    public void setDstValidatorAddress(byte[] dstValidatorAddress) {
+    public void setDstValidatorAddress(String dstValidatorAddress) {
         this.dstValidatorAddress = dstValidatorAddress;
     }
 
@@ -66,11 +74,11 @@ public class SideChainRedelegationMessage implements AminoSerializable {
         this.createHeight = createHeight;
     }
 
-    public TimestampValue getMinTime() {
+    public String getMinTime() {
         return minTime;
     }
 
-    public void setMinTime(TimestampValue minTime) {
+    public void setMinTime(String minTime) {
         this.minTime = minTime;
     }
 
@@ -90,74 +98,19 @@ public class SideChainRedelegationMessage implements AminoSerializable {
         this.balance = balance;
     }
 
-    public Dec getSrcShares() {
+    public long getSrcShares() {
         return srcShares;
     }
 
-    public void setSrcShares(Dec srcShares) {
+    public void setSrcShares(long srcShares) {
         this.srcShares = srcShares;
     }
 
-    public Dec getDstShare() {
+    public long getDstShare() {
         return dstShare;
     }
 
-    public void setDstShare(Dec dstShare) {
+    public void setDstShare(long dstShare) {
         this.dstShare = dstShare;
-    }
-
-    @Override
-    public AminoSerializable newAminoMessage() {
-        return new SideChainRedelegationMessage();
-    }
-
-    @Override
-    public ArrayList<AminoField<?>> IterateFields() {
-        return AminoField.newFieldsBuilder()
-                .addField(byte[].class, delegatorAddress, delegatorAddress == null || delegatorAddress.length == 0)
-                .addField(byte[].class, srcValidatorAddress, srcValidatorAddress == null || srcValidatorAddress.length == 0)
-                .addField(byte[].class, dstValidatorAddress, dstValidatorAddress == null || dstValidatorAddress.length == 0)
-                .addField(Long.class, createHeight, createHeight == 0)
-                .addField(TimestampValue.class, minTime, minTime == null)
-                .addField(CoinValue.class, initialBalance, initialBalance == null)
-                .addField(CoinValue.class, balance, balance == null)
-                .addField(Dec.class, srcShares, srcShares == null || srcShares.isDefaultOrEmpty())
-                .addField(Dec.class, dstShare, dstShare == null || dstShare.isDefaultOrEmpty())
-                .build();
-    }
-
-    @Override
-    public void setValueByFieldIndex(int fieldIndex, Object value) {
-        switch (fieldIndex) {
-            case 1:
-                delegatorAddress = ((byte[]) value);
-                break;
-            case 2:
-                srcValidatorAddress = ((byte[]) value);
-                break;
-            case 3:
-                dstValidatorAddress = ((byte[]) value);
-                break;
-            case 4:
-                createHeight = ((long) value);
-                break;
-            case 5:
-                minTime = ((TimestampValue) value);
-                break;
-            case 6:
-                initialBalance = ((CoinValue) value);
-                break;
-            case 7:
-                balance = ((CoinValue) value);
-                break;
-            case 8:
-                srcShares = ((Dec) value);
-                break;
-            case 9:
-                dstShare = ((Dec) value);
-                break;
-            default:
-                break;
-        }
     }
 }

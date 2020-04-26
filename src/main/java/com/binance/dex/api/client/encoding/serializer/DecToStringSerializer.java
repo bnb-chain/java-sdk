@@ -1,6 +1,6 @@
 package com.binance.dex.api.client.encoding.serializer;
 
-import com.binance.dex.api.client.encoding.message.sidechain.value.Dec;
+import com.binance.dex.api.client.encoding.message.common.Dec;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;

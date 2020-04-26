@@ -347,3 +347,16 @@ message RefundHashTimerLockMsg {
     bytes from = 1;
     bytes swap_id = 2;
 }
+
+message Status {
+    int32 text = 1;
+    string finalClaim = 2;
+}
+
+message Prophecy {
+    string id = 1;
+    Status status = 2;
+
+    map<string, bytes> claimValidators = 3;
+    map<string, string> validatorClaims = 4;
+}

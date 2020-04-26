@@ -3,9 +3,10 @@ package com.binance.dex.api.client.encoding.message.sidechain.transaction;
 import com.binance.dex.api.client.encoding.amino.AminoField;
 import com.binance.dex.api.client.encoding.amino.AminoSerializable;
 import com.binance.dex.api.client.encoding.message.BinanceDexTransactionMessage;
+import com.binance.dex.api.client.encoding.message.common.Bech32AddressValue;
+import com.binance.dex.api.client.encoding.message.common.CoinValueStr;
 import com.binance.dex.api.client.encoding.message.sidechain.value.*;
-import com.binance.dex.api.client.encoding.serializer.AccAddressValueToStringSerializer;
-import com.binance.dex.api.client.encoding.serializer.ValAddressValueToStringSerializer;
+import com.binance.dex.api.client.encoding.serializer.Bech32AddressValueToStringSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -25,15 +26,15 @@ public class CreateSideChainValidatorMessage implements BinanceDexTransactionMes
     private CommissionMsgValue commission = new CommissionMsgValue();
 
     @JsonProperty(value = "delegator_address")
-    @JsonSerialize(using = AccAddressValueToStringSerializer.class)
-    private AddressValue delegatorAddr;
+    @JsonSerialize(using = Bech32AddressValueToStringSerializer.class)
+    private Bech32AddressValue delegatorAddr;
 
     @JsonProperty(value = "validator_address")
-    @JsonSerialize(using = ValAddressValueToStringSerializer.class)
-    private AddressValue validatorOperatorAddr;
+    @JsonSerialize(using = Bech32AddressValueToStringSerializer.class)
+    private Bech32AddressValue validatorOperatorAddr;
 
     @JsonProperty(value = "delegation")
-    private CoinValue delegation;
+    private CoinValueStr delegation;
 
     @JsonProperty(value = "side_chain_id")
     private String sideChainId;
@@ -45,6 +46,11 @@ public class CreateSideChainValidatorMessage implements BinanceDexTransactionMes
     private byte[] sideFeeAddr;
 
     @Override
+    public boolean useAminoJson() {
+        return true;
+    }
+
+    @Override
     public void setValueByFieldIndex(int fieldIndex, Object value) {
         switch (fieldIndex) {
             case 1:
@@ -54,13 +60,13 @@ public class CreateSideChainValidatorMessage implements BinanceDexTransactionMes
                 commission = ((CommissionMsgValue) value);
                 break;
             case 3:
-                delegatorAddr = ((AddressValue) value);
+                delegatorAddr = ((Bech32AddressValue) value);
                 break;
             case 4:
-                validatorOperatorAddr = ((AddressValue) value);
+                validatorOperatorAddr = ((Bech32AddressValue) value);
                 break;
             case 5:
-                delegation = ((CoinValue) value);
+                delegation = ((CoinValueStr) value);
                 break;
             case 6:
                 sideChainId = ((String) value);
@@ -86,9 +92,9 @@ public class CreateSideChainValidatorMessage implements BinanceDexTransactionMes
         ArrayList<AminoField<?>> fields = new ArrayList<>();
         fields.add(new AminoField<>(DescriptionValue.class, description, description == null));
         fields.add(new AminoField<>(CommissionMsgValue.class, commission, commission == null));
-        fields.add(new AminoField<>(AddressValue.class, delegatorAddr, delegatorAddr == null || delegatorAddr.isDefaultOrEmpty()));
-        fields.add(new AminoField<>(AddressValue.class, validatorOperatorAddr, validatorOperatorAddr == null || validatorOperatorAddr.isDefaultOrEmpty()));
-        fields.add(new AminoField<>(CoinValue.class, delegation, delegation == null));
+        fields.add(new AminoField<>(Bech32AddressValue.class, delegatorAddr, delegatorAddr == null || delegatorAddr.isDefaultOrEmpty()));
+        fields.add(new AminoField<>(Bech32AddressValue.class, validatorOperatorAddr, validatorOperatorAddr == null || validatorOperatorAddr.isDefaultOrEmpty()));
+        fields.add(new AminoField<>(CoinValueStr.class, delegation, delegation == null));
         fields.add(new AminoField<>(String.class, sideChainId, StringUtils.isEmpty(sideChainId)));
         fields.add(new AminoField<>(byte[].class, sideConsAddr, sideConsAddr == null || sideConsAddr.length == 0));
         fields.add(new AminoField<>(byte[].class, sideFeeAddr, sideFeeAddr == null || sideFeeAddr.length == 0));
@@ -111,27 +117,27 @@ public class CreateSideChainValidatorMessage implements BinanceDexTransactionMes
         this.commission = commission;
     }
 
-    public AddressValue getDelegatorAddr() {
+    public Bech32AddressValue getDelegatorAddr() {
         return delegatorAddr;
     }
 
-    public void setDelegatorAddr(AddressValue delegatorAddr) {
+    public void setDelegatorAddr(Bech32AddressValue delegatorAddr) {
         this.delegatorAddr = delegatorAddr;
     }
 
-    public AddressValue getValidatorOperatorAddr() {
+    public Bech32AddressValue getValidatorOperatorAddr() {
         return validatorOperatorAddr;
     }
 
-    public void setValidatorOperatorAddr(AddressValue validatorOperatorAddr) {
+    public void setValidatorOperatorAddr(Bech32AddressValue validatorOperatorAddr) {
         this.validatorOperatorAddr = validatorOperatorAddr;
     }
 
-    public CoinValue getDelegation() {
+    public CoinValueStr getDelegation() {
         return delegation;
     }
 
-    public void setDelegation(CoinValue delegation) {
+    public void setDelegation(CoinValueStr delegation) {
         this.delegation = delegation;
     }
 

@@ -2,6 +2,7 @@ package com.binance.dex.api.client.encoding.message.sidechain.value;
 
 import com.binance.dex.api.client.encoding.amino.AminoField;
 import com.binance.dex.api.client.encoding.amino.AminoSerializable;
+import com.binance.dex.api.client.encoding.message.common.CoinValueStr;
 
 import java.util.ArrayList;
 
@@ -14,9 +15,9 @@ public class UnBondingValue implements AminoSerializable {
 
     private TimestampValue minTime = new TimestampValue();
 
-    private CoinValue initialBalance = new CoinValue();
+    private CoinValueStr initialBalance = new CoinValueStr();
 
-    private CoinValue balance = new CoinValue();
+    private CoinValueStr balance = new CoinValueStr();
 
     public UnBondingValue() {
     }
@@ -37,19 +38,19 @@ public class UnBondingValue implements AminoSerializable {
         this.minTime = minTime;
     }
 
-    public CoinValue getInitialBalance() {
+    public CoinValueStr getInitialBalance() {
         return initialBalance;
     }
 
-    public void setInitialBalance(CoinValue initialBalance) {
+    public void setInitialBalance(CoinValueStr initialBalance) {
         this.initialBalance = initialBalance;
     }
 
-    public CoinValue getBalance() {
+    public CoinValueStr getBalance() {
         return balance;
     }
 
-    public void setBalance(CoinValue balance) {
+    public void setBalance(CoinValueStr balance) {
         this.balance = balance;
     }
 
@@ -63,8 +64,8 @@ public class UnBondingValue implements AminoSerializable {
         return AminoField.newFieldsBuilder()
                 .addField(Long.class, creationHeight, creationHeight == 0)
                 .addField(TimestampValue.class, minTime, minTime == null)
-                .addField(CoinValue.class, initialBalance, initialBalance == null)
-                .addField(CoinValue.class, balance, balance == null)
+                .addField(CoinValueStr.class, initialBalance, initialBalance == null)
+                .addField(CoinValueStr.class, balance, balance == null)
                 .build();
     }
 
@@ -78,10 +79,10 @@ public class UnBondingValue implements AminoSerializable {
                 minTime = ((TimestampValue) value);
                 break;
             case 3:
-                initialBalance = ((CoinValue) value);
+                initialBalance = ((CoinValueStr) value);
                 break;
             case 4:
-                balance = ((CoinValue) value);
+                balance = ((CoinValueStr) value);
                 break;
             default:
                 break;
