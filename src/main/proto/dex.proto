@@ -353,7 +353,7 @@ message MiniTokenIssue {
     bytes  from = 1; // issue token owner
     string name = 2;
     string symbol = 3;
-    int64  max_total_supply = 4;
+    int32  token_type = 4;
     int64  total_supply = 5;
     bool   mintable = 6;
     string token_uri = 7;

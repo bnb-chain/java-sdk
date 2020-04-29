@@ -1,15 +1,15 @@
 package com.binance.dex.api.client.domain.broadcast;
 
 public class MiniTokenIssue extends Issue {
-    private Long maxTotalSupply;
+    private int tokenType;
     private String tokenURI;
 
-    public Long getMaxTotalSupply() {
-        return maxTotalSupply;
+    public int getTokenType() {
+        return tokenType;
     }
 
-    public void setMaxTotalSupply(Long maxTotalSupply) {
-        this.maxTotalSupply = maxTotalSupply;
+    public void setTokenType(int tokenType) {
+        this.tokenType = tokenType;
     }
 
     public String getTokenURI() {
@@ -26,7 +26,7 @@ public class MiniTokenIssue extends Issue {
                 "from='" + super.getFrom() + '\'' +
                 ", name='" + super.getName() + '\'' +
                 ", symbol='" + super.getSymbol() + '\'' +
-                ", maxTotalSupply=" + maxTotalSupply +
+                ", tokenType=" + tokenType +
                 ", totalSupply=" + super.getTotalSupply() +
                 ", tokenURI=" + tokenURI +
                 ", mintable=" + super.getMintable() +

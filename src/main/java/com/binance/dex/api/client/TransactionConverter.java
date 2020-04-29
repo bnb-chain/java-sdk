@@ -592,7 +592,7 @@ public class TransactionConverter {
         issue.setFrom(Crypto.encodeAddress(hrp, issueMessage.getFrom().toByteArray()));
         issue.setName(issueMessage.getName());
         issue.setSymbol(issueMessage.getSymbol());
-        issue.setMaxTotalSupply(issueMessage.getMaxTotalSupply());
+        issue.setTokenType(issueMessage.getTokenType());
         issue.setTotalSupply(issueMessage.getTotalSupply());
         issue.setMintable(issueMessage.getMintable());
         issue.setTokenURI(issueMessage.getTokenUri());
