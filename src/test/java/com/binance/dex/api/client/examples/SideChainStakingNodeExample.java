@@ -11,6 +11,7 @@ import com.binance.dex.api.client.domain.stake.Description;
 import com.binance.dex.api.client.domain.stake.Pool;
 import com.binance.dex.api.client.domain.stake.sidechain.*;
 import com.binance.dex.api.client.encoding.message.*;
+import com.binance.dex.api.client.encoding.message.sidechain.SideChainIds;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,7 +43,7 @@ public class SideChainStakingNodeExample {
     }
 
     @Test
-    public void testCreateSideChainValidator(){
+    public void testCreateSideChainValidator() throws IOException, NoSuchAlgorithmException {
         CreateSideChainValidator createSideChainValidator = new CreateSideChainValidator();
 
         //create and set description
@@ -72,7 +73,7 @@ public class SideChainStakingNodeExample {
         createSideChainValidator.setDelegation(delegationToken);
 
         //set side-chain id
-        createSideChainValidator.setSideChainId("bsc");
+        createSideChainValidator.setSideChainId(SideChainIds.BSC);
 
         //set side-chain validator cons address
         createSideChainValidator.setSideConsAddr("0x9fB29AAc15b9A4B7F17c3385939b007540f4d791");
@@ -82,18 +83,12 @@ public class SideChainStakingNodeExample {
 
         TransactionOption options = new TransactionOption("", 0, null);
 
-        try {
-            List<TransactionMetadata> transactionMetadatas = nodeClient.createSideChainValidator(createSideChainValidator, wallet, options, true);
-            for (TransactionMetadata transactionMetadata : transactionMetadatas) {
-                System.out.println(transactionMetadata.toString());
-            }
-        } catch (IOException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        List<TransactionMetadata> transactionMetadatas = nodeClient.createSideChainValidator(createSideChainValidator, wallet, options, true);
+        Assert.assertEquals(1, transactionMetadatas.size());
     }
 
     @Test
-    public void testEditSideChainValidator(){
+    public void testEditSideChainValidator() throws IOException, NoSuchAlgorithmException {
         EditSideChainValidator editSideChainValidator = new EditSideChainValidator();
 
         //set new description if needed
@@ -107,20 +102,14 @@ public class SideChainStakingNodeExample {
         //set new fee address if needed
         editSideChainValidator.setSideFeeAddr("0xd1B22dCC24C55f4d728E7aaA5c9b5a22e1512C08");
 
-        editSideChainValidator.setSideChainId("bsc");
+        editSideChainValidator.setSideChainId(SideChainIds.BSC);
 
-        try {
-            List<TransactionMetadata> transactionMetadatas = nodeClient.editSideChainValidator(editSideChainValidator, wallet, createTransactionOptionForTest(), true);
-            for (TransactionMetadata transactionMetadata : transactionMetadatas) {
-                consolePrintln(transactionMetadata);
-            }
-        }catch (IOException | NoSuchAlgorithmException e){
-            e.printStackTrace();
-        }
+        List<TransactionMetadata> transactionMetadatas = nodeClient.editSideChainValidator(editSideChainValidator, wallet, createTransactionOptionForTest(), true);
+        Assert.assertEquals(1, transactionMetadatas.size());
     }
 
     @Test
-    public void testSideChainDelegate(){
+    public void testSideChainDelegate() throws IOException, NoSuchAlgorithmException {
         SideChainDelegate sideChainDelegate = new SideChainDelegate();
 
         //set delegate token
@@ -134,20 +123,14 @@ public class SideChainStakingNodeExample {
         sideChainDelegate.setValidatorAddress(roseValidator);
 
         //set side-chain id
-        sideChainDelegate.setSideChainId("bsc");
+        sideChainDelegate.setSideChainId(SideChainIds.BSC);
 
-        try {
-            List<TransactionMetadata> transactionMetadatas = nodeClient.sideChainDelegate(sideChainDelegate, wallet, createTransactionOptionForTest(), true);
-            for (TransactionMetadata transactionMetadata : transactionMetadatas) {
-                consolePrintln(transactionMetadata);
-            }
-        }catch (IOException | NoSuchAlgorithmException e){
-            e.printStackTrace();
-        }
+        List<TransactionMetadata> transactionMetadatas = nodeClient.sideChainDelegate(sideChainDelegate, wallet, createTransactionOptionForTest(), true);
+        Assert.assertEquals(1, transactionMetadatas.size());
     }
 
     @Test
-    public void testSideChainRedelegate(){
+    public void testSideChainRedelegate() throws IOException, NoSuchAlgorithmException {
         SideChainRedelegate redelegate = new SideChainRedelegate();
 
         //set redelegate amount
@@ -163,18 +146,14 @@ public class SideChainStakingNodeExample {
         redelegate.setDstValidatorAddress(roseValidator);
 
         //set side-chain id
-        redelegate.setSideChainId("bsc");
+        redelegate.setSideChainId(SideChainIds.BSC);
 
-        try {
-            List<TransactionMetadata> transactionMetadatas = nodeClient.sideChainRedelagate(redelegate, wallet, createTransactionOptionForTest(), true);
-            consolePrintln(transactionMetadatas.get(0));
-        }catch (IOException | NoSuchAlgorithmException e){
-            e.printStackTrace();
-        }
+        List<TransactionMetadata> transactionMetadatas = nodeClient.sideChainRedelagate(redelegate, wallet, createTransactionOptionForTest(), true);
+        Assert.assertEquals(1, transactionMetadatas.size());
     }
 
     @Test
-    public void testSideChainUnbond(){
+    public void testSideChainUnbond() throws IOException, NoSuchAlgorithmException {
         SideChainUnBond sideChainUndelegate = new SideChainUnBond();
 
         //set unbond amount
@@ -187,105 +166,93 @@ public class SideChainStakingNodeExample {
         sideChainUndelegate.setValidatorAddress(jackValidator);
 
         //set side-chain id
-        sideChainUndelegate.setSideChainId("bsc");
+        sideChainUndelegate.setSideChainId(SideChainIds.BSC);
 
-        try {
-            List<TransactionMetadata> transactionMetadatas = nodeClient.sideChainUnbond(sideChainUndelegate, wallet, createTransactionOptionForTest(), true);
-            consolePrintln(transactionMetadatas.get(0));
-        }catch (IOException | NoSuchAlgorithmException e){
-            e.printStackTrace();
-        }
+        List<TransactionMetadata> transactionMetadatas = nodeClient.sideChainUnbond(sideChainUndelegate, wallet, createTransactionOptionForTest(), true);
+        Assert.assertEquals(1, transactionMetadatas.size());
     }
 
     @Test
     public void testGetSideChainValidator() throws IOException {
-        SideChainValidator validator = nodeClient.getSideChainValidator("bsc", jackValidator);
-        Assert.assertNotNull(validator);
-        consolePrintln(validator);
-    }
-
-    @Test
-    public void testGetSideChainTopValidators() throws IOException {
-        List<SideChainValidator> validators = nodeClient.getSideChainTopValidators("bsc", 5);
-        for (SideChainValidator validator : validators) {
-            consolePrintln(validator);
+        SideChainValidator validator = nodeClient.getSideChainValidator(SideChainIds.BSC, jackValidator);
+        if (validator != null){
+            Assert.assertNotNull(validator.getOperatorAddr());
         }
     }
 
     @Test
+    public void testGetSideChainTopValidators() throws IOException {
+        List<SideChainValidator> validators = nodeClient.getSideChainTopValidators(SideChainIds.BSC, 5);
+        Assert.assertNotNull(validators);
+    }
+
+    @Test
     public void testGetSideChainDelegation() throws IOException {
-        SideChainDelegation delegation = nodeClient.getSideChainDelegation("bsc", wallet.getAddress(), roseValidator);
+        SideChainDelegation delegation = nodeClient.getSideChainDelegation(SideChainIds.BSC, wallet.getAddress(), roseValidator);
         if (delegation != null) {
-            consolePrintln(delegation);
+            Assert.assertNotNull(delegation.getDelegation());
+            Assert.assertNotNull(delegation.getBalance());
         }
     }
 
     @Test
     public void testGetSideChainDelegations() throws IOException {
-        List<SideChainDelegation> delegations = nodeClient.getSideChainDelegations("bsc", wallet.getAddress());
-        for (SideChainDelegation delegation : delegations) {
-            consolePrintln(delegation);
-        }
+        List<SideChainDelegation> delegations = nodeClient.getSideChainDelegations(SideChainIds.BSC, wallet.getAddress());
+        Assert.assertNotNull(delegations);
     }
 
     @Test
     public void getSideChainRedelegation() throws IOException {
-        SideChainRedelegation redelegation = nodeClient.getSideChainRedelegation("bsc", wallet.getAddress(), jackValidator, roseValidator);
+        SideChainRedelegation redelegation = nodeClient.getSideChainRedelegation(SideChainIds.BSC, wallet.getAddress(), jackValidator, roseValidator);
         if (redelegation != null) {
-            consolePrintln(redelegation);
+            Assert.assertNotNull(redelegation.getDelegatorAddress());
         }
     }
 
     @Test
     public void getSideChainRedelegations() throws IOException {
-        List<SideChainRedelegation> redelegations = nodeClient.getSideChainRedelegations("bsc", wallet.getAddress());
-        for (SideChainRedelegation redelegation : redelegations) {
-            consolePrintln(redelegation);
-        }
+        List<SideChainRedelegation> redelegations = nodeClient.getSideChainRedelegations(SideChainIds.BSC, wallet.getAddress());
+        Assert.assertNotNull(redelegations);
     }
 
     @Test
     public void getSideChainUnBondingDelegation() throws IOException {
-        UnBondingDelegation unBondingDelegation = nodeClient.getSideChainUnBondingDelegation("bsc", wallet.getAddress(), jackValidator);
+        UnBondingDelegation unBondingDelegation = nodeClient.getSideChainUnBondingDelegation(SideChainIds.BSC, wallet.getAddress(), jackValidator);
         if (unBondingDelegation != null) {
-            consolePrintln(unBondingDelegation);
+            Assert.assertNotNull(unBondingDelegation.getDelegatorAddress());
         }
     }
 
     @Test
     public void getSideChainUnBondingDelegations() throws IOException {
-        List<UnBondingDelegation> unBondingDelegations = nodeClient.getSideChainUnBondingDelegations("bsc", wallet.getAddress());
-        for (UnBondingDelegation unBondingDelegation : unBondingDelegations) {
-            consolePrintln(unBondingDelegation);
-        }
+        List<UnBondingDelegation> unBondingDelegations = nodeClient.getSideChainUnBondingDelegations(SideChainIds.BSC, wallet.getAddress());
+        Assert.assertNotNull(unBondingDelegations);
     }
 
     @Test
     public void testGetSideChainUnBondingDelegationsByValidator() throws IOException {
-        List<UnBondingDelegation> unBondingDelegations = nodeClient.getSideChainUnBondingDelegationsByValidator("bsc", jackValidator);
-        for (UnBondingDelegation unBondingDelegation : unBondingDelegations) {
-            consolePrintln(unBondingDelegation);
-        }
+        List<UnBondingDelegation> unBondingDelegations = nodeClient.getSideChainUnBondingDelegationsByValidator(SideChainIds.BSC, jackValidator);
+        Assert.assertNotNull(unBondingDelegations);
     }
 
     @Test
     public void testGetSideChainRedelegationsByValidator() throws IOException {
-        List<SideChainRedelegation> redelegations = nodeClient.getSideChainRedelegationsByValidator("bsc", jackValidator);
-        for (SideChainRedelegation redelegation : redelegations) {
-            consolePrintln(redelegation);
-        }
+        List<SideChainRedelegation> redelegations = nodeClient.getSideChainRedelegationsByValidator(SideChainIds.BSC, jackValidator);
+        Assert.assertNotNull(redelegations);
     }
 
     @Test
     public void testGetSideChainPool() throws IOException {
-        Pool pool = nodeClient.getSideChainPool("bsc");
-        consolePrintln(pool);
+        Pool pool = nodeClient.getSideChainPool(SideChainIds.BSC);
+        if (pool != null){
+            Assert.assertTrue(pool.getBondedTokens() >= 0L);
+        }
     }
 
     @Test
     public void testGetSideChainValidatorsCount() throws IOException {
-        long count = nodeClient.getAllSideChainValidatorsCount("bsc", false);
-        consolePrintln(count);
+        long count = nodeClient.getAllSideChainValidatorsCount(SideChainIds.BSC, false);
+        Assert.assertTrue(count >= 0);
     }
 
     /**

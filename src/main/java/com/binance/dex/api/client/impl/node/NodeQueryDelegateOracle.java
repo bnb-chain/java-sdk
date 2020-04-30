@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * @author Fitz.Lu
  **/
-public class NodeQueryDelegateOracle extends NodeQueryDelegate {
+public class NodeQueryDelegateOracle extends NodeQuery {
 
     private static final String oracleStoreName = "oracle";
 

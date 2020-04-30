@@ -6,6 +6,7 @@ import com.binance.dex.api.client.encoding.Crypto;
 import com.binance.dex.api.client.encoding.EncodeUtils;
 import com.binance.dex.api.client.encoding.amino.Amino;
 import com.binance.dex.api.client.encoding.amino.AminoSerializable;
+import com.binance.dex.api.client.encoding.amino.InternalAmino;
 import com.binance.dex.api.client.encoding.amino.WireType;
 import com.binance.dex.api.proto.StdSignature;
 import com.binance.dex.api.proto.StdTx;
@@ -36,7 +37,7 @@ public class TransactionRequestAssembler {
     public TransactionRequestAssembler(Wallet wallet, TransactionOption options) {
         this.wallet = wallet;
         this.options = options;
-        this.amino = new Amino();
+        this.amino = InternalAmino.get();
     }
 
     public static long doubleToLong(String d) {

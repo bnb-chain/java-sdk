@@ -3,11 +3,7 @@ package com.binance.dex.api.client.encoding;
 import com.binance.dex.api.client.BinanceDexEnvironment;
 import com.binance.dex.api.client.TransactionConverter;
 import com.binance.dex.api.client.Wallet;
-import com.binance.dex.api.client.domain.bridge.TransferIn;
-import com.binance.dex.api.client.domain.bridge.TransferOut;
 import com.binance.dex.api.client.domain.broadcast.Transaction;
-import com.binance.dex.api.client.domain.broadcast.TransactionOption;
-import com.binance.dex.api.client.domain.oracle.ClaimMsg;
 import com.binance.dex.api.client.domain.stake.Commission;
 import com.binance.dex.api.client.domain.stake.Description;
 import com.binance.dex.api.client.domain.stake.sidechain.*;
@@ -53,7 +49,7 @@ public class AminoTest {
         message.setValidatorAddress(Bech32AddressValue.fromBech32String("bva1337r5pk3r6kvs4a8kc3u5yhdjc79c5lg78343t"));
         byte[] data = amino.encode(message, MessageType.Claim.getTypePrefixBytes(), false);
         Transaction transaction = transactionConverter.convert(data);
-        System.out.println(transaction.getRealTx());
+        Assert.assertNotNull(transaction.getRealTx());
     }
 
     @Test
@@ -65,7 +61,7 @@ public class AminoTest {
         message.setToAddress(EthAddressValue.from("0xd1B22dCC24C55f4d728E7aaA5c9b5a22e1512C08"));
         byte[] data = amino.encode(message, MessageType.TransferOut.getTypePrefixBytes(), false);
         Transaction transaction = transactionConverter.convert(data);
-        System.out.println(transaction.getRealTx());
+        Assert.assertNotNull(transaction.getRealTx());
     }
 
     @Test
@@ -79,7 +75,7 @@ public class AminoTest {
         message.setSymbol("BNB");
         byte[] data = amino.encode(message, MessageType.Bind.getTypePrefixBytes(), false);
         Transaction transaction = transactionConverter.convert(data);
-        System.out.println(transaction.getRealTx());
+        Assert.assertNotNull(transaction.getRealTx());
     }
 
     @Test
@@ -126,7 +122,7 @@ public class AminoTest {
         byte[] msg = amino.encode(convert(createSideChainValidator), MessageType.CreateSideChainValidator.getTypePrefixBytes(), false);
 
         Transaction tx = transactionConverter.convert(msg);
-        System.out.println(tx.getRealTx());
+        Assert.assertNotNull(tx.getRealTx());
     }
 
     @Test
@@ -152,7 +148,7 @@ public class AminoTest {
         byte[] msg = amino.encode(convert(editSideChainValidator), MessageType.EditSideChainValidator.getTypePrefixBytes(), false);
 
         Transaction tx = transactionConverter.convert(msg);
-        System.out.println(tx.getRealTx());
+        Assert.assertNotNull(tx.getRealTx());
     }
 
     @Test
@@ -175,7 +171,7 @@ public class AminoTest {
         byte[] msg = amino.encode(convert(sideChainDelegate), MessageType.SideChainDelegate.getTypePrefixBytes(), false);
 
         Transaction tx = transactionConverter.convert(msg);
-        System.out.println(tx.getRealTx());
+        Assert.assertNotNull(tx.getRealTx());
     }
 
     @Test
@@ -200,7 +196,7 @@ public class AminoTest {
         byte[] msg = amino.encode(convert(redelegate), MessageType.SideChainRedelegate.getTypePrefixBytes(), false);
 
         Transaction tx = transactionConverter.convert(msg);
-        System.out.println(tx.getRealTx());
+        Assert.assertNotNull(tx.getRealTx());
     }
 
     @Test
@@ -222,7 +218,7 @@ public class AminoTest {
         byte[] msg = amino.encode(convert(sideChainUndelegate), MessageType.SideChainUndelegate.getTypePrefixBytes(), false);
 
         Transaction tx = transactionConverter.convert(msg);
-        System.out.println(tx.getRealTx());
+        Assert.assertNotNull(tx.getRealTx());
     }
 
     EditSideChainValidatorMessage convert(EditSideChainValidator editSideChainValidator){

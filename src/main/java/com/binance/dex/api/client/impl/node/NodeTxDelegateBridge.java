@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * @author Fitz.Lu
  **/
-public class NodeTxDelegateBridge extends NodeTxDelegate {
+public class NodeTxDelegateBridge extends NodeTx {
 
     public NodeTxDelegateBridge(BinanceDexNodeApi binanceDexNodeApi, String hrp, String valHrp) {
         super(binanceDexNodeApi, hrp, valHrp);

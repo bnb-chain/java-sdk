@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * @author Fitz.Lu
  **/
-class NodeTxDelegate {
+class NodeTx {
 
     protected final BinanceDexNodeApi binanceDexNodeApi;
 
@@ -29,7 +29,7 @@ class NodeTxDelegate {
 
     protected final String valHrp;
 
-    NodeTxDelegate(BinanceDexNodeApi binanceDexNodeApi, String hrp, String valHrp){
+    NodeTx(BinanceDexNodeApi binanceDexNodeApi, String hrp, String valHrp){
         this.binanceDexNodeApi = binanceDexNodeApi;
         this.hrp = hrp;
         this.valHrp = valHrp;

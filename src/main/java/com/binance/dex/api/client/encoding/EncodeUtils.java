@@ -26,6 +26,10 @@ public class EncodeUtils {
         return Hex.toHexString(bytes);
     }
 
+    public static String bytesToPrefixHex(byte[] bytes) {
+        return "0x" + bytesToHex(bytes);
+    }
+
     public static String toJsonStringSortKeys(Object object) throws JsonProcessingException {
         return OBJECT_MAPPER.writeValueAsString(object);
     }

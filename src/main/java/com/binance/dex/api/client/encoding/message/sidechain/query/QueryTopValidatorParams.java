@@ -5,23 +5,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Fitz.Lu
  **/
-public class QueryTopValidatorParams {
-
-    @JsonProperty(value = "SideChainId")
-    private String sideChainId;
+public class QueryTopValidatorParams extends BaseQueryParams {
 
     @JsonProperty(value = "Top")
     private int top;
 
     public QueryTopValidatorParams() {
-    }
-
-    public String getSideChainId() {
-        return sideChainId;
-    }
-
-    public void setSideChainId(String sideChainId) {
-        this.sideChainId = sideChainId;
     }
 
     public int getTop() {

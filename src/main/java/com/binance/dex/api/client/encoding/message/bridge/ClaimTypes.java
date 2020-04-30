@@ -1,6 +1,7 @@
 package com.binance.dex.api.client.encoding.message.bridge;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Fitz.Lu
@@ -17,8 +18,8 @@ public class ClaimTypes {
     private static final String ClaimTypeUpdateTransferOutName = "UpdateTransferOut";
     private static final String ClaimTypeTransferInName = "TransferIn";
 
-    private static final HashMap<Integer, String> claimTypeToName;
-    private static final HashMap<String, Integer> claimNameToType;
+    private static final Map<Integer, String> claimTypeToName;
+    private static final Map<String, Integer> claimNameToType;
 
     static {
         claimTypeToName = new HashMap<>();

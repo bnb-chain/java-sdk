@@ -1,69 +1,37 @@
 package com.binance.dex.api.client.domain.stake.sidechain;
 
-import java.util.Arrays;
+import com.binance.dex.api.client.encoding.message.Token;
 
 /**
  * @author Fitz.Lu
  **/
 public class SideChainDelegation {
 
-    private String delegatorAddress;
+    private Delegation delegation;
 
-    private String validatorAddress;
-
-    private long shares;
-
-    private long height;
+    private Token balance;
 
     public SideChainDelegation() {
     }
 
-    public SideChainDelegation(String delegatorAddress, String validatorAddress, long shares, long height) {
-        this.delegatorAddress = delegatorAddress;
-        this.validatorAddress = validatorAddress;
-        this.shares = shares;
-        this.height = height;
+    public SideChainDelegation(Delegation delegation, Token balance) {
+        this.delegation = delegation;
+        this.balance = balance;
     }
 
-    public String getDelegatorAddress() {
-        return delegatorAddress;
+    public Delegation getDelegation() {
+        return delegation;
     }
 
-    public void setDelegatorAddress(String delegatorAddress) {
-        this.delegatorAddress = delegatorAddress;
+    public void setDelegation(Delegation delegation) {
+        this.delegation = delegation;
     }
 
-    public String getValidatorAddress() {
-        return validatorAddress;
+    public Token getBalance() {
+        return balance;
     }
 
-    public void setValidatorAddress(String validatorAddress) {
-        this.validatorAddress = validatorAddress;
-    }
-
-    public long getShares() {
-        return shares;
-    }
-
-    public void setShares(long shares) {
-        this.shares = shares;
-    }
-
-    public long getHeight() {
-        return height;
-    }
-
-    public void setHeight(long height) {
-        this.height = height;
-    }
-
-    @Override
-    public String toString() {
-        return "SideChainDelegation{" +
-                "delegatorAddress=" + delegatorAddress +
-                ", validatorAddress=" + validatorAddress +
-                ", shares=" + shares +
-                ", height=" + height +
-                '}';
+    public void setBalance(Token balance) {
+        this.balance = balance;
     }
 }

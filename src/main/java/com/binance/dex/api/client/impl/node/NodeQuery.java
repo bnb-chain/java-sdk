@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * @author Fitz.Lu
  **/
-class NodeQueryDelegate {
+class NodeQuery {
 
     private final BinanceDexNodeApi binanceDexNodeApi;
 
@@ -27,7 +27,7 @@ class NodeQueryDelegate {
 
     protected final String valHrp;
 
-    public NodeQueryDelegate(BinanceDexNodeApi binanceDexNodeApi, String hrp, String valHrp) {
+    public NodeQuery(BinanceDexNodeApi binanceDexNodeApi, String hrp, String valHrp) {
         this.binanceDexNodeApi = binanceDexNodeApi;
         this.hrp = hrp;
         this.valHrp = valHrp;

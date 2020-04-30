@@ -5,32 +5,31 @@ import com.binance.dex.api.client.domain.stake.Commission;
 import com.binance.dex.api.client.domain.stake.Description;
 import com.binance.dex.api.client.domain.stake.Pool;
 import com.binance.dex.api.client.domain.stake.sidechain.*;
+import com.binance.dex.api.client.domain.stake.sidechain.Delegation;
 import com.binance.dex.api.client.encoding.ByteUtil;
 import com.binance.dex.api.client.encoding.Crypto;
 import com.binance.dex.api.client.encoding.EncodeUtils;
 import com.binance.dex.api.client.encoding.amino.Amino;
+import com.binance.dex.api.client.encoding.amino.InternalAmino;
 import com.binance.dex.api.client.encoding.amino.WireType;
 import com.binance.dex.api.client.encoding.message.Token;
 import com.binance.dex.api.client.encoding.message.common.Bech32AddressValue;
 import com.binance.dex.api.client.encoding.message.common.CoinValue;
 import com.binance.dex.api.client.encoding.message.sidechain.query.*;
-import com.binance.dex.api.client.encoding.message.sidechain.value.DelegationValue;
 import com.binance.dex.api.client.encoding.message.sidechain.value.RedelegationValue;
 import com.binance.dex.api.client.encoding.message.sidechain.value.UnBondingValue;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Charsets;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
  * @author Fitz.Lu
  **/
-public class NodeQueryDelegateSideChainStaking extends NodeQueryDelegate {
+public class NodeQueryDelegateSideChainStaking extends NodeQuery {
 
     private final String stakeStoreName = "stake";
     private final String scStoreKey = "sc";
@@ -50,16 +49,12 @@ public class NodeQueryDelegateSideChainStaking extends NodeQueryDelegate {
 
     public NodeQueryDelegateSideChainStaking(BinanceDexNodeApi binanceDexNodeApi, String hrp, String valHrp) {
         super(binanceDexNodeApi, hrp, valHrp);
-        amino = new Amino();
+        amino = InternalAmino.get();
     }
 
     public SideChainValidator querySideChainValidator(String sideChainId, String validatorAddress) throws IOException {
         byte[] storePrefix = getSideChainStorePrefixKey(sideChainId);
-        byte[] keyPrefix = queryStore(stakeStoreName, storePrefix);
-        if (keyPrefix == null) {
-            keyPrefix = new byte[0];
-        }
-        byte[] key = ByteUtil.appendBytesArray(keyPrefix, getValidatorKey(Crypto.decodeAddress(validatorAddress)));
+        byte[] key = ByteUtil.appendBytesArray(storePrefix, getValidatorKey(Crypto.decodeAddress(validatorAddress)));
         byte[] result = queryStore(stakeStoreName, key);
 
         if (result != null) {
@@ -101,25 +96,27 @@ public class NodeQueryDelegateSideChainStaking extends NodeQueryDelegate {
         SideChainValidator sideChainValidator = new SideChainValidator();
 
         if (message.getFeeAddr() != null) {
-            sideChainValidator.setFeeAddr(Crypto.encodeEthAddress(message.getFeeAddr()));
+            sideChainValidator.setFeeAddr(EncodeUtils.bytesToPrefixHex(message.getFeeAddr()));
         }
         if (message.getOperatorAddr() != null) {
             sideChainValidator.setOperatorAddr(Crypto.encodeAddress(valHrp, message.getOperatorAddr()));
         }
 
         //TODO consPubKey use amino decode with type prefix
-        boolean fallBack = true;
-        byte[] typePrefix = ByteUtil.pick(message.getConsPubKey(), 0, 4);
-        if (WireType.isRegistered(typePrefix)){
-            byte length = ByteUtil.pick(message.getConsPubKey(), 4, 1)[0];
-            int len = Byte.toUnsignedInt(length);
-            if (message.getConsPubKey().length - 5 == len){
-                sideChainValidator.setConsPubKey(ByteUtil.cut(message.getConsPubKey(), 5));
-                fallBack = false;
+        if (message.getConsPubKey() != null) {
+            boolean fallBack = true;
+            byte[] typePrefix = ByteUtil.pick(message.getConsPubKey(), 0, 4);
+            if (WireType.isRegistered(typePrefix)) {
+                byte length = ByteUtil.pick(message.getConsPubKey(), 4, 1)[0];
+                int len = Byte.toUnsignedInt(length);
+                if (message.getConsPubKey().length - 5 == len) {
+                    sideChainValidator.setConsPubKey(ByteUtil.cut(message.getConsPubKey(), 5));
+                    fallBack = false;
+                }
             }
-        }
-        if (fallBack) {
-            sideChainValidator.setConsPubKey(message.getConsPubKey());
+            if (fallBack) {
+                sideChainValidator.setConsPubKey(message.getConsPubKey());
+            }
         }
 
         if (message.getDistributionAddr() != null){
@@ -147,71 +144,79 @@ public class NodeQueryDelegateSideChainStaking extends NodeQueryDelegate {
 
         Commission commission = new Commission();
         if (message.getCommission() != null) {
-            commission.setRate(message.getCommission().getRate());
-            commission.setMaxRate(message.getCommission().getMaxRate());
-            commission.setMaxChangeRate(message.getCommission().getMaxChangeRate());
+            if (message.getCommission().getRate() != null) {
+                commission.setRate(message.getCommission().getRate().getValue());
+            }
+            if (message.getCommission().getMaxRate() != null) {
+                commission.setMaxRate(message.getCommission().getMaxRate().getValue());
+            }
+            if (message.getCommission().getMaxChangeRate() != null) {
+                commission.setMaxChangeRate(message.getCommission().getMaxChangeRate().getValue());
+            }
         }
         sideChainValidator.setCommission(commission);
 
         sideChainValidator.setSideChainId(message.getSideChainId());
 
         if (message.getSideConsAddr() != null) {
-            sideChainValidator.setSideConsAddr(Crypto.encodeEthAddress(message.getSideConsAddr()));
+            sideChainValidator.setSideConsAddr(EncodeUtils.bytesToPrefixHex(message.getSideConsAddr()));
         }
         if (message.getSideFeeAddr() != null) {
-            sideChainValidator.setSideFeeAddr(Crypto.encodeEthAddress(message.getSideFeeAddr()));
+            sideChainValidator.setSideFeeAddr(EncodeUtils.bytesToPrefixHex(message.getSideFeeAddr()));
         }
 
         return sideChainValidator;
     }
 
     public SideChainDelegation querySideChainDelegation(String sideChainId, String delegatorAddress, String validatorAddress) throws IOException {
-        byte[] storePrefix = getSideChainStorePrefixKey(sideChainId);
-        byte[] delegationKey = getDelegationKey(Crypto.decodeAddress(delegatorAddress), Crypto.decodeAddress(validatorAddress));
+        QueryBondsParams params = new QueryBondsParams();
+        params.setSideChainId(sideChainId);
+        params.setDelegatorAddr(delegatorAddress);
+        params.setValidatorAddr(validatorAddress);
 
-        byte[] key = ByteUtil.appendBytesArray(storePrefix, delegationKey);
-        byte[] result = queryStore(stakeStoreName, key);
+        byte[] paramsBytes = EncodeUtils.toJsonEncodeBytes(params);
 
-        if (result != null && result.length > 0){
-            DelegationValue delegationValue = new DelegationValue();
-            amino.decodeWithLengthPrefix(result, delegationValue);
-            return convert(delegationValue, delegationKey);
+        byte[] response = queryWithData("\"custom/stake/delegation\"", paramsBytes);
+        if (!ByteUtil.isEmpty(response)){
+            DelegationResponse delegationResponse = EncodeUtils.getObjectMapper().readValue(response, DelegationResponse.class);
+            return convert(delegationResponse);
         }
 
         return null;
     }
 
     public List<SideChainDelegation> querySideChainDelegations(String sideChainId, String delegatorAddress) throws IOException {
-        byte[] storePrefix = getSideChainStorePrefixKey(sideChainId);
-        byte[] key = ByteUtil.appendBytesArray(storePrefix, getDelegationsKey(Crypto.decodeAddress(delegatorAddress)));
-        List<common.Types.KVPair> kvPairs = queryStoreSubspaceKVPairs(stakeStoreName, key);
+        QueryDelegatorParams params = new QueryDelegatorParams();
+        params.setSideChainId(sideChainId);
+        params.setDelegatorAddr(delegatorAddress);
 
-        List<SideChainDelegation> delegations = new ArrayList<>();
-        for (common.Types.KVPair kvPair : kvPairs) {
-            DelegationValue value = new DelegationValue();
-            amino.decodeWithLengthPrefix(kvPair.getValue().toByteArray(), value);
-            delegations.add(convert(value, Arrays.copyOfRange(kvPair.getKey().toByteArray(), storePrefix.length, kvPair.getKey().toByteArray().length)));
+        byte[] paramsBytes = EncodeUtils.toJsonEncodeBytes(params);
+        byte[] response = queryWithData("\"custom/stake/delegatorDelegations\"", paramsBytes);
+
+        List<SideChainDelegation> results = new ArrayList<>();
+
+        if (!ByteUtil.isEmpty(response)){
+            String a = new String(response);
+            List<DelegationResponse> delegations = EncodeUtils.getObjectMapper().readValue(response, new TypeReference<List<DelegationResponse>>(){});
+            for (DelegationResponse delegation : delegations) {
+                results.add(convert(delegation));
+            }
         }
 
-        return delegations;
+        return results;
     }
 
-    private SideChainDelegation convert(DelegationValue delegationValue, byte[] key){
-        if (key.length - 1 != addressLength * 2){
-            throw new IllegalArgumentException("unexpected address length for this (address, validator) pair");
-        }
-        byte[] delAddress = new byte[addressLength];
-        byte[] valAddress = new byte[addressLength];
-
-        System.arraycopy(key, 1, delAddress, 0, addressLength);
-        System.arraycopy(key, addressLength, valAddress, 0, addressLength);
-
+    private SideChainDelegation convert(DelegationResponse delegationResponse){
         SideChainDelegation sideChainDelegation = new SideChainDelegation();
-        sideChainDelegation.setDelegatorAddress(Crypto.encodeAddress(hrp, delAddress));
-        sideChainDelegation.setValidatorAddress(Crypto.encodeAddress(valHrp, valAddress));
-        sideChainDelegation.setHeight(delegationValue.getHeight());
-        if (delegationValue.getShares() != null) {
-            sideChainDelegation.setShares(delegationValue.getShares().getValue());
+        if (delegationResponse.getDelegation() != null) {
+            Delegation delegation = new Delegation();
+            delegation.setDelegatorAddress(delegationResponse.getDelegation().getDelegatorAddress());
+            delegation.setValidatorAddress(delegationResponse.getDelegation().getValidatorAddress());
+            delegation.setShares(delegationResponse.getDelegation().getShares());
+            sideChainDelegation.setDelegation(delegation);
+        }
+        if (delegationResponse.getBalance() != null){
+            sideChainDelegation.setBalance(convert(delegationResponse.getBalance()));
         }
 
         return sideChainDelegation;

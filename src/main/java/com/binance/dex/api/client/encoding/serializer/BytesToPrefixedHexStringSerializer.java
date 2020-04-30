@@ -12,7 +12,7 @@ public class BytesToPrefixedHexStringSerializer extends JsonSerializer<byte[]> {
     @Override
     public void serialize(byte[] bytes, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         if(bytes != null){
-            jsonGenerator.writeString("0x" + EncodeUtils.bytesToHex(bytes));
+            jsonGenerator.writeString(EncodeUtils.bytesToPrefixHex(bytes));
         }
     }
 }

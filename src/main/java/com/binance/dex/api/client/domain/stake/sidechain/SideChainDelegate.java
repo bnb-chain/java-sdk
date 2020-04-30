@@ -13,9 +13,10 @@ public class SideChainDelegate {
 
     private Token delegation;
 
-    private String sideChainId = "";
+    private String sideChainId;
 
     public SideChainDelegate() {
+        sideChainId = "";
     }
 
     public SideChainDelegate(String delegatorAddress, String validatorAddress, Token delegation, String sideChainId) {

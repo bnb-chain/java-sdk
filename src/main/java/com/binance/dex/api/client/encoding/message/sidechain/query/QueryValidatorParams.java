@@ -8,10 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 /**
  * @author Fitz.Lu
  **/
-public class QueryValidatorParams {
-
-    @JsonProperty(value = "SideChainId")
-    private String sideChainId;
+public class QueryValidatorParams extends BaseQueryParams {
 
     @JsonProperty(value = "ValidatorAddr")
     @JsonSerialize(using = Bech32AddressValueToStringSerializer.class)
@@ -23,14 +20,6 @@ public class QueryValidatorParams {
     public QueryValidatorParams(String sideChainId, Bech32AddressValue validatorAddress) {
         this.sideChainId = sideChainId;
         ValidatorAddress = validatorAddress;
-    }
-
-    public String getSideChainId() {
-        return sideChainId;
-    }
-
-    public void setSideChainId(String sideChainId) {
-        this.sideChainId = sideChainId;
     }
 
     public Bech32AddressValue getValidatorAddress() {

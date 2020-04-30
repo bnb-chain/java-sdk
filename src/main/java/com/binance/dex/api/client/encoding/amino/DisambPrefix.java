@@ -18,7 +18,7 @@ public class DisambPrefix {
     private byte[] prefix;
 
     /**
-     * You know it
+     * disamb bytes append prefix bytes
      * */
     private byte[] disambPrefix;
 

@@ -3,11 +3,11 @@ package com.binance.dex.api.client.encoding.amino;
 /**
  * @author Fitz.Lu
  **/
-class InternalAmino {
+public class InternalAmino {
 
-    static final Amino ins = new Amino();
+    private static final Amino ins = new Amino();
 
-    static Amino get(){
+    public static Amino get(){
         return ins;
     }
 

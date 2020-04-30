@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * @author Fitz.Lu
  **/
-public class NodeTxDelegateSideChainStaking extends NodeTxDelegate {
+public class NodeTxDelegateSideChainStaking extends NodeTx {
 
     public NodeTxDelegateSideChainStaking(BinanceDexNodeApi binanceDexNodeApi, String hrp, String valHrp) {
         super(binanceDexNodeApi, hrp, valHrp);

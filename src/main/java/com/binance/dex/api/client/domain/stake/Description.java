@@ -5,15 +5,19 @@ package com.binance.dex.api.client.domain.stake;
  **/
 public class Description {
 
-    private String moniker = "";
+    private String moniker;
 
-    private String identity = "";
+    private String identity;
 
-    private String website = "";
+    private String website;
 
-    private String details = "";
+    private String details;
 
     public Description() {
+        this.moniker = "";
+        this.identity = "";
+        this.website = "";
+        this.details = "";
     }
 
     public Description(String moniker, String identity, String website, String details) {

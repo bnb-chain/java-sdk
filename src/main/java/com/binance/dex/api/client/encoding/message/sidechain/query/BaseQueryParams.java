@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class BaseQueryParams {
 
     @JsonProperty(value = "SideChainId")
-    private String sideChainId;
+    protected String sideChainId;
 
     public BaseQueryParams() {
     }
