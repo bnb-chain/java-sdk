@@ -20,6 +20,8 @@ import com.binance.dex.api.client.domain.broadcast.Transaction;
 import com.binance.dex.api.client.domain.broadcast.Vote;
 import com.binance.dex.api.client.domain.jsonrpc.TxResult;
 import com.binance.dex.api.client.domain.oracle.ClaimMsg;
+import com.binance.dex.api.client.domain.slash.BscSubmitEvidence;
+import com.binance.dex.api.client.domain.slash.SideChainUnJail;
 import com.binance.dex.api.client.domain.stake.Commission;
 import com.binance.dex.api.client.domain.stake.Description;
 import com.binance.dex.api.client.domain.stake.sidechain.*;
@@ -54,7 +56,7 @@ public class TransactionConverter {
 
     private final Amino amino = new Amino();
 
-    public TransactionConverter(String hrp, String valHrp){
+    public TransactionConverter(String hrp, String valHrp) {
         this.hrp = hrp;
         this.valHrp = valHrp;
     }
@@ -82,7 +84,7 @@ public class TransactionConverter {
                         transaction.setResultData(Optional.ofNullable(txMessage.getTx_result()).map(TxResult::getData).orElse(null));
                         transaction.setSource(stdTx.getSource());
                         transaction.setSequence(stdSignature.getSequence());
-                        fillTagsAndEvents(txMessage.getTx_result(),transaction);
+                        fillTagsAndEvents(txMessage.getTx_result(), transaction);
                         return transaction;
                     }).filter(Objects::nonNull).collect(Collectors.toList());
         } catch (InvalidProtocolBufferException e) {
@@ -90,32 +92,32 @@ public class TransactionConverter {
         }
     }
 
-    public void fillTagsAndEvents(TxResult txResult,Transaction transaction){
+    public void fillTagsAndEvents(TxResult txResult, Transaction transaction) {
         boolean hasTags = txResult.getTags() != null && txResult.getTags().size() > 0;
         boolean hasEvents = txResult.getEvents() != null && txResult.getEvents().size() > 0
                 && txResult.getEvents().get(0).getAttributes() != null
                 && txResult.getEvents().get(0).getAttributes().size() > 0;
-        if(hasTags && !hasEvents){
+        if (hasTags && !hasEvents) {
             transaction.setTags(txResult.getTags());
             List<TxResult.Attribute> attributes = txResult.getTags().stream().map(this::convertOf).collect(Collectors.toList());
             TxResult.Event event = new TxResult.Event();
             event.setAttributes(attributes);
             transaction.setEvents(Collections.singletonList(event));
-        }else if(hasEvents && !hasTags){
+        } else if (hasEvents && !hasTags) {
             transaction.setEvents(txResult.getEvents());
             List<TxResult.Tag> tags = txResult.getEvents().get(0).getAttributes().stream().map(this::convertOf).collect(Collectors.toList());
             transaction.setTags(tags);
         }
     }
 
-    private TxResult.Attribute convertOf(TxResult.Tag tag){
+    private TxResult.Attribute convertOf(TxResult.Tag tag) {
         TxResult.Attribute attribute = new TxResult.Attribute();
         attribute.setKey(tag.getKey());
         attribute.setValue(tag.getValue());
         return attribute;
     }
 
-    private TxResult.Tag convertOf(TxResult.Attribute attribute){
+    private TxResult.Tag convertOf(TxResult.Attribute attribute) {
         TxResult.Tag tag = new TxResult.Tag();
         tag.setKey(attribute.getKey());
         tag.setValue(attribute.getValue());
@@ -199,11 +201,70 @@ public class TransactionConverter {
                     return convertTransferOutMsg(bytes);
                 case Bind:
                     return convertBindMsg(bytes);
+                case BscSubmitEvidence:
+                    return convertBscSubmitEvidence(bytes);
+                case SideChainUnJail:
+                    return convertSideChainUnJail(bytes);
             }
             return null;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Transaction convertSideChainUnJail(byte[] value) throws IOException {
+        byte[] raw = ByteUtil.cut(value, 4);
+        SideChainUnJailMsg message = SideChainUnJailMsg.parseFrom(raw);
+
+        SideChainUnJail unJail = new SideChainUnJail();
+        unJail.setSideChainId(message.getSideChainId());
+        unJail.setValidatorAddr(Crypto.encodeAddress(valHrp, message.getAddress().toByteArray()));
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.SIDECHAIN_UNJAIL);
+        transaction.setRealTx(unJail);
+        return transaction;
+    }
+
+    private Transaction convertBscSubmitEvidence(byte[] value) throws IOException {
+        byte[] raw = ByteUtil.cut(value, 4);
+        SubmitEvidenceMsg message = SubmitEvidenceMsg.parseFrom(raw);
+
+        BscSubmitEvidence bscSubmitEvidence = new BscSubmitEvidence();
+        if (message.getSubmitter() != null && raw != null) {
+            bscSubmitEvidence.setSubmitter(Crypto.encodeAddress(hrp, message.getSubmitter().toByteArray()));
+        }
+
+        List<BscHeader> headers = message.getHeadersList();
+        if (headers != null && headers.size() > 0) {
+            com.binance.dex.api.client.domain.slash.BscHeader[] bscHeaders = new com.binance.dex.api.client.domain.slash.BscHeader[headers.size()];
+            com.binance.dex.api.client.domain.slash.BscHeader bscHeader;
+            for (int i = 0; i < headers.size(); i++) {
+                bscHeader = new com.binance.dex.api.client.domain.slash.BscHeader();
+                bscHeader.setParentHash(headers.get(i).getParentHash().toByteArray());
+                bscHeader.setSha3Uncles(headers.get(i).getSha3Uncles().toByteArray());
+                bscHeader.setMiner(headers.get(i).getMiner().toByteArray());
+                bscHeader.setStateRoot(headers.get(i).getStateRoot().toByteArray());
+                bscHeader.setTransactionsRoot(headers.get(i).getTransactionsRoot().toByteArray());
+                bscHeader.setReceiptsRoot(headers.get(i).getReceiptsRoot().toByteArray());
+                bscHeader.setLogsBloom(headers.get(i).getLogsBloom().toByteArray());
+                bscHeader.setDifficulty(headers.get(i).getDifficulty());
+                bscHeader.setNumber(headers.get(i).getNumber());
+                bscHeader.setGasLimit(headers.get(i).getGasLimit());
+                bscHeader.setGasUsed(headers.get(i).getGasUsed());
+                bscHeader.setTimestamp(headers.get(i).getTimestamp());
+                bscHeader.setExtra(headers.get(i).getExtraData().toByteArray());
+                bscHeader.setMixHash(headers.get(i).getMixHash().toByteArray());
+                bscHeader.setNonce(headers.get(i).getNonce().toByteArray());
+                bscHeaders[i] = bscHeader;
+            }
+            bscSubmitEvidence.setHeaders(bscHeaders);
+        }
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.BSC_SUBMIT_EVIDENCE);
+        transaction.setRealTx(bscSubmitEvidence);
+        return transaction;
     }
 
     private Transaction convertBindMsg(byte[] value) throws IOException {
@@ -212,7 +273,7 @@ public class TransactionConverter {
         amino.decodeBare(raw, message);
 
         Bind bind = new Bind();
-        if (message.getFrom() != null && message.getFrom().getRaw() != null){
+        if (message.getFrom() != null && message.getFrom().getRaw() != null) {
             bind.setFrom(Crypto.encodeAddress(hrp, message.getFrom().getRaw()));
         }
         bind.setSymbol(message.getSymbol());
@@ -236,15 +297,15 @@ public class TransactionConverter {
         amino.decodeBare(raw, message);
 
         TransferOut transferOut = new TransferOut();
-        if (message.getFrom() != null && message.getFrom().getRaw() != null){
+        if (message.getFrom() != null && message.getFrom().getRaw() != null) {
             transferOut.setFrom(Crypto.encodeAddress(hrp, message.getFrom().getRaw()));
         }
-        if (message.getToAddress() != null){
+        if (message.getToAddress() != null) {
             transferOut.setToAddress(message.getToAddress().getAddress());
         }
 
         Token token = new Token();
-        if (message.getAmount() != null){
+        if (message.getAmount() != null) {
             token.setAmount(message.getAmount().getAmount());
             token.setDenom(message.getAmount().getDenom());
         }
@@ -285,16 +346,16 @@ public class TransactionConverter {
 
         SideChainUnBond unBond = new SideChainUnBond();
 
-        if (message.getDelegatorAddress() != null && message.getDelegatorAddress().getRaw() != null){
+        if (message.getDelegatorAddress() != null && message.getDelegatorAddress().getRaw() != null) {
             unBond.setDelegatorAddress(Crypto.encodeAddress(hrp, message.getDelegatorAddress().getRaw()));
         }
 
-        if (message.getValidatorAddress() != null && message.getValidatorAddress().getRaw() != null){
+        if (message.getValidatorAddress() != null && message.getValidatorAddress().getRaw() != null) {
             unBond.setValidatorAddress(Crypto.encodeAddress(valHrp, message.getValidatorAddress().getRaw()));
         }
 
         Token amount = new Token();
-        if (message.getAmount() != null){
+        if (message.getAmount() != null) {
             amount.setAmount(message.getAmount().getAmount());
             amount.setDenom(message.getAmount().getDenom());
         }
@@ -315,20 +376,20 @@ public class TransactionConverter {
         amino.decodeBare(raw, message);
 
         SideChainRedelegate redelegate = new SideChainRedelegate();
-        if (message.getDelegatorAddress() != null && message.getDelegatorAddress().getRaw() != null){
+        if (message.getDelegatorAddress() != null && message.getDelegatorAddress().getRaw() != null) {
             redelegate.setDelegatorAddress(Crypto.encodeAddress(hrp, message.getDelegatorAddress().getRaw()));
         }
 
-        if (message.getSrcValidatorAddress() != null && message.getSrcValidatorAddress().getRaw() != null){
+        if (message.getSrcValidatorAddress() != null && message.getSrcValidatorAddress().getRaw() != null) {
             redelegate.setSrcValidatorAddress(Crypto.encodeAddress(valHrp, message.getSrcValidatorAddress().getRaw()));
         }
 
-        if (message.getDstValidatorAddress() != null && message.getDstValidatorAddress().getRaw() != null){
+        if (message.getDstValidatorAddress() != null && message.getDstValidatorAddress().getRaw() != null) {
             redelegate.setDstValidatorAddress(Crypto.encodeAddress(valHrp, message.getDstValidatorAddress().getRaw()));
         }
 
         Token amount = new Token();
-        if (message.getAmount() != null){
+        if (message.getAmount() != null) {
             amount.setAmount(message.getAmount().getAmount());
             amount.setDenom(message.getAmount().getDenom());
         }
@@ -349,16 +410,16 @@ public class TransactionConverter {
         amino.decodeBare(raw, message);
 
         SideChainDelegate sideChainDelegate = new SideChainDelegate();
-        if (message.getDelegatorAddress() != null && message.getDelegatorAddress().getRaw() != null){
+        if (message.getDelegatorAddress() != null && message.getDelegatorAddress().getRaw() != null) {
             sideChainDelegate.setDelegatorAddress(Crypto.encodeAddress(hrp, message.getDelegatorAddress().getRaw()));
         }
 
-        if (message.getValidatorAddress() != null && message.getValidatorAddress().getRaw() != null){
+        if (message.getValidatorAddress() != null && message.getValidatorAddress().getRaw() != null) {
             sideChainDelegate.setValidatorAddress(Crypto.encodeAddress(valHrp, message.getValidatorAddress().getRaw()));
         }
 
         Token token = new Token();
-        if (message.getDelegation() != null){
+        if (message.getDelegation() != null) {
             token.setDenom(message.getDelegation().getDenom());
             token.setAmount(message.getDelegation().getAmount());
         }
@@ -381,7 +442,7 @@ public class TransactionConverter {
         EditSideChainValidator editSideChainValidator = new EditSideChainValidator();
 
         Description description = new Description();
-        if (message.getDescription() != null){
+        if (message.getDescription() != null) {
             description.setMoniker(message.getDescription().getMoniker());
             description.setDetails(message.getDescription().getDetails());
             description.setIdentity(message.getDescription().getIdentity());
@@ -389,11 +450,11 @@ public class TransactionConverter {
         }
         editSideChainValidator.setDescription(description);
 
-        if (message.getValidatorOperatorAddress() != null && message.getValidatorOperatorAddress().getRaw() != null){
+        if (message.getValidatorOperatorAddress() != null && message.getValidatorOperatorAddress().getRaw() != null) {
             editSideChainValidator.setValidatorAddress(Crypto.encodeAddress(valHrp, message.getValidatorOperatorAddress().getRaw()));
         }
 
-        if (message.getCommissionRate() != null){
+        if (message.getCommissionRate() != null) {
             editSideChainValidator.setCommissionRate(message.getCommissionRate().getValue());
         }
 
@@ -418,7 +479,7 @@ public class TransactionConverter {
         CreateSideChainValidator createSideChainValidator = new CreateSideChainValidator();
 
         Description description = new Description();
-        if (message.getDescription() != null){
+        if (message.getDescription() != null) {
             description.setMoniker(message.getDescription().getMoniker());
             description.setDetails(message.getDescription().getDetails());
             description.setIdentity(message.getDescription().getIdentity());
@@ -427,27 +488,27 @@ public class TransactionConverter {
         createSideChainValidator.setDescription(description);
 
         Commission commission = new Commission();
-        if (message.getCommission() != null){
+        if (message.getCommission() != null) {
             try {
                 commission.setRate(message.getCommission().getRate().getValue());
                 commission.setMaxRate(message.getCommission().getMaxRate().getValue());
                 commission.setMaxChangeRate(message.getCommission().getMaxChangeRate().getValue());
-            }catch (NullPointerException e){
+            } catch (NullPointerException e) {
                 //ignore
             }
         }
         createSideChainValidator.setCommission(commission);
 
-        if (message.getDelegatorAddr() != null && message.getDelegatorAddr().getRaw() != null){
+        if (message.getDelegatorAddr() != null && message.getDelegatorAddr().getRaw() != null) {
             createSideChainValidator.setDelegatorAddr(Crypto.encodeAddress(hrp, message.getDelegatorAddr().getRaw()));
         }
 
-        if (message.getValidatorOperatorAddr() != null && message.getValidatorOperatorAddr().getRaw() != null){
+        if (message.getValidatorOperatorAddr() != null && message.getValidatorOperatorAddr().getRaw() != null) {
             createSideChainValidator.setValidatorAddr(Crypto.encodeAddress(valHrp, message.getValidatorOperatorAddr().getRaw()));
         }
 
         Token delegation = new Token();
-        if (message.getDelegation() != null){
+        if (message.getDelegation() != null) {
             delegation.setAmount(message.getDelegation().getAmount());
             delegation.setDenom(message.getDelegation().getDenom());
         }
@@ -470,14 +531,13 @@ public class TransactionConverter {
     }
 
 
-
     private Transaction convertRefundHashTimerLock(byte[] value) throws InvalidProtocolBufferException {
         byte[] array = new byte[value.length - 4];
         System.arraycopy(value, 4, array, 0, array.length);
         RefundHashTimerLockMsg refundHtlMsg = RefundHashTimerLockMsg.parseFrom(array);
 
         RefundHashTimerLock refundHashTimerLock = new RefundHashTimerLock();
-        refundHashTimerLock.setFrom(Crypto.encodeAddress(hrp,refundHtlMsg.getFrom().toByteArray()));
+        refundHashTimerLock.setFrom(Crypto.encodeAddress(hrp, refundHtlMsg.getFrom().toByteArray()));
         refundHashTimerLock.setSwapID(Hex.toHexString(refundHtlMsg.getSwapId().toByteArray()));
 
         Transaction transaction = new Transaction();
@@ -492,7 +552,7 @@ public class TransactionConverter {
         ClaimHashTimerLockMsg claimHtlMsg = ClaimHashTimerLockMsg.parseFrom(array);
 
         ClaimHashTimerLock claimHashTimerLock = new ClaimHashTimerLock();
-        claimHashTimerLock.setFrom(Crypto.encodeAddress(hrp,claimHtlMsg.getFrom().toByteArray()));
+        claimHashTimerLock.setFrom(Crypto.encodeAddress(hrp, claimHtlMsg.getFrom().toByteArray()));
         claimHashTimerLock.setSwapID(Hex.toHexString(claimHtlMsg.getSwapId().toByteArray()));
         claimHashTimerLock.setRandomNumber(Hex.toHexString(claimHtlMsg.getRandomNumber().toByteArray()));
 
@@ -508,7 +568,7 @@ public class TransactionConverter {
         DepositHashTimerLockMsg depositHtlMsg = DepositHashTimerLockMsg.parseFrom(array);
 
         DepositHashTimerLock depositHashTimerLock = new DepositHashTimerLock();
-        depositHashTimerLock.setFrom(Crypto.encodeAddress(hrp,depositHtlMsg.getFrom().toByteArray()));
+        depositHashTimerLock.setFrom(Crypto.encodeAddress(hrp, depositHtlMsg.getFrom().toByteArray()));
         depositHashTimerLock.setAmount(depositHtlMsg.getAmountList().stream().map(Token::of).collect(Collectors.toList()));
         depositHashTimerLock.setSwapID(Hex.toHexString(depositHtlMsg.getSwapId().toByteArray()));
 
@@ -525,8 +585,8 @@ public class TransactionConverter {
         HashTimerLockTransferMsg htlTransferMsg = HashTimerLockTransferMsg.parseFrom(array);
 
         HashTimerLockTransfer hashTimerLockTransfer = new HashTimerLockTransfer();
-        hashTimerLockTransfer.setFrom(Crypto.encodeAddress(hrp,htlTransferMsg.getFrom().toByteArray()));
-        hashTimerLockTransfer.setTo(Crypto.encodeAddress(hrp,htlTransferMsg.getTo().toByteArray()));
+        hashTimerLockTransfer.setFrom(Crypto.encodeAddress(hrp, htlTransferMsg.getFrom().toByteArray()));
+        hashTimerLockTransfer.setTo(Crypto.encodeAddress(hrp, htlTransferMsg.getTo().toByteArray()));
         hashTimerLockTransfer.setRecipientOtherChain(htlTransferMsg.getRecipientOtherChain());
         hashTimerLockTransfer.setSenderOtherChain(htlTransferMsg.getSenderOtherChain());
         hashTimerLockTransfer.setRandomNumberHash(Hex.toHexString(htlTransferMsg.getRandomNumberHash().toByteArray()));
@@ -547,7 +607,7 @@ public class TransactionConverter {
         System.arraycopy(value, 4, array, 0, array.length);
         com.binance.dex.api.proto.SetAccountFlag setAccountFlag = com.binance.dex.api.proto.SetAccountFlag.parseFrom(array);
         SetAccountFlag saf = new SetAccountFlag();
-        saf.setFromAddr(Crypto.encodeAddress(hrp,setAccountFlag.getFrom().toByteArray()));
+        saf.setFromAddr(Crypto.encodeAddress(hrp, setAccountFlag.getFrom().toByteArray()));
         saf.setFlags(setAccountFlag.getFlags());
         Transaction transaction = new Transaction();
         transaction.setTxType(TxType.SetAccountFlag);
@@ -560,7 +620,7 @@ public class TransactionConverter {
         System.arraycopy(value, 4, array, 0, array.length);
         TimeRelock timeRelock = TimeRelock.parseFrom(array);
         com.binance.dex.api.client.domain.broadcast.TimeRelock trl = new com.binance.dex.api.client.domain.broadcast.TimeRelock();
-        trl.setFromAddr(Crypto.encodeAddress(hrp,timeRelock.getFrom().toByteArray()));
+        trl.setFromAddr(Crypto.encodeAddress(hrp, timeRelock.getFrom().toByteArray()));
         trl.setLockId(timeRelock.getTimeLockId());
         trl.setLockTime(Date.from(Instant.ofEpochSecond(timeRelock.getLockTime())));
         trl.setDescription(timeRelock.getDescription());
@@ -582,7 +642,7 @@ public class TransactionConverter {
         System.arraycopy(value, 4, array, 0, array.length);
         TimeUnlock timeUnlock = TimeUnlock.parseFrom(array);
         com.binance.dex.api.client.domain.broadcast.TimeUnlock tul = new com.binance.dex.api.client.domain.broadcast.TimeUnlock();
-        tul.setFromAddr(Crypto.encodeAddress(hrp,timeUnlock.getFrom().toByteArray()));
+        tul.setFromAddr(Crypto.encodeAddress(hrp, timeUnlock.getFrom().toByteArray()));
         tul.setLockId(timeUnlock.getTimeLockId());
 
         Transaction transaction = new Transaction();
@@ -596,7 +656,7 @@ public class TransactionConverter {
         System.arraycopy(value, 4, array, 0, array.length);
         TimeLock timeLock = TimeLock.parseFrom(array);
         com.binance.dex.api.client.domain.broadcast.TimeLock tl = new com.binance.dex.api.client.domain.broadcast.TimeLock();
-        tl.setFromAddr(Crypto.encodeAddress(hrp,timeLock.getFrom().toByteArray()));
+        tl.setFromAddr(Crypto.encodeAddress(hrp, timeLock.getFrom().toByteArray()));
         tl.setDescription(timeLock.getDescription());
         tl.setLockTime(Date.from(Instant.ofEpochSecond(timeLock.getLockTime())));
         List<Token> amount = timeLock.getAmountList().stream().map(token -> {
@@ -806,10 +866,10 @@ public class TransactionConverter {
 
         Deposit deposit = new Deposit();
         deposit.setProposalId(depositMessage.getProposalId());
-        deposit.setDepositer(Crypto.encodeAddress(hrp,depositMessage.getDepositer().toByteArray()));
-        if(null != depositMessage.getAmountList()){
+        deposit.setDepositer(Crypto.encodeAddress(hrp, depositMessage.getDepositer().toByteArray()));
+        if (null != depositMessage.getAmountList()) {
             deposit.setAmount(depositMessage.getAmountList().stream()
-            .map(com.binance.dex.api.client.encoding.message.Token::of).collect(Collectors.toList()));
+                    .map(com.binance.dex.api.client.encoding.message.Token::of).collect(Collectors.toList()));
         }
         Transaction transaction = new Transaction();
         transaction.setTxType(TxType.DEPOSIT);
@@ -824,8 +884,8 @@ public class TransactionConverter {
         RealCreateValidator realCreateValidator = RealCreateValidator.parseFrom(array);
 
         CreateValidator createValidator = new CreateValidator();
-        createValidator.setDelegatorAddress(Crypto.encodeAddress(hrp,realCreateValidator.getCreateValidator().getDelegatorAddress().toByteArray()));
-        createValidator.setValidatorAddress(Crypto.encodeAddress(hrp,realCreateValidator.getCreateValidator().getValidatorAddress().toByteArray()));
+        createValidator.setDelegatorAddress(Crypto.encodeAddress(hrp, realCreateValidator.getCreateValidator().getDelegatorAddress().toByteArray()));
+        createValidator.setValidatorAddress(Crypto.encodeAddress(hrp, realCreateValidator.getCreateValidator().getValidatorAddress().toByteArray()));
         createValidator.setDelegation(com.binance.dex.api.client.encoding.message.Token.of(realCreateValidator.getCreateValidator().getDelegation()));
         createValidator.setProposalId(realCreateValidator.getProposalId());
 
@@ -841,9 +901,9 @@ public class TransactionConverter {
         com.binance.dex.api.proto.RemoveValidator removeValidatorMessage = com.binance.dex.api.proto.RemoveValidator.parseFrom(array);
 
         RemoveValidator removeValidator = new RemoveValidator();
-        removeValidator.setLauncherAddr(Crypto.encodeAddress(hrp,removeValidatorMessage.getLauncherAddr().toByteArray()));
-        removeValidator.setValAddr(Crypto.encodeAddress(hrp,removeValidatorMessage.getValAddr().toByteArray()));
-        removeValidator.setValConsAddr(Crypto.encodeAddress(hrp,removeValidatorMessage.getValConsAddr().toByteArray()));
+        removeValidator.setLauncherAddr(Crypto.encodeAddress(hrp, removeValidatorMessage.getLauncherAddr().toByteArray()));
+        removeValidator.setValAddr(Crypto.encodeAddress(hrp, removeValidatorMessage.getValAddr().toByteArray()));
+        removeValidator.setValConsAddr(Crypto.encodeAddress(hrp, removeValidatorMessage.getValConsAddr().toByteArray()));
         removeValidator.setProposalId(removeValidatorMessage.getProposalId());
 
         Transaction transaction = new Transaction();
@@ -863,7 +923,7 @@ public class TransactionConverter {
         listing.setBaseAssetSymbol(listMessage.getBaseAssetSymbol());
         listing.setQuoteAssetSymbol(listMessage.getQuoteAssetSymbol());
         listing.setInitPrice(listMessage.getInitPrice());
-        listing.setFromAddr(Crypto.encodeAddress(hrp,listMessage.getFrom().toByteArray()));
+        listing.setFromAddr(Crypto.encodeAddress(hrp, listMessage.getFrom().toByteArray()));
 
         Transaction transaction = new Transaction();
         transaction.setTxType(TxType.LISTING);

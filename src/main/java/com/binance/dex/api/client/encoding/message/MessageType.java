@@ -40,7 +40,10 @@ public enum MessageType {
     SideChainUndelegate("514F7E0E"),
     Claim("175A0521"),
     TransferOut("800819C0"),
-    Bind("B9AE640C");
+    Bind("B9AE640C"),
+    BscSubmitEvidence("A38F1399"),
+    SideChainUnJail("5681EC54");
+
     private byte[] typePrefixBytes;
 
     MessageType(String typePrefix) {

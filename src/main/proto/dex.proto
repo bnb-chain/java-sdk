@@ -342,6 +342,36 @@ message ClaimHashTimerLockMsg {
     bytes random_number = 3;
 }
 
+message SubmitEvidenceMsg {
+    // A38F1399
+    bytes submitter = 1;
+    repeated BscHeader headers = 2;
+}
+
+message BscHeader {
+    bytes parentHash = 1;
+    bytes sha3Uncles = 2;
+    bytes miner = 3;
+    bytes stateRoot = 4;
+    bytes transactionsRoot = 5;
+    bytes receiptsRoot = 6;
+    bytes logsBloom = 7;
+    int64 difficulty = 8;
+    int64 number = 9;
+    int64 gasLimit = 10;
+    int64 gasUsed = 11;
+    int64 timestamp = 12;
+    bytes extraData = 13;
+    bytes mixHash = 14;
+    bytes nonce = 15;
+}
+
+message SideChainUnJailMsg {
+    // 5681EC54
+    bytes address = 1;
+    string side_chain_id = 2;
+}
+
 message RefundHashTimerLockMsg {
     //
     bytes from = 1;
