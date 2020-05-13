@@ -5,6 +5,6 @@ package com.binance.dex.api.client.encoding.message.sidechain;
  **/
 public class SideChainIds {
 
-    public static final String BSC = "bsc";
+    public static final String RIALTO = "rialto";
 
 }
