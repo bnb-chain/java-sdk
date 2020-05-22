@@ -14,6 +14,7 @@ import com.binance.dex.api.client.domain.broadcast.Mint;
 import com.binance.dex.api.client.domain.broadcast.NewOrder;
 import com.binance.dex.api.client.domain.broadcast.SetAccountFlag;
 import com.binance.dex.api.client.domain.broadcast.SubmitProposal;
+import com.binance.dex.api.client.domain.broadcast.TinyTokenIssue;
 import com.binance.dex.api.client.domain.broadcast.TokenFreeze;
 import com.binance.dex.api.client.domain.broadcast.TokenUnfreeze;
 import com.binance.dex.api.client.domain.broadcast.Transaction;
@@ -166,6 +167,8 @@ public class TransactionConverter {
                     return convertClaimHashTimerLock(bytes);
                 case RefundHashTimerLockMsg:
                     return convertRefundHashTimerLock(bytes);
+                case TinyTokenIssue:
+                    return convertTinyTokenIssue(bytes);
                 case MiniTokenIssue:
                     return convertMiniTokenIssue(bytes);
                 case MiniTokenSetURI:
@@ -582,6 +585,25 @@ public class TransactionConverter {
 
     }
 
+    private Transaction convertTinyTokenIssue(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.TinyTokenIssue issueMessage = com.binance.dex.api.proto.TinyTokenIssue.parseFrom(array);
+
+        TinyTokenIssue issue = new TinyTokenIssue();
+        issue.setFrom(Crypto.encodeAddress(hrp, issueMessage.getFrom().toByteArray()));
+        issue.setName(issueMessage.getName());
+        issue.setSymbol(issueMessage.getSymbol());
+        issue.setTotalSupply(issueMessage.getTotalSupply());
+        issue.setMintable(issueMessage.getMintable());
+        issue.setTokenURI(issueMessage.getTokenUri());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.TINY_TOKEN_ISSUE);
+        transaction.setRealTx(issue);
+        return transaction;
+    }
+
 
     private Transaction convertMiniTokenIssue(byte[] value) throws InvalidProtocolBufferException {
         byte[] array = new byte[value.length - 4];
@@ -592,7 +614,6 @@ public class TransactionConverter {
         issue.setFrom(Crypto.encodeAddress(hrp, issueMessage.getFrom().toByteArray()));
         issue.setName(issueMessage.getName());
         issue.setSymbol(issueMessage.getSymbol());
-        issue.setTokenType(issueMessage.getTokenType());
         issue.setTotalSupply(issueMessage.getTotalSupply());
         issue.setMintable(issueMessage.getMintable());
         issue.setTokenURI(issueMessage.getTokenUri());

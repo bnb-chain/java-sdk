@@ -35,8 +35,9 @@ public enum MessageType {
     RefundHashTimerLockMsg("3454A27C"),
 
     //mini token
-    MiniTokenIssue("1CE8D28B"),
-    MiniTokenSetURI("5B375246"),
+    TinyTokenIssue("ED2832D4"),
+    MiniTokenIssue("A3F16C41"),
+    MiniTokenSetURI("7B1D34E7"),
     MiniTokenList("4C264019");
 
     private byte[] typePrefixBytes;

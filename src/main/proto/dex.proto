@@ -348,19 +348,28 @@ message RefundHashTimerLockMsg {
 }
 
 //mini token issue
-message MiniTokenIssue {
-    //    1CE8D28B // hardcoded, object type prefix in 4 bytes
+message TinyTokenIssue {
+    //    ED2832D4 // hardcoded, object type prefix in 4 bytes
     bytes  from = 1; // issue token owner
     string name = 2;
     string symbol = 3;
-    int32  token_type = 4;
-    int64  total_supply = 5;
-    bool   mintable = 6;
-    string token_uri = 7;
+    int64  total_supply = 4;
+    bool   mintable = 5;
+    string token_uri = 6;
+}
+
+message MiniTokenIssue {
+    //    A3F16C41 // hardcoded, object type prefix in 4 bytes
+    bytes  from = 1; // issue token owner
+    string name = 2;
+    string symbol = 3;
+    int64  total_supply = 4;
+    bool   mintable = 5;
+    string token_uri = 6;
 }
 
 message MiniTokenSetURI {
-    //    5B375246 // hardcoded, object type prefix in 4 bytes
+    //    7B1D34E7 // hardcoded, object type prefix in 4 bytes
     bytes  from = 1; // issue token owner
     string symbol = 2;
     string token_uri = 3;

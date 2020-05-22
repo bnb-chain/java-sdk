@@ -1,6 +1,6 @@
 package com.binance.dex.api.client.domain.broadcast;
 
-public class MiniTokenIssue extends Issue {
+public class TinyTokenIssue extends Issue {
     private String tokenURI;
 
     public String getTokenURI() {
@@ -13,7 +13,7 @@ public class MiniTokenIssue extends Issue {
 
     @Override
     public String toString() {
-        return "MiniTokenIssue{" +
+        return "TinyTokenIssue{" +
                 "from='" + super.getFrom() + '\'' +
                 ", name='" + super.getName() + '\'' +
                 ", symbol='" + super.getSymbol() + '\'' +
