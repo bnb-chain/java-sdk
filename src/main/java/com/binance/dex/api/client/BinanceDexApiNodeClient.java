@@ -133,6 +133,71 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
     }
 
     @Override
+    default List<MiniToken> getMiniTokens(Integer limit) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default List<Market> getMiniMarkets(Integer limit) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default List<Candlestick> getMiniCandleStickBars(String symbol, CandlestickInterval interval) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default List<Candlestick> getMiniCandleStickBars(String symbol, CandlestickInterval interval, Integer limit, Long startTime, Long endTime) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default OrderList getMiniOpenOrders(String address) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default OrderList getMiniOpenOrders(OpenOrdersRequest request) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default OrderList getMiniClosedOrders(String address) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default OrderList getMiniClosedOrders(ClosedOrdersRequest request) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default Order getMiniOrder(String id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default List<TickerStatistics> getMini24HrPriceStatistics() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default List<TickerStatistics> getMini24HrPriceStatistics(String symbol) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default TradePage getMiniTrades() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default TradePage getMiniTrades(TradesRequest request) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     default List<TransactionMetadata> newOrder(NewOrder newOrder, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
         throw new UnsupportedOperationException();
     }

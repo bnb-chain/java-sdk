@@ -85,4 +85,44 @@ public interface BinanceDexApi {
 
     @POST("api/v1/broadcast")
     Call<List<TransactionMetadata>> broadcast(@Query("sync") boolean sync, @Body RequestBody transaction);
+
+    @GET("api/v1/mini/tokens")
+    Call<List<MiniToken>> getMiniTokens(@Query("limit") Integer limit);
+
+    @GET("api/v1/mini/markets")
+    Call<List<Market>> getMiniMarkets(@Query("limit") Integer limit);
+
+    @GET("api/v1/mini/klines")
+    Call<List<Candlestick>> getMiniCandlestickBars(@Query("symbol") String symbol, @Query("interval") String interval,
+                                               @Query("limit") Integer limit, @Query("startTime") Long startTime,
+                                               @Query("endTime") Long endTime);
+
+    @GET("api/v1/mini/orders/open")
+    Call<OrderList> getMiniOpenOrders(@Query("address") String address, @Query("limit") Integer limit,
+                                  @Query("offset") Integer offset, @Query("symbol") String symbol,
+                                  @Query("total") Integer total);
+
+    @GET("api/v1/mini/orders/closed")
+    Call<OrderList> getMiniClosedOrders(@Query("address") String address, @Query("end") Long end,
+                                    @Query("limit") Integer limit, @Query("offset") Integer offset,
+                                    @Query("side") Integer side, @Query("start") Long start,
+                                    @Query("status") List<String> status, @Query("symbol") String symbol,
+                                    @Query("total") Integer total);
+
+    @GET("api/v1/mini/orders/{id}")
+    Call<Order> getMiniOrder(@Path("id") String id);
+
+    @GET("api/v1/mini/ticker/24hr")
+    Call<List<TickerStatistics>> getMini24HrPriceStatistics();
+
+    @GET("api/v1/mini/ticker/24hr")
+    Call<List<TickerStatistics>> getMini24HrPriceStatistics(@Query("symbol") String symbol);
+
+    @GET("api/v1/mini/trades")
+    Call<TradePage> getMiniTrades(@Query("address") String address,
+                              @Query("buyerOrderId") String buyerOrderId, @Query("end") Long end,
+                              @Query("height") Long height, @Query("limit") Integer limit,
+                              @Query("offset") Integer offset, @Query("quoteAsset") String quoteAsset,
+                              @Query("sellerOrderId") String sellerOrderId, @Query("side") Integer side,
+                              @Query("start") Long start, @Query("symbol") String symbol, @Query("total") Integer total);
 }

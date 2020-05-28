@@ -20,6 +20,8 @@ public class TestRestClient {
 
     private String symbol = "ADA.B-F2F_BNB";
 
+    private String miniSymbol = "MSDK-400M_BNB";
+
     @Test
     public void testGetMarkets() {
         List<Market> mkts = client.getMarkets(1000);
@@ -124,5 +126,53 @@ public class TestRestClient {
     public void testGetFees() {
         List<Fees> fees = client.getFees();
         System.out.println(fees);
+    }
+
+    @Test
+    public void testGetMiniToken() {
+        List<MiniToken> tokens = client.getMiniTokens(100);
+        System.out.println(tokens);
+    }
+
+    @Test
+    public void testGetMiniMarkets() {
+        List<Market> mkts = client.getMiniMarkets(1000);
+        for (Market m : mkts) {
+            System.out.println(m);
+        }
+    }
+
+    @Test
+    public void testGetMiniCandlestickBars() {
+        List<Candlestick> klines = client.getMiniCandleStickBars(miniSymbol, CandlestickInterval.HOURLY);
+        System.out.println(klines);
+
+        System.out.println(client.getMiniCandleStickBars(miniSymbol, CandlestickInterval.ONE_MINUTE,
+                10, System.currentTimeMillis() - 24L * 60 * 60 * 1000L, null));
+    }
+
+    @Test
+    public void testGetMiniOpenOrders() {
+        System.out.println(client.getMiniOpenOrders(address));
+    }
+
+    @Test
+    public void testGetMiniClosedOrders() {
+        System.out.println(client.getMiniClosedOrders(address));
+    }
+
+    @Test
+    public void testGetMini24HrPriceStatistics() {
+        System.out.println(client.getMini24HrPriceStatistics());
+        System.out.println(client.getMini24HrPriceStatistics(miniSymbol));
+    }
+
+    @Test
+    public void testGetMiniTrades() {
+        System.out.println(client.getMiniTrades());
+        TradesRequest request = new TradesRequest();
+        request.setAddress(address);
+        request.setLimit(10);
+        System.out.println(client.getMiniTrades(request));
     }
 }
