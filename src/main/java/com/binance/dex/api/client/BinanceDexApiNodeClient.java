@@ -32,6 +32,8 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
 
     AtomicSwap getSwapByID(String swapID);
 
+    MiniToken getMiniTokenInfoBySymbol(String symbol);
+
     @Override
     default Time getTime() {
         throw new UnsupportedOperationException();
