@@ -84,6 +84,15 @@ public class MiniToken {
         this.mintable = mintable;
     }
 
+    public void setTotalSupply(String totalSupply){
+        if (totalSupply != null) {
+            if (totalSupply.indexOf('.') > 0) {
+                totalSupply = totalSupply.substring(0, totalSupply.indexOf('.') - 1);
+                this.totalSupply = Long.parseLong(totalSupply) * 100000000L;
+            }
+        }
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this, BinanceDexConstants.BINANCE_DEX_TO_STRING_STYLE)

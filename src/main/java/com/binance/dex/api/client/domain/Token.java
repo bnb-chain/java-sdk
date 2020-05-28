@@ -75,4 +75,13 @@ public class Token {
     public Long getTotalSupply() {
         return totalSupply;
     }
+
+    public void setTotalSupply(String totalSupply){
+        if (totalSupply != null) {
+            if (totalSupply.indexOf('.') > 0) {
+                totalSupply = totalSupply.substring(0, totalSupply.indexOf('.') - 1);
+                this.totalSupply = Long.parseLong(totalSupply) * 100000000L;
+            }
+        }
+    }
 }

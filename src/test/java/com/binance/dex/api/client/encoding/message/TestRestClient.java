@@ -14,7 +14,7 @@ import java.util.List;
 @Ignore("Manual run only")
 public class TestRestClient {
     private BinanceDexApiRestClient client =
-            BinanceDexApiClientFactory.newInstance().newRestClient(BinanceDexEnvironment.TEST_NET.getBaseUrl());
+            BinanceDexApiClientFactory.newInstance().newRestClient("https://dex-api.fdgahl.cn");
 
     private String address = "tbnb16hywxpvvkaz6cecjz89mf2w0da3vfeg6z6yky2";
 
