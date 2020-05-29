@@ -87,7 +87,7 @@ public class MiniToken {
     public void setTotalSupply(String totalSupply){
         if (totalSupply != null) {
             if (totalSupply.indexOf('.') > 0) {
-                totalSupply = totalSupply.substring(0, totalSupply.indexOf('.') - 1);
+                totalSupply = totalSupply.substring(0, totalSupply.indexOf('.'));
                 this.totalSupply = Long.parseLong(totalSupply) * 100000000L;
             }
         }
