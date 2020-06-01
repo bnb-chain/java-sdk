@@ -148,6 +148,16 @@ message TokenInfo{
     bool mintable = 6;
 }
 
+message MiniTokenInfo{
+    string name = 1;
+    string symbol = 2;
+    string original_symbol = 3;
+    int64 total_supply = 4;
+    bytes owner = 5;
+    bool mintable = 6;
+    int32 token_type = 7;
+    string token_uri = 8;
+}
 
 message DexFeeParam {
     // 0x495A5044
@@ -345,4 +355,40 @@ message RefundHashTimerLockMsg {
     //
     bytes from = 1;
     bytes swap_id = 2;
+}
+
+//mini token issue
+message TinyTokenIssue {
+    //    ED2832D4 // hardcoded, object type prefix in 4 bytes
+    bytes  from = 1; // issue token owner
+    string name = 2;
+    string symbol = 3;
+    int64  total_supply = 4;
+    bool   mintable = 5;
+    string token_uri = 6;
+}
+
+message MiniTokenIssue {
+    //    A3F16C41 // hardcoded, object type prefix in 4 bytes
+    bytes  from = 1; // issue token owner
+    string name = 2;
+    string symbol = 3;
+    int64  total_supply = 4;
+    bool   mintable = 5;
+    string token_uri = 6;
+}
+
+message MiniTokenSetURI {
+    //    7B1D34E7 // hardcoded, object type prefix in 4 bytes
+    bytes  from = 1; // issue token owner
+    string symbol = 2;
+    string token_uri = 3;
+}
+
+message MiniTokenList {
+    //    4C264019 // hardcoded, object type prefix in 4 bytes
+    bytes   from  = 1;
+    string  base_asset_symbol = 2;
+    string  quote_asset_symbol = 3;
+    int64   init_price = 4;
 }

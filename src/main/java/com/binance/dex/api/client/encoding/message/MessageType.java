@@ -5,7 +5,7 @@ import com.binance.dex.api.client.encoding.EncodeUtils;
 import java.util.Arrays;
 
 /**
- * Binance dex standard transactiont types.
+ * Binance dex standard transaction types.
  */
 public enum MessageType {
     Send("2A2C87FA"),
@@ -32,7 +32,14 @@ public enum MessageType {
     HashTimerLockTransferMsg("B33F9A24"),
     DepositHashTimerLockMsg("63986496"),
     ClaimHashTimerLockMsg("C1665300"),
-    RefundHashTimerLockMsg("3454A27C");
+    RefundHashTimerLockMsg("3454A27C"),
+
+    //mini token
+    TinyTokenIssue("ED2832D4"),
+    MiniTokenIssue("A3F16C41"),
+    MiniTokenSetURI("7B1D34E7"),
+    MiniTokenList("4C264019");
+
     private byte[] typePrefixBytes;
 
     MessageType(String typePrefix) {

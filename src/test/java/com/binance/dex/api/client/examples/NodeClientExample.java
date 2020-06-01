@@ -233,6 +233,13 @@ public class NodeClientExample {
     }
 
     @Test
+    public void testGetMiniTokenInfoBySymbol(){
+        MiniToken token = binanceDexNodeApi.getMiniTokenInfoBySymbol("AT10-1DEM");
+        Assert.assertNotNull(token);
+        Assert.assertEquals("AT10-1DEM",token.getSymbol());
+    }
+
+    @Test
     public void testGetFees() {
         List<Fees> feesList = binanceDexNodeApi.getFees();
         Assert.assertNotNull(feesList);
