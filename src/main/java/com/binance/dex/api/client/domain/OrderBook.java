@@ -46,7 +46,7 @@ public class OrderBook {
     }
 
     public void setPendingMatch(boolean pendingMatch) {
-        pendingMatch = pendingMatch;
+        this.pendingMatch = pendingMatch;
     }
 
     @Override
