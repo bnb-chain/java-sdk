@@ -148,6 +148,16 @@ message TokenInfo{
     bool mintable = 6;
 }
 
+message MiniTokenInfo{
+    string name = 1;
+    string symbol = 2;
+    string original_symbol = 3;
+    int64 total_supply = 4;
+    bytes owner = 5;
+    bool mintable = 6;
+    int32 token_type = 7;
+    string token_uri = 8;
+}
 
 message DexFeeParam {
     // 0x495A5044

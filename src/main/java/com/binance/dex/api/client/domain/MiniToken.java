@@ -6,13 +6,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Token {
+public class MiniToken {
     private String name;
     private String symbol;
     @JsonProperty("original_symbol")
     private String originalSymbol;
     @JsonProperty("total_supply")
     private Long totalSupply;
+    @JsonProperty("token_type")
+    private Integer tokenType;
+    @JsonProperty("token_uri")
+    private String tokenURI;
     private String owner;
     private boolean mintable;
 
@@ -40,6 +44,30 @@ public class Token {
         this.originalSymbol = originalSymbol;
     }
 
+    public Long getTotalSupply() {
+        return totalSupply;
+    }
+
+    public void setTotalSupply(Long totalSupply) {
+        this.totalSupply = totalSupply;
+    }
+
+    public Integer getTokenType() {
+        return tokenType;
+    }
+
+    public void setTokenType(Integer tokenType) {
+        this.tokenType = tokenType;
+    }
+
+    public String getTokenURI() {
+        return tokenURI;
+    }
+
+    public void setTokenURI(String tokenURI) {
+        this.tokenURI = tokenURI;
+    }
+
     public String getOwner() {
         return owner;
     }
@@ -56,26 +84,6 @@ public class Token {
         this.mintable = mintable;
     }
 
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this, BinanceDexConstants.BINANCE_DEX_TO_STRING_STYLE)
-                .append("name", name)
-                .append("symbol", symbol)
-                .append("originalSymbol", originalSymbol)
-                .append("totalSupply", totalSupply)
-                .append("owner", owner)
-                .append("mintable", mintable)
-                .toString();
-    }
-
-    public void setTotalSupply(Long totalSupply) {
-        this.totalSupply = totalSupply;
-    }
-
-    public Long getTotalSupply() {
-        return totalSupply;
-    }
-
     public void setTotalSupply(String totalSupply){
         if (totalSupply != null) {
             if (totalSupply.indexOf('.') > 0) {
@@ -83,5 +91,19 @@ public class Token {
                 this.totalSupply = Long.parseLong(totalSupply) * 100000000L;
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, BinanceDexConstants.BINANCE_DEX_TO_STRING_STYLE)
+                .append("name", name)
+                .append("symbol", symbol)
+                .append("originalSymbol", originalSymbol)
+                .append("totalSupply", totalSupply)
+                .append("tokenType", tokenType)
+                .append("tokenURI", tokenURI)
+                .append("owner", owner)
+                .append("mintable", mintable)
+                .toString();
     }
 }

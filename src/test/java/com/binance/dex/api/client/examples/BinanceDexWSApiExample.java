@@ -54,9 +54,9 @@ public class BinanceDexWSApiExample {
 
     @Test
     public void testBlockByHeight() {
-        BlockMeta.BlockMetaResult result = binanceDexWSApi.blockByHeight(13513018L);
+        BlockMeta.BlockMetaResult result = binanceDexWSApi.blockByHeight(18L);
         Assert.assertNotNull(result);
-        Assert.assertEquals(13513018L,result.getBlockMeta().getHeader().getHeight().longValue());
+        Assert.assertEquals(18L,result.getBlockMeta().getHeader().getHeight().longValue());
     }
 
     @Test
