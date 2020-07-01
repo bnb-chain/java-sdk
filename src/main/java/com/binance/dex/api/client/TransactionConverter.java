@@ -13,6 +13,9 @@ import com.binance.dex.api.client.domain.broadcast.Issue;
 import com.binance.dex.api.client.domain.broadcast.Mint;
 import com.binance.dex.api.client.domain.broadcast.NewOrder;
 import com.binance.dex.api.client.domain.broadcast.SetAccountFlag;
+import com.binance.dex.api.client.domain.broadcast.SideDeposit;
+import com.binance.dex.api.client.domain.broadcast.SideSubmitProposal;
+import com.binance.dex.api.client.domain.broadcast.SideVote;
 import com.binance.dex.api.client.domain.broadcast.SubmitProposal;
 import com.binance.dex.api.client.domain.broadcast.TokenFreeze;
 import com.binance.dex.api.client.domain.broadcast.TokenUnfreeze;
@@ -152,6 +155,8 @@ public class TransactionConverter {
                     return convertTokenUnfreeze(bytes);
                 case Vote:
                     return convertVote(bytes);
+                case SideVote:
+                    return convertSideVote(bytes);
                 case Issue:
                     return convertIssue(bytes);
                 case Burn:
@@ -160,8 +165,12 @@ public class TransactionConverter {
                     return convertMint(bytes);
                 case SubmitProposal:
                     return convertSubmitProposal(bytes);
+                case SideSubmitProposal:
+                    return convertSideSubmitProposal(bytes);
                 case Deposit:
                     return convertDeposit(bytes);
+                case SideDeposit:
+                    return convertSideDeposit(bytes);
                 case CreateValidator:
                     return convertCreateValidator(bytes);
                 case RemoveValidator:
@@ -786,6 +795,24 @@ public class TransactionConverter {
         return transaction;
     }
 
+    protected Transaction convertSideVote(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.SideVote voteMessage = com.binance.dex.api.proto.SideVote.parseFrom(array);
+
+        SideVote vote = new SideVote();
+
+        vote.setVoter(Crypto.encodeAddress(hrp, voteMessage.getVoter().toByteArray()));
+        vote.setOption((int) voteMessage.getOption());
+        vote.setProposalId(voteMessage.getProposalId());
+        vote.setSideChainId(voteMessage.getSideChainId());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.SIDE_VOTE);
+        transaction.setRealTx(vote);
+        return transaction;
+    }
+
     protected Transaction convertIssue(byte[] value) throws InvalidProtocolBufferException {
         byte[] array = new byte[value.length - 4];
         System.arraycopy(value, 4, array, 0, array.length);
@@ -859,6 +886,30 @@ public class TransactionConverter {
         return transaction;
     }
 
+    protected Transaction convertSideSubmitProposal(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.SideSubmitProposal proposalMessage = com.binance.dex.api.proto.SideSubmitProposal.parseFrom(array);
+
+        SideSubmitProposal proposal = new SideSubmitProposal();
+        proposal.setTitle(proposalMessage.getTitle());
+        proposal.setDescription(proposalMessage.getDescription());
+        proposal.setProposalType(ProposalType.fromValue(proposalMessage.getProposalType()));
+        proposal.setProposer(Crypto.encodeAddress(hrp, proposalMessage.getProposer().toByteArray()));
+
+        if (null != proposalMessage.getInitialDepositList()) {
+            proposal.setInitDeposit(proposalMessage.getInitialDepositList().stream()
+                    .map(com.binance.dex.api.client.encoding.message.Token::of).collect(Collectors.toList()));
+        }
+        proposal.setVotingPeriod(proposalMessage.getVotingPeriod());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.SIDE_SUBMIT_PROPOSAL);
+        transaction.setRealTx(proposal);
+        proposal.setSideChainId(proposalMessage.getSideChainId());
+        return transaction;
+    }
+
     private Transaction convertDeposit(byte[] value) throws InvalidProtocolBufferException {
         byte[] array = new byte[value.length - 4];
         System.arraycopy(value, 4, array, 0, array.length);
@@ -873,6 +924,25 @@ public class TransactionConverter {
         }
         Transaction transaction = new Transaction();
         transaction.setTxType(TxType.DEPOSIT);
+        transaction.setRealTx(deposit);
+        return transaction;
+    }
+
+    private Transaction convertSideDeposit(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.SideDeposit depositMessage = com.binance.dex.api.proto.SideDeposit.parseFrom(array);
+
+        SideDeposit deposit = new SideDeposit();
+        deposit.setProposalId(depositMessage.getProposalId());
+        deposit.setDepositer(Crypto.encodeAddress(hrp, depositMessage.getDepositer().toByteArray()));
+        if (null != depositMessage.getAmountList()) {
+            deposit.setAmount(depositMessage.getAmountList().stream()
+                    .map(com.binance.dex.api.client.encoding.message.Token::of).collect(Collectors.toList()));
+        }
+        deposit.setSideChainId(depositMessage.getSideChainId());
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.SIDE_DEPOSIT);
         transaction.setRealTx(deposit);
         return transaction;
     }

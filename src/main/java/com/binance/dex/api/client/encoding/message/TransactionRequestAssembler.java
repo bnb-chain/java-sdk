@@ -151,6 +151,16 @@ public class TransactionRequestAssembler {
     }
 
     @VisibleForTesting
+    SideVoteMessage createSideVoteMessage(SideVote vote){
+        SideVoteMessage voteMessage = new SideVoteMessage();
+        voteMessage.setProposalId(vote.getProposalId());
+        voteMessage.setOption(vote.getOption());
+        voteMessage.setVoter(wallet.getAddress());
+        voteMessage.setSideChainId(vote.getSideChainId());
+        return voteMessage;
+    }
+
+    @VisibleForTesting
     byte[] encodeNewOrderMessage(NewOrderMessage newOrder)
             throws IOException {
         com.binance.dex.api.proto.NewOrder proto = com.binance.dex.api.proto.NewOrder.newBuilder()
@@ -177,6 +187,18 @@ public class TransactionRequestAssembler {
         return EncodeUtils.aminoWrap(proto.toByteArray(), MessageType.Vote.getTypePrefixBytes(), false);
     }
 
+    @VisibleForTesting
+    byte[] encodeSideVoteMessage(SideVoteMessage voteMessage)
+            throws IOException {
+        com.binance.dex.api.proto.SideVote proto = com.binance.dex.api.proto.SideVote.newBuilder()
+                .setVoter(ByteString.copyFrom(wallet.getAddressBytes()))
+                .setProposalId(voteMessage.getProposalId())
+                .setOption(voteMessage.getOption())
+                .setSideChainId(voteMessage.getSideChainId())
+                .build();
+        return EncodeUtils.aminoWrap(proto.toByteArray(), MessageType.SideVote.getTypePrefixBytes(), false);
+    }
+
     public RequestBody buildNewOrder(com.binance.dex.api.client.domain.broadcast.NewOrder newOrder)
             throws IOException, NoSuchAlgorithmException {
         return createRequestBody(buildNewOrderPayload(newOrder));
@@ -198,6 +220,18 @@ public class TransactionRequestAssembler {
     public String buildVotePayload(Vote vote) throws IOException, NoSuchAlgorithmException {
         VoteMessage msgBean = createVoteMessage(vote);
         byte[] msg = encodeVoteMessage(msgBean);
+        byte[] signature = encodeSignature(sign(msgBean));
+        byte[] stdTx = encodeStdTx(msg, signature);
+        return EncodeUtils.bytesToHex(stdTx);
+    }
+
+    public RequestBody buildSideVote(SideVote vote) throws IOException, NoSuchAlgorithmException {
+        return createRequestBody(buildSideVotePayload(vote));
+    }
+
+    public String buildSideVotePayload(SideVote vote) throws IOException, NoSuchAlgorithmException {
+        SideVoteMessage msgBean = createSideVoteMessage(vote);
+        byte[] msg = encodeSideVoteMessage(msgBean);
         byte[] signature = encodeSignature(sign(msgBean));
         byte[] stdTx = encodeStdTx(msg, signature);
         return EncodeUtils.bytesToHex(stdTx);
