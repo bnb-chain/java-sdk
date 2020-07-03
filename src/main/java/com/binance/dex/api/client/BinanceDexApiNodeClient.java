@@ -33,6 +33,8 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
 
     Proposal getProposalById(String proposalId);
 
+    Proposal getSideProposalById(String proposalId, String sideChainId);
+
     Account getCommittedAccount(String address);
 
     AtomicSwap getSwapByID(String swapID);

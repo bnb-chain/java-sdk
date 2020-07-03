@@ -205,9 +205,9 @@ public class NodeClientExample {
 
     @Test
     public void testGetTransaction() {
-        Transaction transaction = binanceDexNodeApi.getTransaction("A1D07086EC08E983A47157FEACC1CF42179C37FCCDD56E7A4460CD1E4C82E51F");
+        Transaction transaction = binanceDexNodeApi.getTransaction("8B13490FB57C4650CE68E09E51C768D76A15B00FE5E5898D9453EF9B7162DB82");
         Assert.assertNotNull(transaction);
-        Assert.assertEquals("A1D07086EC08E983A47157FEACC1CF42179C37FCCDD56E7A4460CD1E4C82E51F", transaction.getHash());
+        Assert.assertEquals("8B13490FB57C4650CE68E09E51C768D76A15B00FE5E5898D9453EF9B7162DB82", transaction.getHash());
         Assert.assertEquals(0, transaction.getCode().intValue());
     }
 
@@ -250,5 +250,11 @@ public class NodeClientExample {
     public void testGetProposalById(){
         Proposal proposal = binanceDexNodeApi.getProposalById("1");
         Assert.assertEquals("1",proposal.getValue().getProposalId());
+    }
+
+    @Test
+    public void testGetSideProposalById(){
+        Proposal proposal = binanceDexNodeApi.getSideProposalById("4", "rialto");
+        Assert.assertEquals("4",proposal.getValue().getProposalId());
     }
 }

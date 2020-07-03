@@ -3,6 +3,7 @@ package com.binance.dex.api.client.impl;
 import com.binance.dex.api.client.*;
 import com.binance.dex.api.client.domain.*;
 import com.binance.dex.api.client.domain.bridge.TransferIn;
+import com.binance.dex.api.client.domain.broadcast.SideVote;
 import com.binance.dex.api.client.domain.oracle.Prophecy;
 import com.binance.dex.api.client.domain.StakeValidator;
 import com.binance.dex.api.client.domain.stake.Pool;
@@ -13,10 +14,8 @@ import com.binance.dex.api.client.domain.jsonrpc.*;
 import com.binance.dex.api.client.encoding.Crypto;
 import com.binance.dex.api.client.encoding.EncodeUtils;
 import com.binance.dex.api.client.encoding.message.TransactionRequestAssembler;
-import com.binance.dex.api.client.impl.node.NodeQueryDelegateOracle;
-import com.binance.dex.api.client.impl.node.NodeQueryDelegateSideChainStaking;
-import com.binance.dex.api.client.impl.node.NodeTxDelegateBridge;
-import com.binance.dex.api.client.impl.node.NodeTxDelegateSideChainStaking;
+import com.binance.dex.api.client.encoding.message.sidechain.query.QuerySideProposal;
+import com.binance.dex.api.client.impl.node.*;
 import com.binance.dex.api.proto.*;
 import com.binance.dex.api.proto.Token;
 import com.google.common.collect.Lists;
@@ -278,6 +277,31 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         }
     }
 
+    @Override
+    public Proposal getSideProposalById(String proposalId, String sideChainId) {
+        try {
+            QuerySideProposal params = new QuerySideProposal();
+            params.setSideChainId(sideChainId);
+            params.setProposalID(proposalId);
+
+            byte[] paramsBytes = EncodeUtils.toJsonEncodeBytes(params);
+            String requestData = "0x" + Hex.toHexString(paramsBytes);
+            JsonRpcResponse<ABCIQueryResult> rpcResponse = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getProposalById(requestData));
+            checkRpcResult(rpcResponse);
+            ABCIQueryResult.Response response = rpcResponse.getResult().getResponse();
+            if (response.getCode() != null) {
+                BinanceDexApiError binanceDexApiError = new BinanceDexApiError();
+                binanceDexApiError.setCode(response.getCode());
+                binanceDexApiError.setMessage(response.getLog());
+                throw new BinanceDexApiException(binanceDexApiError);
+            }
+            String proposalJson = new String(response.getValue());
+            return EncodeUtils.toObjectFromJsonString(proposalJson, Proposal.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     @Override
     public List<TransactionMetadata> transfer(Transfer transfer, Wallet wallet, TransactionOption options, boolean sync)
@@ -463,6 +487,20 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     @Override
     public long getAllSideChainValidatorsCount(String sideChainId, boolean jailInvolved) throws IOException {
         return sideChainQueryDelegate.queryAllSideChainValidatorsCount(sideChainId, jailInvolved);
+    }
+
+    @Override
+    public List<TransactionMetadata> sideVote(SideVote vote, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException{
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
+            String requestPayload = "0x" + assembler.buildSideVotePayload(vote);
+            if (sync) {
+                return syncBroadcast(requestPayload, wallet);
+            } else {
+                return asyncBroadcast(requestPayload, wallet);
+            }
+        }
     }
 
     @Override

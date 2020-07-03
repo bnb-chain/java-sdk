@@ -65,6 +65,8 @@ public interface BinanceDexApiRestClient {
 
     List<TransactionMetadata> vote(Vote vote,Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
 
+    List<TransactionMetadata> sideVote(SideVote vote,Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
+
     List<TransactionMetadata> cancelOrder(CancelOrder cancelOrder, Wallet wallet, TransactionOption options, boolean sync)
             throws IOException, NoSuchAlgorithmException;
 
