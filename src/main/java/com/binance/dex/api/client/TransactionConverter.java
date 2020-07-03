@@ -8,6 +8,8 @@ import com.binance.dex.api.client.domain.broadcast.*;
 import com.binance.dex.api.client.domain.broadcast.Burn;
 import com.binance.dex.api.client.domain.broadcast.CancelOrder;
 import com.binance.dex.api.client.domain.broadcast.CreateValidator;
+import com.binance.dex.api.client.domain.broadcast.MiniTokenIssue;
+import com.binance.dex.api.client.domain.broadcast.MiniTokenSetURI;
 import com.binance.dex.api.client.domain.broadcast.RemoveValidator;
 import com.binance.dex.api.client.domain.broadcast.Deposit;
 import com.binance.dex.api.client.domain.broadcast.Issue;
@@ -18,6 +20,7 @@ import com.binance.dex.api.client.domain.broadcast.SideDeposit;
 import com.binance.dex.api.client.domain.broadcast.SideSubmitProposal;
 import com.binance.dex.api.client.domain.broadcast.SideVote;
 import com.binance.dex.api.client.domain.broadcast.SubmitProposal;
+import com.binance.dex.api.client.domain.broadcast.TinyTokenIssue;
 import com.binance.dex.api.client.domain.broadcast.TokenFreeze;
 import com.binance.dex.api.client.domain.broadcast.TokenUnfreeze;
 import com.binance.dex.api.client.domain.broadcast.Transaction;
@@ -218,6 +221,14 @@ public class TransactionConverter {
                     return convertBscSubmitEvidence(bytes);
                 case SideChainUnJail:
                     return convertSideChainUnJail(bytes);
+                case TinyTokenIssue:
+                    return convertTinyTokenIssue(bytes);
+                case MiniTokenIssue:
+                    return convertMiniTokenIssue(bytes);
+                case MiniTokenSetURI:
+                    return convertMiniTokenSetURI(bytes);
+                case MiniTokenList:
+                    return convertMiniTokenList(bytes);
             }
             return null;
         } catch (Exception e) {
@@ -1025,4 +1036,76 @@ public class TransactionConverter {
 
     }
 
+    private Transaction convertTinyTokenIssue(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.TinyTokenIssue issueMessage = com.binance.dex.api.proto.TinyTokenIssue.parseFrom(array);
+
+        TinyTokenIssue issue = new TinyTokenIssue();
+        issue.setFrom(Crypto.encodeAddress(hrp, issueMessage.getFrom().toByteArray()));
+        issue.setName(issueMessage.getName());
+        issue.setSymbol(issueMessage.getSymbol());
+        issue.setTotalSupply(issueMessage.getTotalSupply());
+        issue.setMintable(issueMessage.getMintable());
+        issue.setTokenURI(issueMessage.getTokenUri());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.TINY_TOKEN_ISSUE);
+        transaction.setRealTx(issue);
+        return transaction;
+    }
+
+
+    private Transaction convertMiniTokenIssue(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.MiniTokenIssue issueMessage = com.binance.dex.api.proto.MiniTokenIssue.parseFrom(array);
+
+        MiniTokenIssue issue = new MiniTokenIssue();
+        issue.setFrom(Crypto.encodeAddress(hrp, issueMessage.getFrom().toByteArray()));
+        issue.setName(issueMessage.getName());
+        issue.setSymbol(issueMessage.getSymbol());
+        issue.setTotalSupply(issueMessage.getTotalSupply());
+        issue.setMintable(issueMessage.getMintable());
+        issue.setTokenURI(issueMessage.getTokenUri());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.MINI_TOKEN_ISSUE);
+        transaction.setRealTx(issue);
+        return transaction;
+    }
+
+
+    private Transaction convertMiniTokenSetURI(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.MiniTokenSetURI uriMessage = com.binance.dex.api.proto.MiniTokenSetURI.parseFrom(array);
+
+        MiniTokenSetURI setURI = new MiniTokenSetURI();
+        setURI.setFrom(Crypto.encodeAddress(hrp, uriMessage.getFrom().toByteArray()));
+        setURI.setSymbol(uriMessage.getSymbol());
+        setURI.setTokenURI(uriMessage.getTokenUri());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.MINI_TOKEN_SET_URI);
+        transaction.setRealTx(setURI);
+        return transaction;
+    }
+
+    private Transaction convertMiniTokenList(byte[] value) throws InvalidProtocolBufferException {
+        byte[] array = new byte[value.length - 4];
+        System.arraycopy(value, 4, array, 0, array.length);
+        com.binance.dex.api.proto.MiniTokenList listMessage = com.binance.dex.api.proto.MiniTokenList.parseFrom(array);
+
+        MiniTokenListing listing = new MiniTokenListing();
+        listing.setFromAddr(Crypto.encodeAddress(hrp, listMessage.getFrom().toByteArray()));
+        listing.setBaseAssetSymbol(listMessage.getBaseAssetSymbol());
+        listing.setQuoteAssetSymbol(listMessage.getQuoteAssetSymbol());
+        listing.setInitPrice(listMessage.getInitPrice());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.MINI_TOKEN_LIST);
+        transaction.setRealTx(listing);
+        return transaction;
+    }
 }

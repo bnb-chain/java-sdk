@@ -579,6 +579,23 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         }
     }
 
+    @Override
+    public com.binance.dex.api.client.domain.MiniToken getMiniTokenInfoBySymbol(String symbol) {
+        try {
+            String pathWithSymbol = "\"mini-tokens/info/" + symbol + "\"";
+            JsonRpcResponse<ABCIQueryResult> rpcResponse = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getTokenInfo(pathWithSymbol));
+            checkRpcResult(rpcResponse);
+            byte[] value = rpcResponse.getResult().getResponse().getValue();
+            int startIndex = getStartIndex(value);
+            byte[] array = new byte[value.length - startIndex];
+            System.arraycopy(value, startIndex, array, 0, array.length);
+            MiniTokenInfo tokenInfo = MiniTokenInfo.parseFrom(array);
+            return convert(tokenInfo);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     protected Infos convert(NodeInfos nodeInfos) {
         Infos infos = new Infos();
 
@@ -629,6 +646,19 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         token.setOwner(Crypto.encodeAddress(hrp, tokenInfo.getOwner().toByteArray()));
         token.setTotalSupply(tokenInfo.getTotalSupply());
         token.setMintable(tokenInfo.getMintable());
+        return token;
+    }
+
+    protected com.binance.dex.api.client.domain.MiniToken convert(MiniTokenInfo tokenInfo) {
+        com.binance.dex.api.client.domain.MiniToken token = new com.binance.dex.api.client.domain.MiniToken();
+        token.setName(tokenInfo.getName());
+        token.setOriginalSymbol(tokenInfo.getOriginalSymbol());
+        token.setSymbol(tokenInfo.getSymbol());
+        token.setOwner(Crypto.encodeAddress(hrp, tokenInfo.getOwner().toByteArray()));
+        token.setTotalSupply(tokenInfo.getTotalSupply());
+        token.setMintable(tokenInfo.getMintable());
+        token.setTokenType(tokenInfo.getTokenType());
+        token.setTokenURI(tokenInfo.getTokenUri());
         return token;
     }
 

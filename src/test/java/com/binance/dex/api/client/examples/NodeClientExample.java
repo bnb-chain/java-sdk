@@ -47,10 +47,37 @@ public class NodeClientExample {
 
     @Test
     public void testBlockTransactions() {
+        //Mini Issue
+        Long height = 87908207L;
+        List<Transaction> transactions = binanceDexNodeApi.getBlockTransactions(height);
+        Assert.assertNotNull(transactions);
+        Assert.assertTrue(transactions.size() == 1);
+        Assert.assertEquals(transactions.get(0).getTxType(), TxType.MINI_TOKEN_ISSUE);
+
+        //Tiny Issue
+        height = 86888933L;
+        transactions = binanceDexNodeApi.getBlockTransactions(height);
+        Assert.assertNotNull(transactions);
+        Assert.assertTrue(transactions.size() == 1);
+        Assert.assertEquals(transactions.get(0).getTxType(), TxType.TINY_TOKEN_ISSUE);
+
+        //List Mini
+        height = 86890587L;
+        transactions = binanceDexNodeApi.getBlockTransactions(height);
+        Assert.assertNotNull(transactions);
+        Assert.assertTrue(transactions.size() == 1);
+        Assert.assertEquals(transactions.get(0).getTxType(), TxType.MINI_TOKEN_LIST);
+
+        //Set token uri
+        height = 86881980L;
+        transactions = binanceDexNodeApi.getBlockTransactions(height);
+        Assert.assertNotNull(transactions);
+        Assert.assertTrue(transactions.size() == 1);
+        Assert.assertEquals(transactions.get(0).getTxType(), TxType.MINI_TOKEN_SET_URI);
 
         //Transfer
-        Long height = 33896036L;
-        List<Transaction> transactions = binanceDexNodeApi.getBlockTransactions(height);
+        height = 33896036L;
+        transactions = binanceDexNodeApi.getBlockTransactions(height);
         Assert.assertNotNull(transactions);
         Assert.assertTrue(transactions.size() == 1);
         Assert.assertEquals(transactions.get(0).getTxType(), TxType.TRANSFER);
@@ -230,6 +257,13 @@ public class NodeClientExample {
         Token token = binanceDexNodeApi.getTokenInfoBySymbol("BNB");
         Assert.assertNotNull(token);
         Assert.assertEquals("BNB",token.getSymbol());
+    }
+
+    @Test
+    public void testGetMiniTokenInfoBySymbol(){
+        MiniToken token = binanceDexNodeApi.getMiniTokenInfoBySymbol("TTT-873M");
+        Assert.assertNotNull(token);
+        Assert.assertEquals("TTT-873M",token.getSymbol());
     }
 
     @Test

@@ -60,6 +60,32 @@ public interface BinanceDexApiRestClient {
 
     TransactionPage getTransactions(TransactionsRequest request);
 
+    List<MiniToken> getMiniTokens(Integer limit);
+
+    List<Market> getMiniMarkets(Integer limit);
+
+    List<Candlestick> getMiniCandleStickBars(String symbol, CandlestickInterval interval);
+
+    List<Candlestick> getMiniCandleStickBars(String symbol, CandlestickInterval interval, Integer limit, Long startTime, Long endTime);
+
+    OrderList getMiniOpenOrders(String address);
+
+    OrderList getMiniOpenOrders(OpenOrdersRequest request);
+
+    OrderList getMiniClosedOrders(String address);
+
+    OrderList getMiniClosedOrders(ClosedOrdersRequest request);
+
+    Order getMiniOrder(String id);
+
+    List<TickerStatistics> getMini24HrPriceStatistics();
+
+    List<TickerStatistics> getMini24HrPriceStatistics(String symbol);
+
+    TradePage getMiniTrades();
+
+    TradePage getMiniTrades(TradesRequest request);
+
     List<TransactionMetadata> newOrder(NewOrder newOrder, Wallet wallet, TransactionOption options, boolean sync)
             throws IOException, NoSuchAlgorithmException;
 
