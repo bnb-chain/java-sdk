@@ -31,6 +31,7 @@ public enum TxType {
     CLAIM,
     TRANSFER_OUT,
     BIND,
+    UNBIND,
     BSC_SUBMIT_EVIDENCE,
     SIDECHAIN_UNJAIL
 }

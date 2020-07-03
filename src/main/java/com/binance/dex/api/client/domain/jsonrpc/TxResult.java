@@ -74,6 +74,9 @@ public class TxResult {
     }
 
     public static class Event{
+
+        private String type;
+
         private List<Attribute> attributes;
 
         public List<Attribute> getAttributes() {
@@ -82,6 +85,14 @@ public class TxResult {
 
         public void setAttributes(List<Attribute> attributes) {
             this.attributes = attributes;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
         }
     }
 

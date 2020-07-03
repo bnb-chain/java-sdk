@@ -41,6 +41,7 @@ public enum MessageType {
     Claim("175A0521"),
     TransferOut("800819C0"),
     Bind("B9AE640C"),
+    UnBind("E9EEC508"),
     BscSubmitEvidence("A38F1399"),
     SideChainUnJail("5681EC54");
 

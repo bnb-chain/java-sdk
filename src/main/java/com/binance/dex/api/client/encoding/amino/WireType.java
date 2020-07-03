@@ -4,6 +4,7 @@ import com.binance.dex.api.client.encoding.amino.types.PubKeyEd25519;
 import com.binance.dex.api.client.encoding.message.bridge.BindMsgMessage;
 import com.binance.dex.api.client.encoding.message.bridge.ClaimMsgMessage;
 import com.binance.dex.api.client.encoding.message.bridge.TransferOutMsgMessage;
+import com.binance.dex.api.client.encoding.message.bridge.UnbindMsgMessage;
 import com.binance.dex.api.client.encoding.message.sidechain.transaction.*;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -29,6 +30,7 @@ public class WireType {
 
         classToTypeName.put(TransferOutMsgMessage.class, "bridge/TransferOutMsg");
         classToTypeName.put(BindMsgMessage.class, "bridge/BindMsg");
+        classToTypeName.put(UnbindMsgMessage.class, "bridge/UnbindMsg");
         classToTypeName.put(ClaimMsgMessage.class, "oracle/ClaimMsg");
     }
 

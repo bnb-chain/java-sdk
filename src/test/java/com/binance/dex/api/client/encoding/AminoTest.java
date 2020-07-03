@@ -43,8 +43,8 @@ public class AminoTest {
     @Test
     public void testClaim() throws IOException {
         ClaimMsgMessage message = new ClaimMsgMessage();
-        message.setClaimType(ClaimTypes.ClaimTypeTransferIn);
-        message.setClaim("claim content");
+        message.setChainId(ClaimTypes.ClaimTypeTransferIn);
+        message.setPayload("claim content".getBytes());
         message.setSequence(1);
         message.setValidatorAddress(Bech32AddressValue.fromBech32String("bva1337r5pk3r6kvs4a8kc3u5yhdjc79c5lg78343t"));
         byte[] data = amino.encode(message, MessageType.Claim.getTypePrefixBytes(), false);
@@ -74,6 +74,16 @@ public class AminoTest {
         message.setFrom(Bech32AddressValue.fromBech32StringWithNewHrp("bva1337r5pk3r6kvs4a8kc3u5yhdjc79c5lg78343t", "bnb"));
         message.setSymbol("BNB");
         byte[] data = amino.encode(message, MessageType.Bind.getTypePrefixBytes(), false);
+        Transaction transaction = transactionConverter.convert(data);
+        Assert.assertNotNull(transaction.getRealTx());
+    }
+
+    @Test
+    public void testUnBind() throws IOException {
+        UnbindMsgMessage message = new UnbindMsgMessage();
+        message.setFrom(Bech32AddressValue.fromBech32StringWithNewHrp("bva1337r5pk3r6kvs4a8kc3u5yhdjc79c5lg78343t", "bnb"));
+        message.setSymbol("BNB");
+        byte[] data = amino.encode(message, MessageType.UnBind.getTypePrefixBytes(), false);
         Transaction transaction = transactionConverter.convert(data);
         Assert.assertNotNull(transaction.getRealTx());
     }

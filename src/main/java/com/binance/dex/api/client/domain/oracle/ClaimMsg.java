@@ -1,24 +1,26 @@
 package com.binance.dex.api.client.domain.oracle;
 
+import org.apache.commons.codec.binary.Hex;
+
 /**
  * @author Fitz.Lu
  **/
 public class ClaimMsg {
 
-    private int claimType;
+    private int chainId;
 
     private long sequence;
 
-    private String claim;
+    private byte[] payload;
 
     private String validatorAddress;
 
-    public int getClaimType() {
-        return claimType;
+    public int getChainId() {
+        return chainId;
     }
 
-    public void setClaimType(int claimType) {
-        this.claimType = claimType;
+    public void setChainId(int chainId) {
+        this.chainId = chainId;
     }
 
     public long getSequence() {
@@ -29,12 +31,12 @@ public class ClaimMsg {
         this.sequence = sequence;
     }
 
-    public String getClaim() {
-        return claim;
+    public byte[] getPayload() {
+        return payload;
     }
 
-    public void setClaim(String claim) {
-        this.claim = claim;
+    public void setPayload(byte[] payload) {
+        this.payload = payload;
     }
 
     public String getValidatorAddress() {
@@ -48,9 +50,9 @@ public class ClaimMsg {
     @Override
     public String toString() {
         return "ClaimMsg{" +
-                "claimType=" + claimType +
+                "chainId=" + chainId +
                 ", sequence=" + sequence +
-                ", claim='" + claim + '\'' +
+                ", payload='" + Hex.encodeHexString(payload) + '\'' +
                 ", validatorAddress='" + validatorAddress + '\'' +
                 '}';
     }

@@ -25,20 +25,19 @@ public class NodeTxDelegateBridge extends NodeTx {
         super(binanceDexNodeApi, hrp, valHrp);
     }
 
-    public List<TransactionMetadata> claim(int claimType, String claim, long sequence, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+    public List<TransactionMetadata> claim(int chainId, byte[] payload, long sequence, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
         ClaimMsgMessage message = new ClaimMsgMessage();
-        message.setClaimType(claimType);
+        message.setChainId(chainId);
         message.setSequence(sequence);
-        message.setClaim(claim);
+        message.setPayload(payload);
         message.setValidatorAddress(Bech32AddressValue.fromBech32String(wallet.getAddress()));
-
         return broadcast(message, wallet, options, sync);
     }
 
     public List<TransactionMetadata> transferIn(long sequence, TransferIn transferIn, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
         TransferInClaimMessage message = convert(transferIn);
         String claim = EncodeUtils.getObjectMapper().writeValueAsString(message);
-        ClaimMsgMessage claimMsg = new ClaimMsgMessage(ClaimTypes.ClaimTypeTransferIn, sequence, claim, Bech32AddressValue.fromBech32String(wallet.getAddress()));
+        ClaimMsgMessage claimMsg = new ClaimMsgMessage(ClaimTypes.ClaimTypeTransferIn, sequence, claim.getBytes(), Bech32AddressValue.fromBech32String(wallet.getAddress()));
 
         return broadcast(claimMsg, wallet, options, sync);
     }
@@ -65,6 +64,14 @@ public class NodeTxDelegateBridge extends NodeTx {
         return broadcast(message, wallet, options, sync);
     }
 
+    public List<TransactionMetadata> unBind(String symbol, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        UnbindMsgMessage message = new UnbindMsgMessage();
+        message.setFrom(Bech32AddressValue.fromBech32String(wallet.getAddress()));
+        message.setSymbol(symbol);
+
+        return broadcast(message, wallet, options, sync);
+    }
+
     public List<TransactionMetadata> updateTransferOut(long sequence, String refundAddress, Token amount, int refundReason, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
         UpdateTransferOutClaimMessage message = new UpdateTransferOutClaimMessage();
         message.setAmount(convert(amount));
@@ -72,7 +79,7 @@ public class NodeTxDelegateBridge extends NodeTx {
         message.setRefundReason(refundReason);
 
         ClaimMsgMessage claimMsg = new ClaimMsgMessage(ClaimTypes.ClaimTypeUpdateTransferOut, sequence,
-                EncodeUtils.getObjectMapper().writeValueAsString(message), Bech32AddressValue.fromBech32String(wallet.getAddress()));
+                EncodeUtils.getObjectMapper().writeValueAsString(message).getBytes(), Bech32AddressValue.fromBech32String(wallet.getAddress()));
 
         return broadcast(claimMsg, wallet, options, sync);
     }
@@ -84,7 +91,7 @@ public class NodeTxDelegateBridge extends NodeTx {
         message.setContractAddress(EthAddressValue.from(contractAddress));
 
         ClaimMsgMessage claimMsg = new ClaimMsgMessage(ClaimTypes.ClaimTypeUpdateBind, sequence,
-                EncodeUtils.getObjectMapper().writeValueAsString(message), Bech32AddressValue.fromBech32String(wallet.getAddress()));
+                EncodeUtils.getObjectMapper().writeValueAsString(message).getBytes(), Bech32AddressValue.fromBech32String(wallet.getAddress()));
 
         return broadcast(claimMsg, wallet, options, sync);
     }

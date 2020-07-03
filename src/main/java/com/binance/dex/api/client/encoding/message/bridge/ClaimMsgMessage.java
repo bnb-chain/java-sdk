@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 
@@ -20,14 +19,14 @@ import java.util.ArrayList;
 @JsonPropertyOrder(alphabetic = true)
 public class ClaimMsgMessage implements BinanceDexTransactionMessage, AminoSerializable {
 
-    @JsonProperty(value = "claim_type")
-    private int claimType;
+    @JsonProperty(value = "chain_id")
+    private int chainId;
 
     @JsonProperty(value = "sequence")
     private long sequence;
 
-    @JsonProperty(value = "claim")
-    private String claim;
+    @JsonProperty(value = "payload")
+    private byte[] payload;
 
     @JsonProperty(value = "validator_address")
     @JsonSerialize(using = Bech32AddressValueToStringSerializer.class)
@@ -36,19 +35,19 @@ public class ClaimMsgMessage implements BinanceDexTransactionMessage, AminoSeria
     public ClaimMsgMessage() {
     }
 
-    public ClaimMsgMessage(int claimType, long sequence, String claim, Bech32AddressValue validatorAddress) {
-        this.claimType = claimType;
+    public ClaimMsgMessage(int chainId, long sequence, byte[] payload, Bech32AddressValue validatorAddress) {
+        this.chainId = chainId;
         this.sequence = sequence;
-        this.claim = claim;
+        this.payload = payload;
         this.validatorAddress = validatorAddress;
     }
 
-    public int getClaimType() {
-        return claimType;
+    public int getChainId() {
+        return chainId;
     }
 
-    public void setClaimType(int claimType) {
-        this.claimType = claimType;
+    public void setChainId(int chainId) {
+        this.chainId = chainId;
     }
 
     public long getSequence() {
@@ -59,12 +58,12 @@ public class ClaimMsgMessage implements BinanceDexTransactionMessage, AminoSeria
         this.sequence = sequence;
     }
 
-    public String getClaim() {
-        return claim;
+    public byte[] getPayload() {
+        return payload;
     }
 
-    public void setClaim(String claim) {
-        this.claim = claim;
+    public void setPayload(byte[] payload) {
+        this.payload = payload;
     }
 
     public Bech32AddressValue getValidatorAddress() {
@@ -77,14 +76,14 @@ public class ClaimMsgMessage implements BinanceDexTransactionMessage, AminoSeria
 
     @Override
     public void validateBasic() {
-        if (!ClaimTypes.IsValidClaimType(claimType)){
-            throw new IllegalArgumentException(String.format("claim type %s does not exist, see class ClaimTypes", claimType));
+        if (!ClaimTypes.IsValidClaimType(chainId)) {
+            throw new IllegalArgumentException(String.format("claim type %s does not exist, see class ClaimTypes", chainId));
         }
-        if (sequence < 0){
+        if (sequence < 0) {
             throw new IllegalArgumentException("sequence should not be less than 0");
         }
-        if (StringUtils.isEmpty(claim)){
-            throw new IllegalArgumentException("claim should not be empty");
+        if (payload == null || payload.length == 0) {
+            throw new IllegalArgumentException("payload should not be empty");
         }
     }
 
@@ -96,10 +95,10 @@ public class ClaimMsgMessage implements BinanceDexTransactionMessage, AminoSeria
     @Override
     public ArrayList<AminoField<?>> IterateFields() {
         return AminoField.newFieldsBuilder()
-                .addField(Integer.class, claimType, false)
+                .addField(Integer.class, chainId, false)
                 .addField(Long.class, sequence, false)
-                .addField(String.class, claim, StringUtils.isEmpty(claim))
-                .addField(Bech32AddressValue.class, validatorAddress, validatorAddress == null ||validatorAddress.isDefaultOrEmpty())
+                .addField(byte[].class, payload, (payload == null || payload.length == 0))
+                .addField(Bech32AddressValue.class, validatorAddress, validatorAddress == null || validatorAddress.isDefaultOrEmpty())
                 .build();
     }
 
@@ -107,13 +106,13 @@ public class ClaimMsgMessage implements BinanceDexTransactionMessage, AminoSeria
     public void setValueByFieldIndex(int fieldIndex, Object value) {
         switch (fieldIndex) {
             case 1:
-                claimType = ((int) value);
+                chainId = ((int) value);
                 break;
             case 2:
                 sequence = ((long) value);
                 break;
             case 3:
-                claim = ((String) value);
+                payload = (byte[]) value;
                 break;
             case 4:
                 validatorAddress = (Bech32AddressValue) value;
