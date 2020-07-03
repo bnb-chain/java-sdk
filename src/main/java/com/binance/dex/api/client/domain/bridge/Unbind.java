@@ -24,7 +24,7 @@ public class Unbind {
 
     @Override
     public String toString() {
-        return "Bind{" +
+        return "UnBind{" +
                 "from='" + from + '\'' +
                 ", symbol='" + symbol + '\'' +
                 '}';
