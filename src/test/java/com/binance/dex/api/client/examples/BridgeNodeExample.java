@@ -8,6 +8,7 @@ import com.binance.dex.api.client.domain.TransactionMetadata;
 import com.binance.dex.api.client.domain.bridge.TransferIn;
 import com.binance.dex.api.client.domain.broadcast.TransactionOption;
 import com.binance.dex.api.client.domain.oracle.Prophecy;
+import com.binance.dex.api.client.encoding.EncodeUtils;
 import com.binance.dex.api.client.encoding.message.Token;
 import com.binance.dex.api.client.encoding.message.bridge.BindStatus;
 import com.binance.dex.api.client.encoding.message.bridge.ClaimTypes;
@@ -19,6 +20,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -27,11 +29,13 @@ import java.util.List;
 public class BridgeNodeExample {
 
     private BinanceDexApiNodeClient nodeClient = null;
-    private final Wallet wallet = new Wallet("bce1c934173e84cb4a0abf06b371f7568d3c4686da8f3ea7e1e8d230ae681920", BinanceDexEnvironment.TEST_NET);
+    private Wallet wallet = null;
 
     @Before
-    public void setup() {
-        nodeClient = BinanceDexApiClientFactory.newInstance().newNodeRpcClient(BinanceDexEnvironment.TEST_NET.getNodeUrl(),BinanceDexEnvironment.TEST_NET.getHrp(), BinanceDexEnvironment.TEST_NET.getValHrp());
+    public void setup() throws IOException {
+        nodeClient = BinanceDexApiClientFactory.newInstance().newNodeRpcClient("http://dex-qa-s1-bsc-dev-validator-alb-501442930.ap-northeast-1.elb.amazonaws.com:27147",BinanceDexEnvironment.TEST_NET.getHrp(), BinanceDexEnvironment.TEST_NET.getValHrp());
+        String mnemonic = "ten spring excite fluid pizza amused goat equal language cinnamon change drive alien second table onion obscure culture void science renew scrub capable wet";
+        wallet = Wallet.createWalletFromMnemonicCode(Arrays.asList(mnemonic.split(" ")), BinanceDexEnvironment.TEST_NET);
     }
 
     @Test
@@ -92,6 +96,16 @@ public class BridgeNodeExample {
     }
 
     @Test
+    public void unBind() throws IOException, NoSuchAlgorithmException {
+        String symbol = "ABC-196";
+        TransactionOption options = new TransactionOption("", 0, null);
+        List<TransactionMetadata> results = nodeClient.unBind(symbol, wallet, options, true);
+        System.out.println(EncodeUtils.toJsonStringSortKeys(results));
+        Assert.assertEquals(1, results.size());
+        Assert.assertTrue(results.get(0).isOk());
+    }
+
+    @Test
     public void updateTransferOut() throws IOException, NoSuchAlgorithmException {
         long sequence = nodeClient.getCurrentSequence(ClaimTypes.ClaimTypeUpdateTransferOut);
         String refundAddress = wallet.getAddress();
@@ -120,8 +134,9 @@ public class BridgeNodeExample {
     @Test
     public void claim() throws IOException, NoSuchAlgorithmException {
         TransactionOption options = new TransactionOption("", 0, null);
-        List<TransactionMetadata> results = nodeClient.claim(ClaimTypes.ClaimTypeUpdateBind, "claim message", 1, wallet, options, true);
+        List<TransactionMetadata> results = nodeClient.claim(2, "test claim message message message message message".getBytes(), 0, wallet, options, true);
         Assert.assertEquals(1, results.size());
+        Assert.assertTrue(results.get(0).isOk());
     }
 
     @Test

@@ -528,6 +528,14 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     }
 
     @Override
+    public List<TransactionMetadata> unBind(String symbol, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            return bridgeTxDelegate.unBind(symbol, wallet, options, sync);
+        }
+    }
+
+    @Override
     public List<TransactionMetadata> updateTransferOut(long sequence, String refundAddress, com.binance.dex.api.client.encoding.message.Token amount, int refundReason, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
         synchronized (wallet) {
             wallet.ensureWalletIsReady(this);
@@ -544,10 +552,10 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     }
 
     @Override
-    public List<TransactionMetadata> claim(int claimType, String claim, long sequence, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+    public List<TransactionMetadata> claim(int chainId, byte[] payload, long sequence, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
         synchronized (wallet) {
             wallet.ensureWalletIsReady(this);
-            return bridgeTxDelegate.claim(claimType, claim, sequence, wallet, options, sync);
+            return bridgeTxDelegate.claim(chainId, payload, sequence, wallet, options, sync);
         }
     }
 

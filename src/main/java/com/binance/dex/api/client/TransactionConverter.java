@@ -3,6 +3,7 @@ package com.binance.dex.api.client;
 import com.binance.dex.api.client.domain.*;
 import com.binance.dex.api.client.domain.bridge.Bind;
 import com.binance.dex.api.client.domain.bridge.TransferOut;
+import com.binance.dex.api.client.domain.bridge.Unbind;
 import com.binance.dex.api.client.domain.broadcast.*;
 import com.binance.dex.api.client.domain.broadcast.Burn;
 import com.binance.dex.api.client.domain.broadcast.CancelOrder;
@@ -37,6 +38,7 @@ import com.binance.dex.api.client.encoding.message.Token;
 import com.binance.dex.api.client.encoding.message.bridge.BindMsgMessage;
 import com.binance.dex.api.client.encoding.message.bridge.ClaimMsgMessage;
 import com.binance.dex.api.client.encoding.message.bridge.TransferOutMsgMessage;
+import com.binance.dex.api.client.encoding.message.bridge.UnbindMsgMessage;
 import com.binance.dex.api.client.encoding.message.sidechain.transaction.*;
 import com.binance.dex.api.proto.*;
 import com.binance.dex.api.proto.TimeLock;
@@ -210,6 +212,8 @@ public class TransactionConverter {
                     return convertTransferOutMsg(bytes);
                 case Bind:
                     return convertBindMsg(bytes);
+                case UnBind:
+                    return convertUnBindMsg(bytes);
                 case BscSubmitEvidence:
                     return convertBscSubmitEvidence(bytes);
                 case SideChainUnJail:
@@ -300,6 +304,25 @@ public class TransactionConverter {
         return transaction;
     }
 
+    private Transaction convertUnBindMsg(byte[] value) throws IOException {
+        byte[] raw = ByteUtil.cut(value, 4);
+        UnbindMsgMessage message = new UnbindMsgMessage();
+        amino.decodeBare(raw, message);
+
+        Unbind bind = new Unbind();
+        if (message.getFrom() != null && message.getFrom().getRaw() != null) {
+            bind.setFrom(Crypto.encodeAddress(hrp, message.getFrom().getRaw()));
+        }
+        bind.setSymbol(message.getSymbol());
+
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.UNBIND);
+        transaction.setRealTx(bind);
+
+        return transaction;
+    }
+
     private Transaction convertTransferOutMsg(byte[] value) throws IOException {
         byte[] raw = ByteUtil.cut(value, 4);
         TransferOutMsgMessage message = new TransferOutMsgMessage();
@@ -334,9 +357,9 @@ public class TransactionConverter {
         ClaimMsgMessage message = new ClaimMsgMessage();
         amino.decodeBare(raw, message);
         ClaimMsg claimMsg = new ClaimMsg();
-        claimMsg.setClaimType(message.getClaimType());
+        claimMsg.setChainId(message.getChainId());
         claimMsg.setSequence(message.getSequence());
-        claimMsg.setClaim(message.getClaim());
+        claimMsg.setPayload(message.getPayload());
         if (message.getValidatorAddress().getRaw() != null) {
             claimMsg.setValidatorAddress(Crypto.encodeAddress(valHrp, message.getValidatorAddress().getRaw()));
         }

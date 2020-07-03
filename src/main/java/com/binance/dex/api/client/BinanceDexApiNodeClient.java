@@ -199,7 +199,7 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
 
     long getAllSideChainValidatorsCount(String sideChainId, boolean jailInvolved) throws IOException;
 
-    List<TransactionMetadata> claim(int claimType, String claim, long sequence, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
+    List<TransactionMetadata> claim(int chainId, byte[] payload, long sequence, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
 
     @Nullable
     Prophecy getProphecy(int claimType, long sequence) throws IOException;
@@ -211,6 +211,8 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
     List<TransactionMetadata> transferOut(String toAddress, com.binance.dex.api.client.encoding.message.Token amount, long expireTimeInSeconds, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
 
     List<TransactionMetadata> bind(String symbol, long amount, String contractAddress, int contractDecimal, long expireTimeInSeconds, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
+
+    List<TransactionMetadata> unBind(String symbol, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
 
     List<TransactionMetadata> updateTransferOut(long sequence, String refundAddress, com.binance.dex.api.client.encoding.message.Token amount, int refundReason, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
 
