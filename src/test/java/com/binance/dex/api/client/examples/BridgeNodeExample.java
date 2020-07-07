@@ -4,15 +4,21 @@ import com.binance.dex.api.client.BinanceDexApiClientFactory;
 import com.binance.dex.api.client.BinanceDexApiNodeClient;
 import com.binance.dex.api.client.BinanceDexEnvironment;
 import com.binance.dex.api.client.Wallet;
+import com.binance.dex.api.client.crosschain.Package;
 import com.binance.dex.api.client.domain.TransactionMetadata;
 import com.binance.dex.api.client.domain.bridge.TransferIn;
+import com.binance.dex.api.client.domain.broadcast.Transaction;
 import com.binance.dex.api.client.domain.broadcast.TransactionOption;
+import com.binance.dex.api.client.domain.oracle.ClaimMsg;
 import com.binance.dex.api.client.domain.oracle.Prophecy;
 import com.binance.dex.api.client.encoding.EncodeUtils;
 import com.binance.dex.api.client.encoding.message.Token;
 import com.binance.dex.api.client.encoding.message.bridge.BindStatus;
+import com.binance.dex.api.client.encoding.message.bridge.ClaimMsgMessage;
 import com.binance.dex.api.client.encoding.message.bridge.ClaimTypes;
 import com.binance.dex.api.client.encoding.message.bridge.RefundReason;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.commons.codec.binary.Hex;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +42,43 @@ public class BridgeNodeExample {
         nodeClient = BinanceDexApiClientFactory.newInstance().newNodeRpcClient("http://dex-qa-s1-bsc-dev-validator-alb-501442930.ap-northeast-1.elb.amazonaws.com:27147",BinanceDexEnvironment.TEST_NET.getHrp(), BinanceDexEnvironment.TEST_NET.getValHrp());
         String mnemonic = "ten spring excite fluid pizza amused goat equal language cinnamon change drive alien second table onion obscure culture void science renew scrub capable wet";
         wallet = Wallet.createWalletFromMnemonicCode(Arrays.asList(mnemonic.split(" ")), BinanceDexEnvironment.TEST_NET);
+    }
+
+    @Test
+    public void t() throws JsonProcessingException {
+        System.out.println();
+        Transaction transaction = nodeClient.getTransaction("0757F090A88F99436A6E1B138EA5ED1A5F2A8CC46BF03912F663119A5924DF62");
+        ClaimMsg msg = (ClaimMsg)transaction.getRealTx();
+        List<Package> packages = msg.getPayload();
+        System.out.println(EncodeUtils.toJsonStringSortKeys(packages));
+
+        System.out.println();
+
+        transaction = nodeClient.getTransaction("59619D76EAB7B5D3FCE17589B6735869A49B77B5A059168731EA31ACE5A3119D");
+        msg = (ClaimMsg)transaction.getRealTx();
+        packages = msg.getPayload();
+        System.out.println(EncodeUtils.toJsonStringSortKeys(packages));
+
+        System.out.println();
+
+        transaction = nodeClient.getTransaction("35568AB9D81409A54B38C11924C8B3BB374B8A57A4FF2070EF71BB393E94EE02");
+        msg = (ClaimMsg)transaction.getRealTx();
+        packages = msg.getPayload();
+        System.out.println(EncodeUtils.toJsonStringSortKeys(packages));
+
+        System.out.println();
+
+        transaction = nodeClient.getTransaction("29FE859C0B40F73996346FBD9261B4F8B28C8381F13F3D3DCAE87ED3C6EE0A72");
+        msg = (ClaimMsg)transaction.getRealTx();
+        packages = msg.getPayload();
+        System.out.println(EncodeUtils.toJsonStringSortKeys(packages));
+
+        System.out.println();
+
+        transaction = nodeClient.getTransaction("362BA6ACD9A831AC30D1C83AAD02F954C38940DCB91610DA4EA43CF7DCEAE0EA");
+        msg = (ClaimMsg)transaction.getRealTx();
+        packages = msg.getPayload();
+        System.out.println(EncodeUtils.toJsonStringSortKeys(packages));
     }
 
     @Test

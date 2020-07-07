@@ -1,5 +1,7 @@
 package com.binance.dex.api.client.encoding;
 
+import java.util.Arrays;
+
 /**
  * @author Fitz.Lu
  **/
@@ -33,6 +35,23 @@ public class ByteUtil {
         byte[] newBytes = new byte[length];
         System.arraycopy(bytes, start, newBytes, 0, length);
         return newBytes;
+    }
+
+    public static byte[] trim(byte[] bytes, byte b){
+        requireByteArrayNotEmpty(bytes);
+        byte[] newBytes = new byte[0];
+        for(byte bb : bytes){
+            if (bb != b){
+                newBytes = appendByte(newBytes,bb);
+            }
+        }
+        return newBytes;
+    }
+
+    public static byte[] appendByte(byte[] bytes, byte b) {
+        byte[] result = Arrays.copyOf(bytes, bytes.length + 1);
+        result[result.length - 1] = b;
+        return result;
     }
 
     public static byte[] appendBytesArray(byte[] first, byte[] second){

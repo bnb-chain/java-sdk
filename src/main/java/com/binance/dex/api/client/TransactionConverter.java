@@ -1,5 +1,6 @@
 package com.binance.dex.api.client;
 
+import com.binance.dex.api.client.crosschain.Package;
 import com.binance.dex.api.client.domain.*;
 import com.binance.dex.api.client.domain.bridge.Bind;
 import com.binance.dex.api.client.domain.bridge.TransferOut;
@@ -34,6 +35,7 @@ import com.binance.dex.api.client.domain.stake.Description;
 import com.binance.dex.api.client.domain.stake.sidechain.*;
 import com.binance.dex.api.client.encoding.ByteUtil;
 import com.binance.dex.api.client.encoding.Crypto;
+import com.binance.dex.api.client.encoding.EncodeUtils;
 import com.binance.dex.api.client.encoding.amino.Amino;
 import com.binance.dex.api.client.encoding.message.InputOutput;
 import com.binance.dex.api.client.encoding.message.MessageType;
@@ -43,6 +45,7 @@ import com.binance.dex.api.client.encoding.message.bridge.ClaimMsgMessage;
 import com.binance.dex.api.client.encoding.message.bridge.TransferOutMsgMessage;
 import com.binance.dex.api.client.encoding.message.bridge.UnbindMsgMessage;
 import com.binance.dex.api.client.encoding.message.sidechain.transaction.*;
+import com.binance.dex.api.client.rlp.Decoder;
 import com.binance.dex.api.proto.*;
 import com.binance.dex.api.proto.TimeLock;
 import com.binance.dex.api.proto.TimeRelock;
@@ -363,18 +366,19 @@ public class TransactionConverter {
         return transaction;
     }
 
-    private Transaction convertClaimMsg(byte[] value) throws IOException {
+    private Transaction convertClaimMsg(byte[] value) throws Exception {
         byte[] raw = ByteUtil.cut(value, 4);
         ClaimMsgMessage message = new ClaimMsgMessage();
         amino.decodeBare(raw, message);
         ClaimMsg claimMsg = new ClaimMsg();
         claimMsg.setChainId(message.getChainId());
         claimMsg.setSequence(message.getSequence());
-        claimMsg.setPayload(message.getPayload());
+        List<Package> packages = Decoder.decodeList(message.getPayload(), Package.class);
+        packages.forEach(pack -> pack.setHrp(this.hrp));
+        claimMsg.setPayload(packages);
         if (message.getValidatorAddress().getRaw() != null) {
             claimMsg.setValidatorAddress(Crypto.encodeAddress(valHrp, message.getValidatorAddress().getRaw()));
         }
-
         Transaction transaction = new Transaction();
         transaction.setTxType(TxType.CLAIM);
         transaction.setRealTx(claimMsg);
