@@ -1,9 +1,7 @@
 package com.binance.dex.api.client.encoding.message.sidechain.query;
 
 import com.binance.dex.api.client.encoding.message.common.Bech32AddressValue;
-import com.binance.dex.api.client.encoding.serializer.Bech32AddressValueToStringSerializer;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * @author Fitz.Lu
@@ -11,7 +9,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 public class QueryValidatorParams extends BaseQueryParams {
 
     @JsonProperty(value = "ValidatorAddr")
-    @JsonSerialize(using = Bech32AddressValueToStringSerializer.class)
     private Bech32AddressValue ValidatorAddress;
 
     public QueryValidatorParams() {

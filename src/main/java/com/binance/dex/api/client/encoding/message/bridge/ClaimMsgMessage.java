@@ -4,11 +4,9 @@ import com.binance.dex.api.client.encoding.amino.AminoField;
 import com.binance.dex.api.client.encoding.amino.AminoSerializable;
 import com.binance.dex.api.client.encoding.message.BinanceDexTransactionMessage;
 import com.binance.dex.api.client.encoding.message.common.Bech32AddressValue;
-import com.binance.dex.api.client.encoding.serializer.Bech32AddressValueToStringSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.ArrayList;
 
@@ -29,7 +27,6 @@ public class ClaimMsgMessage implements BinanceDexTransactionMessage, AminoSeria
     private byte[] payload;
 
     @JsonProperty(value = "validator_address")
-    @JsonSerialize(using = Bech32AddressValueToStringSerializer.class)
     private Bech32AddressValue validatorAddress;
 
     public ClaimMsgMessage() {

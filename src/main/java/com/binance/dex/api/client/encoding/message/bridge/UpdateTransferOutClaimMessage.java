@@ -5,11 +5,9 @@ import com.binance.dex.api.client.encoding.amino.AminoSerializable;
 import com.binance.dex.api.client.encoding.message.BinanceDexTransactionMessage;
 import com.binance.dex.api.client.encoding.message.common.Bech32AddressValue;
 import com.binance.dex.api.client.encoding.message.common.CoinValue;
-import com.binance.dex.api.client.encoding.serializer.Bech32AddressValueToStringSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.ArrayList;
 
@@ -21,7 +19,6 @@ import java.util.ArrayList;
 public class UpdateTransferOutClaimMessage implements BinanceDexTransactionMessage, AminoSerializable {
 
     @JsonProperty(value = "refund_address")
-    @JsonSerialize(using = Bech32AddressValueToStringSerializer.class)
     private Bech32AddressValue refundAddress;
 
     @JsonProperty(value = "amount")

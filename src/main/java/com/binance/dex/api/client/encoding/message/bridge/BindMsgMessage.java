@@ -5,12 +5,9 @@ import com.binance.dex.api.client.encoding.amino.AminoSerializable;
 import com.binance.dex.api.client.encoding.message.BinanceDexTransactionMessage;
 import com.binance.dex.api.client.encoding.message.common.Bech32AddressValue;
 import com.binance.dex.api.client.encoding.message.common.EthAddressValue;
-import com.binance.dex.api.client.encoding.serializer.Bech32AddressValueToStringSerializer;
-import com.binance.dex.api.client.encoding.serializer.EthAddressValueToStringSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -23,7 +20,6 @@ import java.util.ArrayList;
 public class BindMsgMessage implements BinanceDexTransactionMessage, AminoSerializable {
 
     @JsonProperty(value = "from")
-    @JsonSerialize(using = Bech32AddressValueToStringSerializer.class)
     private Bech32AddressValue from;
 
     @JsonProperty(value = "symbol")
@@ -33,7 +29,6 @@ public class BindMsgMessage implements BinanceDexTransactionMessage, AminoSerial
     private long amount;
 
     @JsonProperty(value = "contract_address")
-    @JsonSerialize(using = EthAddressValueToStringSerializer.class)
     private EthAddressValue contractAddress;
 
     @JsonProperty(value = "contract_decimals")

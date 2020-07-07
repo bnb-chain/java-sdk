@@ -2,6 +2,8 @@ package com.binance.dex.api.client.encoding.message.common;
 
 import com.binance.dex.api.client.encoding.amino.AminoCustomSerialized;
 import com.binance.dex.api.client.encoding.amino.WireType;
+import com.binance.dex.api.client.encoding.serializer.EthAddressValueToStringSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.CodedOutputStream;
 import org.apache.commons.lang3.StringUtils;
@@ -12,6 +14,7 @@ import java.io.IOException;
 /**
  * @author Fitz.Lu
  **/
+@JsonSerialize(using = EthAddressValueToStringSerializer.class)
 public class EthAddressValue implements AminoCustomSerialized {
 
     private String address;

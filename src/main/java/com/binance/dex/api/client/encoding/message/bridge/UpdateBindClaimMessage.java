@@ -4,11 +4,9 @@ import com.binance.dex.api.client.encoding.amino.AminoField;
 import com.binance.dex.api.client.encoding.amino.AminoSerializable;
 import com.binance.dex.api.client.encoding.message.BinanceDexTransactionMessage;
 import com.binance.dex.api.client.encoding.message.common.EthAddressValue;
-import com.binance.dex.api.client.encoding.serializer.EthAddressValueToStringSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -27,7 +25,6 @@ public class UpdateBindClaimMessage implements BinanceDexTransactionMessage, Ami
     private String symbol;
 
     @JsonProperty(value = "contract_address")
-    @JsonSerialize(using = EthAddressValueToStringSerializer.class)
     private EthAddressValue contractAddress;
 
     public int getStatus() {

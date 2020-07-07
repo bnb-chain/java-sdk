@@ -5,6 +5,8 @@ import com.binance.dex.api.client.encoding.ByteUtil;
 import com.binance.dex.api.client.encoding.Crypto;
 import com.binance.dex.api.client.encoding.amino.AminoCustomSerialized;
 import com.binance.dex.api.client.encoding.amino.WireType;
+import com.binance.dex.api.client.encoding.serializer.Bech32AddressValueToStringSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.CodedOutputStream;
 
@@ -13,6 +15,7 @@ import java.io.IOException;
 /**
  * @author Fitz.Lu
  **/
+@JsonSerialize(using = Bech32AddressValueToStringSerializer.class)
 public class Bech32AddressValue implements AminoCustomSerialized {
 
     private String hrp;
@@ -90,5 +93,4 @@ public class Bech32AddressValue implements AminoCustomSerialized {
             return CodedOutputStream.computeByteArraySizeNoTag(raw);
         }
     }
-
 }
