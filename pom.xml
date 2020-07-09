@@ -102,6 +102,28 @@
             <artifactId>javax.annotation-api</artifactId>
             <version>1.3.2</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.ethereum/ethereumj-core -->
+        <dependency>
+            <groupId>org.ethereum</groupId>
+            <artifactId>ethereumj-core</artifactId>
+            <version>1.12.0-RELEASE</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.ethereum</groupId>
+                    <artifactId>rocksdbjni</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.ethereum</groupId>
+                    <artifactId>solcJ-all</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.iq80.leveldb</groupId>
+                    <artifactId>leveldb</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
     </dependencies>
 
     <build>

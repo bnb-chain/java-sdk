@@ -6,11 +6,9 @@ import com.binance.dex.api.client.encoding.message.BinanceDexTransactionMessage;
 import com.binance.dex.api.client.encoding.message.common.Bech32AddressValue;
 import com.binance.dex.api.client.encoding.message.common.CoinValueStr;
 import com.binance.dex.api.client.encoding.message.sidechain.value.*;
-import com.binance.dex.api.client.encoding.serializer.Bech32AddressValueToStringSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -26,11 +24,9 @@ public class CreateSideChainValidatorMessage implements BinanceDexTransactionMes
     private CommissionMsgValue commission = new CommissionMsgValue();
 
     @JsonProperty(value = "delegator_address")
-    @JsonSerialize(using = Bech32AddressValueToStringSerializer.class)
     private Bech32AddressValue delegatorAddr;
 
     @JsonProperty(value = "validator_address")
-    @JsonSerialize(using = Bech32AddressValueToStringSerializer.class)
     private Bech32AddressValue validatorOperatorAddr;
 
     @JsonProperty(value = "delegation")

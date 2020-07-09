@@ -5,11 +5,9 @@ import com.binance.dex.api.client.encoding.amino.AminoSerializable;
 import com.binance.dex.api.client.encoding.message.BinanceDexTransactionMessage;
 import com.binance.dex.api.client.encoding.message.common.Bech32AddressValue;
 import com.binance.dex.api.client.encoding.message.common.CoinValueStr;
-import com.binance.dex.api.client.encoding.serializer.Bech32AddressValueToStringSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -22,15 +20,12 @@ import java.util.ArrayList;
 public class SideChainRedelegateMessage implements BinanceDexTransactionMessage, AminoSerializable {
 
     @JsonProperty(value = "delegator_addr")
-    @JsonSerialize(using = Bech32AddressValueToStringSerializer.class)
     private Bech32AddressValue delegatorAddress;
 
     @JsonProperty(value = "validator_src_addr")
-    @JsonSerialize(using = Bech32AddressValueToStringSerializer.class)
     private Bech32AddressValue srcValidatorAddress;
 
     @JsonProperty(value = "validator_dst_addr")
-    @JsonSerialize(using = Bech32AddressValueToStringSerializer.class)
     private Bech32AddressValue dstValidatorAddress;
 
     @JsonProperty(value = "amount")

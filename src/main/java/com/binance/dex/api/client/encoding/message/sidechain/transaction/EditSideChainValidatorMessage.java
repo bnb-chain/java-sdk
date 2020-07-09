@@ -6,7 +6,6 @@ import com.binance.dex.api.client.encoding.message.BinanceDexTransactionMessage;
 import com.binance.dex.api.client.encoding.message.common.Bech32AddressValue;
 import com.binance.dex.api.client.encoding.message.common.Dec;
 import com.binance.dex.api.client.encoding.message.sidechain.value.DescriptionValue;
-import com.binance.dex.api.client.encoding.serializer.Bech32AddressValueToStringSerializer;
 import com.binance.dex.api.client.encoding.serializer.DecToStringSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -27,7 +26,6 @@ public class EditSideChainValidatorMessage implements BinanceDexTransactionMessa
     private DescriptionValue description;
 
     @JsonProperty(value = "address")
-    @JsonSerialize(using = Bech32AddressValueToStringSerializer.class)
     private Bech32AddressValue validatorOperatorAddress;
 
     @JsonProperty(value = "commission_rate")
