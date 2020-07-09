@@ -3,6 +3,7 @@ package com.binance.dex.api.client.encoding.message.common;
 import com.binance.dex.api.client.encoding.amino.AminoCustomSerialized;
 import com.binance.dex.api.client.encoding.amino.WireType;
 import com.binance.dex.api.client.encoding.serializer.EthAddressValueToStringSerializer;
+import com.binance.dex.api.client.rlp.RlpDecodable;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.CodedOutputStream;
@@ -15,7 +16,7 @@ import java.io.IOException;
  * @author Fitz.Lu
  **/
 @JsonSerialize(using = EthAddressValueToStringSerializer.class)
-public class EthAddressValue implements AminoCustomSerialized {
+public class EthAddressValue implements AminoCustomSerialized, RlpDecodable {
 
     private String address;
 
@@ -80,5 +81,11 @@ public class EthAddressValue implements AminoCustomSerialized {
             addr = address.substring(2);
         }
         return Hex.decode(addr);
+    }
+
+    @Override
+    public void decode(byte[] raw, Object superInstance) {
+        address = Hex.toHexString(raw);
+        address = "0x" + address;
     }
 }

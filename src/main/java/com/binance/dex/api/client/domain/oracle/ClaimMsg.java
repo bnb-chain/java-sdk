@@ -1,6 +1,10 @@
 package com.binance.dex.api.client.domain.oracle;
 
-import org.apache.commons.codec.binary.Hex;
+import com.binance.dex.api.client.crosschain.Package;
+import com.binance.dex.api.client.encoding.EncodeUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import java.util.List;
 
 /**
  * @author Fitz.Lu
@@ -11,7 +15,7 @@ public class ClaimMsg {
 
     private long sequence;
 
-    private byte[] payload;
+    private List<Package> payload;
 
     private String validatorAddress;
 
@@ -31,11 +35,11 @@ public class ClaimMsg {
         this.sequence = sequence;
     }
 
-    public byte[] getPayload() {
+    public List<Package> getPayload() {
         return payload;
     }
 
-    public void setPayload(byte[] payload) {
+    public void setPayload(List<Package> payload) {
         this.payload = payload;
     }
 
@@ -49,11 +53,15 @@ public class ClaimMsg {
 
     @Override
     public String toString() {
-        return "ClaimMsg{" +
-                "chainId=" + chainId +
-                ", sequence=" + sequence +
-                ", payload='" + Hex.encodeHexString(payload) + '\'' +
-                ", validatorAddress='" + validatorAddress + '\'' +
-                '}';
+        try {
+            return "ClaimMsg{" +
+                    "chainId=" + chainId +
+                    ", sequence=" + sequence +
+                    ", payload='" + EncodeUtils.toJsonStringSortKeys(payload) + '\'' +
+                    ", validatorAddress='" + validatorAddress + '\'' +
+                    '}';
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("failed to encode payload", e);
+        }
     }
 }
