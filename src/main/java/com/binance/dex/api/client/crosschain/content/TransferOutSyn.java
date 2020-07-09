@@ -1,6 +1,6 @@
 package com.binance.dex.api.client.crosschain.content;
 
-import com.binance.dex.api.client.crosschain.Bep2TokenSymbol;
+import com.binance.dex.api.client.crosschain.TokenSymbol;
 import com.binance.dex.api.client.crosschain.Content;
 import com.binance.dex.api.client.crosschain.UnsignedLong;
 import com.binance.dex.api.client.crosschain.UnsignedNumber;
@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 public class TransferOutSyn extends Content {
 
-    private Bep2TokenSymbol symbol;
+    private TokenSymbol symbol;
     private Bech32AddressValue contractAddress;
     private UnsignedNumber amount;
     private Bech32AddressValue recipient;

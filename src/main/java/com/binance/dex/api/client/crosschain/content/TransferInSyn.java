@@ -1,6 +1,6 @@
 package com.binance.dex.api.client.crosschain.content;
 
-import com.binance.dex.api.client.crosschain.Bep2TokenSymbol;
+import com.binance.dex.api.client.crosschain.TokenSymbol;
 import com.binance.dex.api.client.crosschain.Content;
 import com.binance.dex.api.client.crosschain.UnsignedLong;
 import com.binance.dex.api.client.crosschain.UnsignedNumber;
@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 public class TransferInSyn extends Content {
 
-    private Bep2TokenSymbol symbol;
+    private TokenSymbol symbol;
     private EthAddressValue contractAddress;
     private List<UnsignedNumber> amounts;
     private List<Bech32AddressValue> receiverAddresses;

@@ -1,7 +1,7 @@
 package com.binance.dex.api.client.crosschain;
 
 import com.binance.dex.api.client.encoding.ByteUtil;
-import com.binance.dex.api.client.encoding.serializer.Bep2TokenSymbolSerializer;
+import com.binance.dex.api.client.encoding.serializer.TokenSymbolSerializer;
 import com.binance.dex.api.client.rlp.RlpDecodable;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
@@ -9,8 +9,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@JsonSerialize(using = Bep2TokenSymbolSerializer.class)
-public class Bep2TokenSymbol implements RlpDecodable {
+@JsonSerialize(using = TokenSymbolSerializer.class)
+public class TokenSymbol implements RlpDecodable {
 
     private byte[] raw;
     private String symbol;
