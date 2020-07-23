@@ -232,9 +232,9 @@ public class NodeClientExample {
 
     @Test
     public void testGetTransaction() {
-        Transaction transaction = binanceDexNodeApi.getTransaction("8B13490FB57C4650CE68E09E51C768D76A15B00FE5E5898D9453EF9B7162DB82");
+        Transaction transaction = binanceDexNodeApi.getTransaction("1218DC0B64E3A128790AD8697CC9EC19F840D1D4202A5FA6EC64C4424793F5F0");
         Assert.assertNotNull(transaction);
-        Assert.assertEquals("8B13490FB57C4650CE68E09E51C768D76A15B00FE5E5898D9453EF9B7162DB82", transaction.getHash());
+        Assert.assertEquals("1218DC0B64E3A128790AD8697CC9EC19F840D1D4202A5FA6EC64C4424793F5F0", transaction.getHash());
         Assert.assertEquals(0, transaction.getCode().intValue());
     }
 
