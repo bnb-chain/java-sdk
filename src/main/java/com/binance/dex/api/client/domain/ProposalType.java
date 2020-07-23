@@ -14,7 +14,9 @@ public enum ProposalType {
     FeeChange(5L),
     CreateValidator(6L),
     RemoveValidator(7L),
-    DelistTradingPair(8L);
+    DelistTradingPair(8L),
+    SideChainParamsChange(129L),
+    CrossSideChainParamsChange(130L);
 
     private long value;
 
