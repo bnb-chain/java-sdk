@@ -4,11 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.protobuf.CodedOutputStream;
+import org.bouncycastle.jcajce.provider.digest.Keccak;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 public class EncodeUtils {
@@ -28,6 +30,13 @@ public class EncodeUtils {
 
     public static String bytesToPrefixHex(byte[] bytes) {
         return "0x" + bytesToHex(bytes);
+    }
+
+    public static String cleanHexPrefix(String s){
+        if (s.startsWith("0x")){
+            s = s.substring(2);
+        }
+        return s;
     }
 
     public static String toJsonStringSortKeys(Object object) throws JsonProcessingException {
@@ -75,6 +84,18 @@ public class EncodeUtils {
 
     public static ObjectMapper getObjectMapper() {
         return OBJECT_MAPPER;
+    }
+
+    public static String sha3String(String utf8String) {
+        return bytesToHex(sha3(utf8String.getBytes(StandardCharsets.UTF_8)));
+    }
+    public static byte[] sha3(byte[] input) {
+        return sha3(input, 0, input.length);
+    }
+    public static byte[] sha3(byte[] input, int offset, int length) {
+        Keccak.DigestKeccak kecc = new Keccak.Digest256();
+        kecc.update(input, offset, length);
+        return kecc.digest();
     }
 
 }

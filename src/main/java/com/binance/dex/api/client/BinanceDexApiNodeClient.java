@@ -273,16 +273,10 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
 
     long getCurrentSequence(int claimType);
 
-    List<TransactionMetadata> transferIn(long sequence, TransferIn transferIn, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
-
     List<TransactionMetadata> transferOut(String toAddress, com.binance.dex.api.client.encoding.message.Token amount, long expireTimeInSeconds, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
 
     List<TransactionMetadata> bind(String symbol, long amount, String contractAddress, int contractDecimal, long expireTimeInSeconds, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
 
     List<TransactionMetadata> unBind(String symbol, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
-
-    List<TransactionMetadata> updateTransferOut(long sequence, String refundAddress, com.binance.dex.api.client.encoding.message.Token amount, int refundReason, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
-
-    List<TransactionMetadata> updateBind(long sequence, String symbol, String contractAddress, int status, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
 
 }
