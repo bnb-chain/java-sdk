@@ -504,14 +504,6 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     }
 
     @Override
-    public List<TransactionMetadata> transferIn(long sequence, TransferIn transferIn, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
-        synchronized (wallet) {
-            wallet.ensureWalletIsReady(this);
-            return bridgeTxDelegate.transferIn(sequence, transferIn, wallet, options, sync);
-        }
-    }
-
-    @Override
     public List<TransactionMetadata> transferOut(String toAddress, com.binance.dex.api.client.encoding.message.Token amount, long expireTimeInSeconds, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
         synchronized (wallet) {
             wallet.ensureWalletIsReady(this);
@@ -532,22 +524,6 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         synchronized (wallet) {
             wallet.ensureWalletIsReady(this);
             return bridgeTxDelegate.unBind(symbol, wallet, options, sync);
-        }
-    }
-
-    @Override
-    public List<TransactionMetadata> updateTransferOut(long sequence, String refundAddress, com.binance.dex.api.client.encoding.message.Token amount, int refundReason, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
-        synchronized (wallet) {
-            wallet.ensureWalletIsReady(this);
-            return bridgeTxDelegate.updateTransferOut(sequence, refundAddress, amount, refundReason, wallet, options, sync);
-        }
-    }
-
-    @Override
-    public List<TransactionMetadata> updateBind(long sequence, String symbol, String contractAddress, int status, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
-        synchronized (wallet) {
-            wallet.ensureWalletIsReady(this);
-            return bridgeTxDelegate.updateBind(sequence, symbol, contractAddress, status, wallet, options, sync);
         }
     }
 
