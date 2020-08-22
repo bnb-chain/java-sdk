@@ -40,7 +40,6 @@ public class AminoTest {
         Assert.assertNotNull(value.getSharesDst());
     }
 
-    @Test
     public void testClaim() throws IOException {
         ClaimMsgMessage message = new ClaimMsgMessage();
         message.setChainId(ClaimTypes.ClaimTypeTransferIn);
