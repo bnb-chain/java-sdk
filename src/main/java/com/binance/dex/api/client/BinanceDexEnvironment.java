@@ -18,7 +18,7 @@ public class BinanceDexEnvironment {
             "http://data-seed-pre-0-s3.binance.org",
             "wss://data-seed-pre-0-s3.binance.org/websocket",
             "tbnb",
-            "tbva"
+            "bva"
     );
 
     // Rest API base URL
