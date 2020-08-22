@@ -4,6 +4,10 @@ import com.binance.dex.api.client.Wallet;
 import com.binance.dex.api.client.domain.broadcast.*;
 import com.binance.dex.api.client.encoding.Crypto;
 import com.binance.dex.api.client.encoding.EncodeUtils;
+import com.binance.dex.api.client.encoding.amino.Amino;
+import com.binance.dex.api.client.encoding.amino.AminoSerializable;
+import com.binance.dex.api.client.encoding.amino.InternalAmino;
+import com.binance.dex.api.client.encoding.amino.WireType;
 import com.binance.dex.api.proto.StdSignature;
 import com.binance.dex.api.proto.StdTx;
 import com.google.common.annotations.VisibleForTesting;
@@ -28,9 +32,12 @@ public class TransactionRequestAssembler {
     private Wallet wallet;
     private TransactionOption options;
 
+    private final Amino amino;
+
     public TransactionRequestAssembler(Wallet wallet, TransactionOption options) {
         this.wallet = wallet;
         this.options = options;
+        this.amino = InternalAmino.get();
     }
 
     public static long doubleToLong(String d) {
@@ -50,6 +57,23 @@ public class TransactionRequestAssembler {
     }
 
     @VisibleForTesting
+    byte[] signTx(BinanceDexTransactionMessage msg) throws IOException, NoSuchAlgorithmException {
+        return sign(assembleMessage4Sign(msg));
+    }
+
+    private  <T extends BinanceDexTransactionMessage> BinanceDexTransactionMessage assembleMessage4Sign(T t){
+        if (t.useAminoJson()){
+            if (WireType.isRegistered(t.getClass())){
+                return new TransactionMessageWithType<T>(WireType.getRegisteredTypeName(t.getClass()), t);
+            }else{
+                throw new IllegalStateException("Class " + t.getClass().getCanonicalName() + " has not been registered into amino");
+            }
+        }else{
+            return t;
+        }
+    }
+
+    @VisibleForTesting
     byte[] sign(BinanceDexTransactionMessage msg)
             throws NoSuchAlgorithmException, IOException {
         SignData sd = new SignData();
@@ -64,6 +88,7 @@ public class TransactionRequestAssembler {
         if (wallet.getEcKey() == null && wallet.getLedgerKey() != null) {
             return Crypto.sign(EncodeUtils.toJsonEncodeBytes(sd), wallet.getLedgerKey());
         }
+
         return Crypto.sign(EncodeUtils.toJsonEncodeBytes(sd), wallet.getEcKey());
     }
 
@@ -126,6 +151,16 @@ public class TransactionRequestAssembler {
     }
 
     @VisibleForTesting
+    SideVoteMessage createSideVoteMessage(SideVote vote){
+        SideVoteMessage voteMessage = new SideVoteMessage();
+        voteMessage.setProposalId(vote.getProposalId());
+        voteMessage.setOption(vote.getOption());
+        voteMessage.setVoter(wallet.getAddress());
+        voteMessage.setSideChainId(vote.getSideChainId());
+        return voteMessage;
+    }
+
+    @VisibleForTesting
     byte[] encodeNewOrderMessage(NewOrderMessage newOrder)
             throws IOException {
         com.binance.dex.api.proto.NewOrder proto = com.binance.dex.api.proto.NewOrder.newBuilder()
@@ -152,6 +187,18 @@ public class TransactionRequestAssembler {
         return EncodeUtils.aminoWrap(proto.toByteArray(), MessageType.Vote.getTypePrefixBytes(), false);
     }
 
+    @VisibleForTesting
+    byte[] encodeSideVoteMessage(SideVoteMessage voteMessage)
+            throws IOException {
+        com.binance.dex.api.proto.SideVote proto = com.binance.dex.api.proto.SideVote.newBuilder()
+                .setVoter(ByteString.copyFrom(wallet.getAddressBytes()))
+                .setProposalId(voteMessage.getProposalId())
+                .setOption(voteMessage.getOption())
+                .setSideChainId(voteMessage.getSideChainId())
+                .build();
+        return EncodeUtils.aminoWrap(proto.toByteArray(), MessageType.SideVote.getTypePrefixBytes(), false);
+    }
+
     public RequestBody buildNewOrder(com.binance.dex.api.client.domain.broadcast.NewOrder newOrder)
             throws IOException, NoSuchAlgorithmException {
         return createRequestBody(buildNewOrderPayload(newOrder));
@@ -173,6 +220,18 @@ public class TransactionRequestAssembler {
     public String buildVotePayload(Vote vote) throws IOException, NoSuchAlgorithmException {
         VoteMessage msgBean = createVoteMessage(vote);
         byte[] msg = encodeVoteMessage(msgBean);
+        byte[] signature = encodeSignature(sign(msgBean));
+        byte[] stdTx = encodeStdTx(msg, signature);
+        return EncodeUtils.bytesToHex(stdTx);
+    }
+
+    public RequestBody buildSideVote(SideVote vote) throws IOException, NoSuchAlgorithmException {
+        return createRequestBody(buildSideVotePayload(vote));
+    }
+
+    public String buildSideVotePayload(SideVote vote) throws IOException, NoSuchAlgorithmException {
+        SideVoteMessage msgBean = createSideVoteMessage(vote);
+        byte[] msg = encodeSideVoteMessage(msgBean);
         byte[] signature = encodeSignature(sign(msgBean));
         byte[] stdTx = encodeStdTx(msg, signature);
         return EncodeUtils.bytesToHex(stdTx);
@@ -549,6 +608,21 @@ public class TransactionRequestAssembler {
         builder.setSwapId(ByteString.copyFrom(Hex.decode(msg.getSwapId())));
         com.binance.dex.api.proto.RefundHashTimerLockMsg proto = builder.build();
         return EncodeUtils.aminoWrap(proto.toByteArray(), MessageType.RefundHashTimerLockMsg.getTypePrefixBytes(), false);
+    }
+
+    /**
+     * Used for amino serializable message
+     * */
+    public String buildTxPayload(BinanceDexTransactionMessage message) throws IOException, NoSuchAlgorithmException {
+        if (!AminoSerializable.class.isAssignableFrom(message.getClass())){
+            throw new IllegalArgumentException("Class " + message.getClass() + " should also implement AminoSerializable to support amino encoding");
+        }
+
+        byte[] typePrefix = WireType.getTypePrefix(message.getClass());
+        byte[] msg = amino.encode(((AminoSerializable) message), typePrefix, false);
+        byte[] signature = encodeSignature(signTx(message));
+        byte[] stdTx = encodeStdTx(msg, signature);
+        return EncodeUtils.bytesToHex(stdTx);
     }
 
 }

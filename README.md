@@ -7,6 +7,8 @@ The Binance Chain Java SDK works as a lightweight Java library for interacting w
 * **[client](https://github.com/binance-chain/java-sdk/tree/master/src/main/java/com/binance/dex/api/client/impl)** - implementations of API rest client, supporting synchronous and asynchronous access to Binance Chain's REST APIs.
 * **[wallet](https://github.com/binance-chain/java-sdk/blob/master/src/main/java/com/binance/dex/api/client/Wallet.java)** - management of accounts, including seed and encrypted mnemonic generation.
 
+## Disclaimer
+**This branch is under active development, all subject to potential future change without notification and not ready for production use. The code and security audit have not been fully completed and not ready for any bug bounty.**
 
 # Installation
 
@@ -17,7 +19,7 @@ The Binance Chain Java SDK works as a lightweight Java library for interacting w
 <dependency>
     <groupId>com.binance.dex.api</groupId>
     <artifactId>binance-dex-api-client</artifactId>
-    <version>1.0.7</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 # Protobuf

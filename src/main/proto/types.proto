@@ -315,6 +315,10 @@ message Evidence {
   int64 total_voting_power = 5;
 }
 
+message KVPairs {
+  repeated common.KVPair pairs = 1;
+}
+
 //----------------------------------------
 // Service Definition
 

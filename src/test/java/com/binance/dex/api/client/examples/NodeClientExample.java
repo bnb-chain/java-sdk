@@ -28,7 +28,7 @@ public class NodeClientExample {
 
     @Before
     public void setup() {
-        binanceDexNodeApi = BinanceDexApiClientFactory.newInstance().newNodeRpcClient(BinanceDexEnvironment.TEST_NET.getNodeUrl(),BinanceDexEnvironment.TEST_NET.getHrp());
+        binanceDexNodeApi = BinanceDexApiClientFactory.newInstance().newNodeRpcClient(BinanceDexEnvironment.TEST_NET.getNodeUrl(),BinanceDexEnvironment.TEST_NET.getHrp(), BinanceDexEnvironment.TEST_NET.getValHrp());
     }
 
     @Test
@@ -232,9 +232,9 @@ public class NodeClientExample {
 
     @Test
     public void testGetTransaction() {
-        Transaction transaction = binanceDexNodeApi.getTransaction("A1D07086EC08E983A47157FEACC1CF42179C37FCCDD56E7A4460CD1E4C82E51F");
+        Transaction transaction = binanceDexNodeApi.getTransaction("1218DC0B64E3A128790AD8697CC9EC19F840D1D4202A5FA6EC64C4424793F5F0");
         Assert.assertNotNull(transaction);
-        Assert.assertEquals("A1D07086EC08E983A47157FEACC1CF42179C37FCCDD56E7A4460CD1E4C82E51F", transaction.getHash());
+        Assert.assertEquals("1218DC0B64E3A128790AD8697CC9EC19F840D1D4202A5FA6EC64C4424793F5F0", transaction.getHash());
         Assert.assertEquals(0, transaction.getCode().intValue());
     }
 
@@ -284,5 +284,11 @@ public class NodeClientExample {
     public void testGetProposalById(){
         Proposal proposal = binanceDexNodeApi.getProposalById("1");
         Assert.assertEquals("1",proposal.getValue().getProposalId());
+    }
+
+    @Test
+    public void testGetSideProposalById(){
+        Proposal proposal = binanceDexNodeApi.getSideProposalById("4", "rialto");
+        Assert.assertEquals("4",proposal.getValue().getProposalId());
     }
 }

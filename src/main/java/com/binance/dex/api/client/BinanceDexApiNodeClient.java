@@ -1,13 +1,18 @@
 package com.binance.dex.api.client;
 
 import com.binance.dex.api.client.domain.*;
+import com.binance.dex.api.client.domain.bridge.TransferIn;
 import com.binance.dex.api.client.domain.broadcast.*;
 import com.binance.dex.api.client.domain.broadcast.Transaction;
+import com.binance.dex.api.client.domain.oracle.Prophecy;
 import com.binance.dex.api.client.domain.request.ClosedOrdersRequest;
 import com.binance.dex.api.client.domain.request.OpenOrdersRequest;
 import com.binance.dex.api.client.domain.request.TradesRequest;
 import com.binance.dex.api.client.domain.request.TransactionsRequest;
+import com.binance.dex.api.client.domain.stake.Pool;
+import com.binance.dex.api.client.domain.stake.sidechain.*;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -27,6 +32,8 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
     List<StakeValidator> getStakeValidator();
 
     Proposal getProposalById(String proposalId);
+
+    Proposal getSideProposalById(String proposalId, String sideChainId);
 
     Account getCommittedAccount(String address);
 
@@ -224,4 +231,52 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
     default List<TransactionMetadata> unfreeze(TokenUnfreeze unfreeze, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
         throw new UnsupportedOperationException();
     }
+
+    List<TransactionMetadata> createSideChainValidator(CreateSideChainValidator createSideChainValidator, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
+
+    List<TransactionMetadata> editSideChainValidator(EditSideChainValidator editSideChainValidator, Wallet wallet, TransactionOption option, boolean synv) throws IOException, NoSuchAlgorithmException ;
+
+    List<TransactionMetadata> sideChainDelegate(SideChainDelegate sideChainDelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
+
+    List<TransactionMetadata> sideChainRedelagate(SideChainRedelegate sideChainRedelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
+
+    List<TransactionMetadata> sideChainUnbond(SideChainUnBond sideChainUndelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
+
+    SideChainValidator getSideChainValidator(String sideChainId, String validatorAddress) throws IOException;
+
+    List<SideChainValidator> getSideChainTopValidators(String sideChainId, int top) throws IOException ;
+
+    SideChainDelegation getSideChainDelegation(String sideChainId, String delegatorAddress, String validatorAddress) throws IOException;
+
+    List<SideChainDelegation> getSideChainDelegations(String sideChainId, String delegatorAddress) throws IOException;
+
+    SideChainRedelegation getSideChainRedelegation(String sideChainId, String delegatorAddress, String srcValidatorAddress, String dstValidatorAddress) throws IOException;
+
+    List<SideChainRedelegation> getSideChainRedelegations(String sideChainId, String delegatorAddress) throws IOException;
+
+    UnBondingDelegation getSideChainUnBondingDelegation(String sideChainId, String delegatorAddress, String validatorAddress) throws IOException;
+
+    List<UnBondingDelegation> getSideChainUnBondingDelegations(String sideChainId, String delegatorAddress) throws IOException;
+
+    List<UnBondingDelegation> getSideChainUnBondingDelegationsByValidator(String sideChainId, String validatorAddress)  throws IOException ;
+
+    List<SideChainRedelegation> getSideChainRedelegationsByValidator(String sideChainId, String validatorAddress) throws IOException;
+
+    Pool getSideChainPool(String sideChainId) throws IOException;
+
+    long getAllSideChainValidatorsCount(String sideChainId, boolean jailInvolved) throws IOException;
+
+    List<TransactionMetadata> claim(int chainId, byte[] payload, long sequence, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
+
+    @Nullable
+    Prophecy getProphecy(int claimType, long sequence) throws IOException;
+
+    long getCurrentSequence(int claimType);
+
+    List<TransactionMetadata> transferOut(String toAddress, com.binance.dex.api.client.encoding.message.Token amount, long expireTimeInSeconds, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
+
+    List<TransactionMetadata> bind(String symbol, long amount, String contractAddress, int contractDecimal, long expireTimeInSeconds, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
+
+    List<TransactionMetadata> unBind(String symbol, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
+
 }

@@ -32,12 +32,12 @@ public class BinanceDexClientWSFactory {
         }
         return binanceDexWSApiImplMap.get(env.getWsBaseUrl());
     }
-    public static BinanceDexWSApiImpl getWSApiImpl(String url,String hrp){
+    public static BinanceDexWSApiImpl getWSApiImpl(String url,String hrp, String valHrp){
         synchronized (lock){
             binanceDexWSApiImplMap.computeIfAbsent(url,(k)->{
                 BinanceDexClientEndpoint<JsonRpcResponse> endpoint = newDefaultClientEndpoint(url);
                 WebsocketLauncher.startUp(endpoint);
-                return new BinanceDexWSApiImpl(hrp,endpoint);
+                return new BinanceDexWSApiImpl(hrp, valHrp, endpoint);
             });
         }
         return binanceDexWSApiImplMap.get(url);

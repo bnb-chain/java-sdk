@@ -50,4 +50,10 @@ public interface BinanceDexNodeApi {
     @GET("/block_by_hash")
     Call<JsonRpcResponse<BlockMeta.BlockMetaResult>> getBlock(@Query("hash") String hash);
 
+    @GET("/abci_query?height=0&prove=false")
+    Call<JsonRpcResponse<ABCIQueryResult>> abciQuery(@Query("path") String path, @Query("data") String data);
+
+    @GET("/abci_query")
+    Call<JsonRpcResponse<ABCIQueryResult>> abciQueryWithOptions(@Query("path") String path, @Query("data") String data, @Query("height") long height, @Query("prove") boolean prove);
+
 }

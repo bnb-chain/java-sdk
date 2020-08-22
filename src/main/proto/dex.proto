@@ -7,6 +7,7 @@ option java_outer_classname = "Transaction";
 
 package transaction;
 import "types.proto";
+import "google/protobuf/timestamp.proto";
 
 // please note the field name is the JSON name.
 message StdTx {
@@ -99,6 +100,14 @@ message Vote {
     int64 proposal_id = 1; // ID of the proposal
     bytes voter = 2; // address of the voter
     int64 option = 3; // option from OptionSet chosen by the voter,
+}
+
+message SideVote {
+    //    0xE26BA13D	    // hardcoded, object type prefix in 4 bytes
+    int64 proposal_id = 1; // ID of the proposal
+    bytes voter = 2; // address of the voter
+    int64 option = 3; // option from OptionSet chosen by the voter,
+    string side_chain_id = 4;
 }
 
 message Token {
@@ -233,11 +242,30 @@ message SubmitProposal {
     int64  voting_period = 6;
 }
 
+message SideSubmitProposal {
+    // 0x4ACBF03C
+    string title = 1;
+    string description = 2;
+    int64 proposal_type = 3;
+    bytes proposer = 4;
+    repeated Token initial_deposit = 5;
+    int64  voting_period = 6;
+    string side_chain_id = 7;
+}
+
 message Deposit {
     // 0xA18A56E5
   int64 proposal_id = 1;
   bytes   depositer = 2;
   repeated Token amount = 3;
+}
+
+message SideDeposit {
+  // 0x140F2DB4
+  int64 proposal_id = 1;
+  bytes   depositer = 2;
+  repeated Token amount = 3;
+  string side_chain_id = 4;
 }
 
 message Description {
@@ -351,10 +379,53 @@ message ClaimHashTimerLockMsg {
     bytes random_number = 3;
 }
 
+message SubmitEvidenceMsg {
+    // A38F1399
+    bytes submitter = 1;
+    repeated BscHeader headers = 2;
+}
+
+message BscHeader {
+    bytes parentHash = 1;
+    bytes sha3Uncles = 2;
+    bytes miner = 3;
+    bytes stateRoot = 4;
+    bytes transactionsRoot = 5;
+    bytes receiptsRoot = 6;
+    bytes logsBloom = 7;
+    int64 difficulty = 8;
+    int64 number = 9;
+    int64 gasLimit = 10;
+    int64 gasUsed = 11;
+    int64 timestamp = 12;
+    bytes extraData = 13;
+    bytes mixHash = 14;
+    bytes nonce = 15;
+}
+
+message SideChainUnJailMsg {
+    // 5681EC54
+    bytes address = 1;
+    string side_chain_id = 2;
+}
+
 message RefundHashTimerLockMsg {
     //
     bytes from = 1;
     bytes swap_id = 2;
+}
+
+message Status {
+    int32 text = 1;
+    string finalClaim = 2;
+}
+
+message Prophecy {
+    string id = 1;
+    Status status = 2;
+
+    map<string, bytes> claimValidators = 3;
+    map<string, string> validatorClaims = 4;
 }
 
 //mini token issue

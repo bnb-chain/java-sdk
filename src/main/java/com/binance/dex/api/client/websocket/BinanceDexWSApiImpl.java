@@ -37,12 +37,12 @@ public class BinanceDexWSApiImpl extends IdGenerator implements BinanceDexWSApi 
 
     BinanceDexWSApiImpl(BinanceDexEnvironment env,BinanceDexClientEndpoint<JsonRpcResponse> endpoint){
         this.endpoint = endpoint;
-        this.transactionConverter = new TransactionConverter(env.getHrp());
+        this.transactionConverter = new TransactionConverter(env.getHrp(), env.getValHrp());
     }
 
-    BinanceDexWSApiImpl(String hrp,BinanceDexClientEndpoint<JsonRpcResponse> endpoint){
+    BinanceDexWSApiImpl(String hrp, String valHrp, BinanceDexClientEndpoint<JsonRpcResponse> endpoint){
         this.endpoint = endpoint;
-        this.transactionConverter = new TransactionConverter(hrp);
+        this.transactionConverter = new TransactionConverter(hrp, valHrp);
     }
 
 

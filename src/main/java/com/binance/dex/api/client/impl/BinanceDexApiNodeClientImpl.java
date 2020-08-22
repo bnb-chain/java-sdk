@@ -2,13 +2,20 @@ package com.binance.dex.api.client.impl;
 
 import com.binance.dex.api.client.*;
 import com.binance.dex.api.client.domain.*;
+import com.binance.dex.api.client.domain.bridge.TransferIn;
+import com.binance.dex.api.client.domain.broadcast.SideVote;
+import com.binance.dex.api.client.domain.oracle.Prophecy;
 import com.binance.dex.api.client.domain.StakeValidator;
+import com.binance.dex.api.client.domain.stake.Pool;
+import com.binance.dex.api.client.domain.stake.sidechain.*;
 import com.binance.dex.api.client.domain.broadcast.Transaction;
 import com.binance.dex.api.client.domain.broadcast.*;
 import com.binance.dex.api.client.domain.jsonrpc.*;
 import com.binance.dex.api.client.encoding.Crypto;
 import com.binance.dex.api.client.encoding.EncodeUtils;
 import com.binance.dex.api.client.encoding.message.TransactionRequestAssembler;
+import com.binance.dex.api.client.encoding.message.sidechain.query.QuerySideProposal;
+import com.binance.dex.api.client.impl.node.*;
 import com.binance.dex.api.proto.*;
 import com.binance.dex.api.proto.Token;
 import com.google.common.collect.Lists;
@@ -28,9 +35,11 @@ import java.util.stream.Collectors;
 
 public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
 
-    private BinanceDexNodeApi binanceDexNodeApi;
+    protected BinanceDexNodeApi binanceDexNodeApi;
 
     private String hrp;
+
+    private String valHrp;
 
     private TransactionConverter transactionConverter;
 
@@ -42,11 +51,25 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
 
     private final static int TX_SEARCH_PERPAGE = 10000;
 
-    public BinanceDexApiNodeClientImpl(String nodeUrl, String hrp) {
+    private final NodeTxDelegateSideChainStaking sideChainStakingTxDelegate;
+
+    private final NodeTxDelegateBridge bridgeTxDelegate;
+
+    private final NodeQueryDelegateSideChainStaking sideChainQueryDelegate;
+
+    private final NodeQueryDelegateOracle oracleQueryDelegate;
+
+    public BinanceDexApiNodeClientImpl(String nodeUrl, String hrp, String valHrp) {
         this.binanceDexNodeApi = BinanceDexApiClientGenerator.createService(BinanceDexNodeApi.class, nodeUrl);
         this.hrp = hrp;
-        transactionConverter = new TransactionConverter(hrp);
+        this.valHrp = valHrp;
+        transactionConverter = new TransactionConverter(hrp, valHrp);
         feeConverter = new FeeConverter();
+
+        sideChainStakingTxDelegate = new NodeTxDelegateSideChainStaking(binanceDexNodeApi, hrp, valHrp);
+        bridgeTxDelegate = new NodeTxDelegateBridge(binanceDexNodeApi, hrp, valHrp);
+        sideChainQueryDelegate = new NodeQueryDelegateSideChainStaking(binanceDexNodeApi, hrp, valHrp);
+        oracleQueryDelegate = new NodeQueryDelegateOracle(binanceDexNodeApi, hrp, valHrp);
     }
 
     @Override
@@ -86,11 +109,11 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     @Override
     public Account getAccount(String address) {
         try {
-            String queryPath = String.format("\"/account/%s\"",address);
+            String queryPath = String.format("\"/account/%s\"", address);
             JsonRpcResponse<AccountResult> response = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getAccount(queryPath));
             checkRpcResult(response);
             byte[] value = response.getResult().getResponse().getValue();
-            if(value != null && value.length > 0){
+            if (value != null && value.length > 0) {
                 byte[] array = new byte[value.length - 4];
                 System.arraycopy(value, 4, array, 0, array.length);
                 AppAccount account = AppAccount.parseFrom(array);
@@ -109,7 +132,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
             JsonRpcResponse<AccountResult> response = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getCommittedAccount(encodedAddress));
             checkRpcResult(response);
             byte[] value = response.getResult().getResponse().getValue();
-            if(value != null && value.length > 0){
+            if (value != null && value.length > 0) {
                 byte[] array = new byte[value.length - 4];
                 System.arraycopy(value, 4, array, 0, array.length);
                 AppAccount account = AppAccount.parseFrom(array);
@@ -122,7 +145,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     }
 
     @Override
-    public AtomicSwap getSwapByID(String swapID){
+    public AtomicSwap getSwapByID(String swapID) {
         try {
             Map.Entry swapIdEntry = Maps.immutableEntry("SwapID", swapID);
             String requestData = "0x" + Hex.toHexString(EncodeUtils.toJsonStringSortKeys(swapIdEntry).getBytes());
@@ -145,7 +168,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     @Override
     public List<Transaction> getBlockTransactions(Long height) {
         JsonRpcResponse<BlockInfoResult> response = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi
-                .getBlockTransactions("\"tx.height=" + height.toString() + "\"",TX_SEARCH_PAGE,TX_SEARCH_PERPAGE));
+                .getBlockTransactions("\"tx.height=" + height.toString() + "\"", TX_SEARCH_PAGE, TX_SEARCH_PERPAGE));
         checkRpcResult(response);
         return response.getResult().getTxs().stream()
                 .map(transactionConverter::convert)
@@ -178,7 +201,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
                 transactions.get(0).setHash(transactionResult.getHash());
                 transactions.get(0).setCode(transactionResult.getTxResult().getCode());
                 transactions.get(0).setLog(transactionResult.getTxResult().getLog());
-                transactionConverter.fillTagsAndEvents(transactionResult.getTxResult(),transactions.get(0));
+                transactionConverter.fillTagsAndEvents(transactionResult.getTxResult(), transactions.get(0));
                 return transactions.get(0);
             }
 
@@ -254,6 +277,31 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         }
     }
 
+    @Override
+    public Proposal getSideProposalById(String proposalId, String sideChainId) {
+        try {
+            QuerySideProposal params = new QuerySideProposal();
+            params.setSideChainId(sideChainId);
+            params.setProposalID(proposalId);
+
+            byte[] paramsBytes = EncodeUtils.toJsonEncodeBytes(params);
+            String requestData = "0x" + Hex.toHexString(paramsBytes);
+            JsonRpcResponse<ABCIQueryResult> rpcResponse = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.getProposalById(requestData));
+            checkRpcResult(rpcResponse);
+            ABCIQueryResult.Response response = rpcResponse.getResult().getResponse();
+            if (response.getCode() != null) {
+                BinanceDexApiError binanceDexApiError = new BinanceDexApiError();
+                binanceDexApiError.setCode(response.getCode());
+                binanceDexApiError.setMessage(response.getLog());
+                throw new BinanceDexApiException(binanceDexApiError);
+            }
+            String proposalJson = new String(response.getValue());
+            return EncodeUtils.toObjectFromJsonString(proposalJson, Proposal.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     @Override
     public List<TransactionMetadata> transfer(Transfer transfer, Wallet wallet, TransactionOption options, boolean sync)
@@ -304,7 +352,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         synchronized (wallet) {
             wallet.ensureWalletIsReady(this);
             TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
-            String requestPayload = "0x" + assembler.buildDepositHtltPayload(swapId,amount);
+            String requestPayload = "0x" + assembler.buildDepositHtltPayload(swapId, amount);
             if (sync) {
                 return syncBroadcast(requestPayload, wallet);
             } else {
@@ -318,7 +366,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         synchronized (wallet) {
             wallet.ensureWalletIsReady(this);
             TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
-            String requestPayload = "0x" + assembler.buildClaimHtltPayload(swapId,randomNumber);
+            String requestPayload = "0x" + assembler.buildClaimHtltPayload(swapId, randomNumber);
             if (sync) {
                 return syncBroadcast(requestPayload, wallet);
             } else {
@@ -339,6 +387,162 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
                 return asyncBroadcast(requestPayload, wallet);
             }
         }
+    }
+
+    @Override
+    public List<TransactionMetadata> createSideChainValidator(CreateSideChainValidator createSideChainValidator, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            return sideChainStakingTxDelegate.createSideChainValidator(createSideChainValidator, wallet, options, sync);
+        }
+    }
+
+    @Override
+    public List<TransactionMetadata> editSideChainValidator(EditSideChainValidator editSideChainValidator, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            return sideChainStakingTxDelegate.editSideChainValidator(editSideChainValidator, wallet, options, sync);
+        }
+    }
+
+    @Override
+    public List<TransactionMetadata> sideChainDelegate(SideChainDelegate sideChainDelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            return sideChainStakingTxDelegate.sideChainDelegate(sideChainDelegate, wallet, options, sync);
+        }
+    }
+
+    @Override
+    public List<TransactionMetadata> sideChainRedelagate(SideChainRedelegate sideChainRedelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            return sideChainStakingTxDelegate.sideChainRedelagate(sideChainRedelegate, wallet, options, sync);
+        }
+    }
+
+    @Override
+    public List<TransactionMetadata> sideChainUnbond(SideChainUnBond sideChainUndelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            return sideChainStakingTxDelegate.sideChainUnbond(sideChainUndelegate, wallet, options, sync);
+        }
+    }
+
+    @Override
+    public SideChainValidator getSideChainValidator(String sideChainId, String validatorAddress) throws IOException {
+        return sideChainQueryDelegate.querySideChainValidator(sideChainId, validatorAddress);
+    }
+
+    @Override
+    public List<SideChainValidator> getSideChainTopValidators(String sideChainId, int top) throws IOException {
+        return sideChainQueryDelegate.querySideChainTopValidators(sideChainId, top);
+    }
+
+    @Override
+    public SideChainDelegation getSideChainDelegation(String sideChainId, String delegatorAddress, String validatorAddress) throws IOException {
+        return sideChainQueryDelegate.querySideChainDelegation(sideChainId, delegatorAddress, validatorAddress);
+    }
+
+    @Override
+    public List<SideChainDelegation> getSideChainDelegations(String sideChainId, String delegatorAddress) throws IOException {
+        return sideChainQueryDelegate.querySideChainDelegations(sideChainId, delegatorAddress);
+    }
+
+    @Override
+    public SideChainRedelegation getSideChainRedelegation(String sideChainId, String delegatorAddress, String srcValidatorAddress, String dstValidatorAddress) throws IOException {
+        return sideChainQueryDelegate.querySideChainRedelegation(sideChainId, delegatorAddress, srcValidatorAddress, dstValidatorAddress);
+    }
+
+    @Override
+    public List<SideChainRedelegation> getSideChainRedelegations(String sideChainId, String delegatorAddress) throws IOException {
+        return sideChainQueryDelegate.querySideChainRedelegations(sideChainId, delegatorAddress);
+    }
+
+    @Override
+    public UnBondingDelegation getSideChainUnBondingDelegation(String sideChainId, String delegatorAddress, String validatorAddress) throws IOException {
+        return sideChainQueryDelegate.querySideChainUnBondingDelegation(sideChainId, delegatorAddress, validatorAddress);
+    }
+
+    @Override
+    public List<UnBondingDelegation> getSideChainUnBondingDelegations(String sideChainId, String delegatorAddress) throws IOException {
+        return sideChainQueryDelegate.querySideChainUnBondingDelegations(sideChainId, delegatorAddress);
+    }
+
+    @Override
+    public List<UnBondingDelegation> getSideChainUnBondingDelegationsByValidator(String sideChainId, String validatorAddress) throws IOException{
+        return sideChainQueryDelegate.querySideChainUnBondingDelegationsByValidator(sideChainId, validatorAddress);
+    }
+
+    @Override
+    public List<SideChainRedelegation> getSideChainRedelegationsByValidator(String sideChainId, String validatorAddress) throws IOException {
+        return sideChainQueryDelegate.querySideChainRedelegationsByValidator(sideChainId, validatorAddress);
+    }
+
+    @Override
+    public Pool getSideChainPool(String sideChainId) throws IOException {
+        return sideChainQueryDelegate.querySideChainPool(sideChainId);
+    }
+
+    @Override
+    public long getAllSideChainValidatorsCount(String sideChainId, boolean jailInvolved) throws IOException {
+        return sideChainQueryDelegate.queryAllSideChainValidatorsCount(sideChainId, jailInvolved);
+    }
+
+    @Override
+    public List<TransactionMetadata> sideVote(SideVote vote, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException{
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
+            String requestPayload = "0x" + assembler.buildSideVotePayload(vote);
+            if (sync) {
+                return syncBroadcast(requestPayload, wallet);
+            } else {
+                return asyncBroadcast(requestPayload, wallet);
+            }
+        }
+    }
+
+    @Override
+    public List<TransactionMetadata> transferOut(String toAddress, com.binance.dex.api.client.encoding.message.Token amount, long expireTimeInSeconds, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            return bridgeTxDelegate.transferOut(toAddress, amount, expireTimeInSeconds, wallet, options, sync);
+        }
+    }
+
+    @Override
+    public List<TransactionMetadata> bind(String symbol, long amount, String contractAddress, int contractDecimal, long expireTimeInSeconds, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            return bridgeTxDelegate.bind(symbol, amount, contractAddress, contractDecimal, expireTimeInSeconds, wallet, options, sync);
+        }
+    }
+
+    @Override
+    public List<TransactionMetadata> unBind(String symbol, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            return bridgeTxDelegate.unBind(symbol, wallet, options, sync);
+        }
+    }
+
+    @Override
+    public List<TransactionMetadata> claim(int chainId, byte[] payload, long sequence, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            return bridgeTxDelegate.claim(chainId, payload, sequence, wallet, options, sync);
+        }
+    }
+
+    @Override
+    public Prophecy getProphecy(int claimType, long sequence) throws IOException {
+        return oracleQueryDelegate.getProphecy(claimType, sequence);
+    }
+
+    @Override
+    public long getCurrentSequence(int claimType) {
+        return oracleQueryDelegate.getCurrentSequence(claimType);
     }
 
     @Override
