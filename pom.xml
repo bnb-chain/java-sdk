@@ -5,7 +5,7 @@
 
     <groupId>com.binance.dex.api</groupId>
     <artifactId>binance-dex-api-client</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.1.0</version>
 
     <properties>
         <com.squareup.retrofit2.version>2.6.0</com.squareup.retrofit2.version>
@@ -163,38 +163,4 @@
         </plugins>
 
     </build>
-
-    <profiles>
-        <profile>
-            <id>dev</id>
-            <distributionManagement>
-                <repository>
-                    <id>bijie-releases</id>
-                    <name>Internal Releases</name>
-                    <url>http://nexus.k8s.qa1fdg.net/repository/maven-releases</url>
-                </repository>
-                <snapshotRepository>
-                    <id>bijie-snapshots</id>
-                    <name>Internal Releases</name>
-                    <url>http://nexus.k8s.qa1fdg.net/repository/maven-snapshots</url>
-                </snapshotRepository>
-            </distributionManagement>
-        </profile>
-
-        <profile>
-            <id>server</id>
-            <distributionManagement>
-                <repository>
-                    <id>bijie-releases</id>
-                    <name>Internal Releases</name>
-                    <url>http://10.99.41.221:8081/repository/maven-releases</url>
-                </repository>
-                <snapshotRepository>
-                    <id>bijie-snapshots</id>
-                    <name>Internal Releases</name>
-                    <url>http://10.99.41.221:8081/repository/maven-snapshots</url>
-                </snapshotRepository>
-            </distributionManagement>
-        </profile>
-    </profiles>
 </project>
