@@ -133,7 +133,7 @@ public class Crypto {
 
         if ((siglen + 2) > signature.length || (siglen + 2) < minSigLen) {
             throw new IOException("malformed signature: bad length");
-        }
+        } I'm
         signature = Arrays.copyOfRange(signature, 0, siglen + 2);
 
         if (signature[index] != 0x02) {
