@@ -171,6 +171,8 @@ public class TransactionConverter {
                     return convertBurn(bytes);
                 case Mint:
                     return convertMint(bytes);
+                case TransferTokenOwnership:
+                    return convertTransferTokenOwnership(bytes);
                 case SubmitProposal:
                     return convertSubmitProposal(bytes);
                 case SideSubmitProposal:
@@ -237,6 +239,21 @@ public class TransactionConverter {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Transaction convertTransferTokenOwnership(byte[] value) throws IOException {
+        byte[] raw = ByteUtil.cut(value, 4);
+        TransferTokenOwnershipMsg msg = TransferTokenOwnershipMsg.parseFrom(raw);
+
+        TransferTokenOwnership transferTokenOwnership = new TransferTokenOwnership();
+        transferTokenOwnership.setFrom(Crypto.encodeAddress(hrp, msg.getFrom().toByteArray()));
+        transferTokenOwnership.setSymbol(msg.getSymbol());
+        transferTokenOwnership.setNewOwner(Crypto.encodeAddress(hrp, msg.getNewOwner().toByteArray()));
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.TRANSFER_TOKEN_OWNERSHIP);
+        transaction.setRealTx(transferTokenOwnership);
+        return transaction;
     }
 
     private Transaction convertSideChainUnJail(byte[] value) throws IOException {

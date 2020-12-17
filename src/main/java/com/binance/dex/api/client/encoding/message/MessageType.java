@@ -21,6 +21,7 @@ public enum MessageType {
     Issue("17EFAB80"),
     Burn("7ED2D2A0"),
     Mint("467E0829"),
+    TransferTokenOwnership("6D99D273"),
     SubmitProposal("B42D614E"),
     SideSubmitProposal("4ACBF03C"),
     Deposit("A18A56E5"),

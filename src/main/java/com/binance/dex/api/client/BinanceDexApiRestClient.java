@@ -120,5 +120,8 @@ public interface BinanceDexApiRestClient {
     List<TransactionMetadata> refundHtlt(String swapId,Wallet wallet, TransactionOption options, boolean sync)
             throws IOException, NoSuchAlgorithmException;
 
+    List<TransactionMetadata> transferTokenOwnership(String symbol, String newOwner, Wallet wallet, TransactionOption options, boolean sync)
+            throws IOException, NoSuchAlgorithmException;
+
     List<TransactionMetadata> broadcast(String payload,boolean sync);
 }

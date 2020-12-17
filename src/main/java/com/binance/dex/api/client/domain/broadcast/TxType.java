@@ -11,6 +11,7 @@ public enum TxType {
     ISSUE,
     BURN,
     MINT,
+    TRANSFER_TOKEN_OWNERSHIP,
     SUBMIT_PROPOSAL,
     SIDE_SUBMIT_PROPOSAL,
     DEPOSIT,

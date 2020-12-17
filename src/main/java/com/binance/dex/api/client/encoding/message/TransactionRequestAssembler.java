@@ -10,6 +10,7 @@ import com.binance.dex.api.client.encoding.amino.InternalAmino;
 import com.binance.dex.api.client.encoding.amino.WireType;
 import com.binance.dex.api.proto.StdSignature;
 import com.binance.dex.api.proto.StdTx;
+import com.binance.dex.api.proto.TransferTokenOwnershipMsg;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.ByteString;
 import okhttp3.RequestBody;
@@ -61,14 +62,14 @@ public class TransactionRequestAssembler {
         return sign(assembleMessage4Sign(msg));
     }
 
-    private  <T extends BinanceDexTransactionMessage> BinanceDexTransactionMessage assembleMessage4Sign(T t){
-        if (t.useAminoJson()){
-            if (WireType.isRegistered(t.getClass())){
+    private <T extends BinanceDexTransactionMessage> BinanceDexTransactionMessage assembleMessage4Sign(T t) {
+        if (t.useAminoJson()) {
+            if (WireType.isRegistered(t.getClass())) {
                 return new TransactionMessageWithType<T>(WireType.getRegisteredTypeName(t.getClass()), t);
-            }else{
+            } else {
                 throw new IllegalStateException("Class " + t.getClass().getCanonicalName() + " has not been registered into amino");
             }
-        }else{
+        } else {
             return t;
         }
     }
@@ -142,7 +143,7 @@ public class TransactionRequestAssembler {
     }
 
     @VisibleForTesting
-    VoteMessage createVoteMessage(Vote vote){
+    VoteMessage createVoteMessage(Vote vote) {
         VoteMessage voteMessage = new VoteMessage();
         voteMessage.setProposalId(vote.getProposalId());
         voteMessage.setOption(vote.getOption());
@@ -151,7 +152,7 @@ public class TransactionRequestAssembler {
     }
 
     @VisibleForTesting
-    SideVoteMessage createSideVoteMessage(SideVote vote){
+    SideVoteMessage createSideVoteMessage(SideVote vote) {
         SideVoteMessage voteMessage = new SideVoteMessage();
         voteMessage.setProposalId(vote.getProposalId());
         voteMessage.setOption(vote.getOption());
@@ -205,7 +206,7 @@ public class TransactionRequestAssembler {
     }
 
     public String buildNewOrderPayload(com.binance.dex.api.client.domain.broadcast.NewOrder newOrder)
-        throws IOException, NoSuchAlgorithmException {
+            throws IOException, NoSuchAlgorithmException {
         NewOrderMessage msgBean = createNewOrderMessage(newOrder);
         byte[] msg = encodeNewOrderMessage(msgBean);
         byte[] signature = encodeSignature(sign(msgBean));
@@ -265,7 +266,7 @@ public class TransactionRequestAssembler {
     }
 
     public String buildCancelOrderPayload(com.binance.dex.api.client.domain.broadcast.CancelOrder cancelOrder)
-        throws IOException, NoSuchAlgorithmException {
+            throws IOException, NoSuchAlgorithmException {
         CancelOrderMessage msgBean = createCancelOrderMessage(cancelOrder);
         byte[] msg = encodeCancelOrderMessage(msgBean);
         byte[] signature = encodeSignature(sign(msgBean));
@@ -341,7 +342,7 @@ public class TransactionRequestAssembler {
     }
 
     public String buildTransferPayload(Transfer transfer)
-        throws IOException, NoSuchAlgorithmException {
+            throws IOException, NoSuchAlgorithmException {
         TransferMessage msgBean = createTransferMessage(transfer);
         byte[] msg = encodeTransferMessage(msgBean);
         byte[] signature = encodeSignature(sign(msgBean));
@@ -375,7 +376,7 @@ public class TransactionRequestAssembler {
     }
 
     public String buildTokenFreezePayload(TokenFreeze freeze)
-        throws IOException, NoSuchAlgorithmException {
+            throws IOException, NoSuchAlgorithmException {
         TokenFreezeMessage msgBean = createTokenFreezeMessage(freeze);
         byte[] msg = encodeTokenFreezeMessage(msgBean);
         byte[] signature = encodeSignature(sign(msgBean));
@@ -409,7 +410,7 @@ public class TransactionRequestAssembler {
     }
 
     public String buildTokenUnfreezePayload(TokenUnfreeze unfreeze)
-        throws IOException, NoSuchAlgorithmException {
+            throws IOException, NoSuchAlgorithmException {
         TokenUnfreezeMessage msgBean = createTokenUnfreezeMessage(unfreeze);
         byte[] msg = encodeTokenUnfreezeMessage(msgBean);
         byte[] signature = encodeSignature(sign(msgBean));
@@ -421,11 +422,11 @@ public class TransactionRequestAssembler {
     TransferMessage createMultiTransferMessage(MultiTransfer multiTransfer) {
         Map<String, Long> inputsCoins = new TreeMap<String, Long>();
         ArrayList<InputOutput> outputs = new ArrayList<>();
-        for (Output o: multiTransfer.getOutputs()) {
+        for (Output o : multiTransfer.getOutputs()) {
             InputOutput out = new InputOutput();
             out.setAddress(o.getAddress());
             List<Token> tokens = new ArrayList<>(o.getTokens().size());
-            for (OutputToken t: o.getTokens()) {
+            for (OutputToken t : o.getTokens()) {
                 Token token = new Token();
                 token.setDenom(t.getCoin());
                 long amount = doubleToLong(t.getAmount());
@@ -447,7 +448,7 @@ public class TransactionRequestAssembler {
         InputOutput input = new InputOutput();
         input.setAddress(multiTransfer.getFromAddress());
         List<Token> inputTokens = new ArrayList<>(inputsCoins.size());
-        for (String coin: inputsCoins.keySet()) {
+        for (String coin : inputsCoins.keySet()) {
             Token token = new Token();
             token.setDenom(coin);
             token.setAmount(inputsCoins.get(coin));
@@ -461,7 +462,7 @@ public class TransactionRequestAssembler {
         return msgBean;
     }
 
-    public RequestBody buildMultiTransfer(MultiTransfer multiTransfer) throws IOException, NoSuchAlgorithmException{
+    public RequestBody buildMultiTransfer(MultiTransfer multiTransfer) throws IOException, NoSuchAlgorithmException {
         return createRequestBody(buildMultiTransferPayload(multiTransfer));
     }
 
@@ -488,7 +489,7 @@ public class TransactionRequestAssembler {
     }
 
     @VisibleForTesting
-    public HtltMessage createHtltMessage(HtltReq htltReq){
+    public HtltMessage createHtltMessage(HtltReq htltReq) {
         HtltMessage message = new HtltMessage();
         message.setFrom(wallet.getAddress());
         message.setTo(htltReq.getRecipient());
@@ -515,7 +516,7 @@ public class TransactionRequestAssembler {
         builder.setSenderOtherChain(msg.getSenderOtherChain());
         builder.setRandomNumberHash(ByteString.copyFrom(msg.getRandomNumberHash()));
         builder.setTimestamp(msg.getTimestamp());
-        for(Token token : msg.getAmount()){
+        for (Token token : msg.getAmount()) {
             builder.addAmount(com.binance.dex.api.proto.Token.newBuilder().setAmount(token.getAmount()).setDenom(token.getDenom()));
         }
         builder.setExpectedIncome(msg.getExpectedIncome());
@@ -526,11 +527,11 @@ public class TransactionRequestAssembler {
     }
 
     public RequestBody buildDepositHtlt(String swapId, List<Token> amount) throws IOException, NoSuchAlgorithmException {
-        return createRequestBody(buildDepositHtltPayload(swapId,amount));
+        return createRequestBody(buildDepositHtltPayload(swapId, amount));
     }
 
     public String buildDepositHtltPayload(String swapId, List<Token> amount) throws IOException, NoSuchAlgorithmException {
-        DepositHtltMessage depositHtltMessage = createDepositHtltMessage(swapId,amount);
+        DepositHtltMessage depositHtltMessage = createDepositHtltMessage(swapId, amount);
         byte[] msg = encodeDepositHtltMessage(depositHtltMessage);
         byte[] signature = encodeSignature(sign(depositHtltMessage));
         byte[] stdTx = encodeStdTx(msg, signature);
@@ -538,7 +539,7 @@ public class TransactionRequestAssembler {
     }
 
     @VisibleForTesting
-    public DepositHtltMessage createDepositHtltMessage(String swapId, List<Token> amount){
+    public DepositHtltMessage createDepositHtltMessage(String swapId, List<Token> amount) {
         DepositHtltMessage message = new DepositHtltMessage();
         message.setFrom(wallet.getAddress());
         message.setSwapId(swapId);
@@ -553,7 +554,7 @@ public class TransactionRequestAssembler {
         com.binance.dex.api.proto.DepositHashTimerLockMsg.Builder builder = com.binance.dex.api.proto.DepositHashTimerLockMsg.newBuilder();
         builder.setFrom(ByteString.copyFrom(address));
         builder.setSwapId(ByteString.copyFrom(Hex.decode(msg.getSwapId())));
-        for(Token token : msg.getAmount()){
+        for (Token token : msg.getAmount()) {
             builder.addAmount(com.binance.dex.api.proto.Token.newBuilder().setAmount(token.getAmount()).setDenom(token.getDenom()));
         }
         com.binance.dex.api.proto.DepositHashTimerLockMsg proto = builder.build();
@@ -561,7 +562,7 @@ public class TransactionRequestAssembler {
     }
 
     public RequestBody buildClaimHtlt(String swapId, byte[] randomNumber) throws IOException, NoSuchAlgorithmException {
-        return createRequestBody(buildClaimHtltPayload(swapId,randomNumber));
+        return createRequestBody(buildClaimHtltPayload(swapId, randomNumber));
     }
 
     public String buildClaimHtltPayload(String swapId, byte[] randomNumber) throws IOException, NoSuchAlgorithmException {
@@ -610,11 +611,39 @@ public class TransactionRequestAssembler {
         return EncodeUtils.aminoWrap(proto.toByteArray(), MessageType.RefundHashTimerLockMsg.getTypePrefixBytes(), false);
     }
 
+    public RequestBody buildTransferTokenOwnership(String symbol, String newOwner) throws IOException, NoSuchAlgorithmException {
+        return createRequestBody(buildTransferTokenOwnershipPayload(symbol, newOwner));
+    }
+
+    public String buildTransferTokenOwnershipPayload(String symbol, String newOwner) throws IOException, NoSuchAlgorithmException {
+        TransferTokenOwnershipMessage message = new TransferTokenOwnershipMessage();
+        message.setFrom(wallet.getAddress());
+        message.setSymbol(symbol);
+        message.setNewOwner(newOwner);
+        byte[] msg = encodeTransferTokenOwnershipMessage(message);
+        byte[] signature = encodeSignature(sign(message));
+        byte[] stdTx = encodeStdTx(msg, signature);
+        return EncodeUtils.bytesToHex(stdTx);
+    }
+
+    @VisibleForTesting
+    public byte[] encodeTransferTokenOwnershipMessage(TransferTokenOwnershipMessage msg) throws IOException {
+        byte[] address = Crypto.decodeAddress(msg.getFrom());
+        byte[] newOwnerB = Crypto.decodeAddress(msg.getNewOwner());
+        TransferTokenOwnershipMsg.Builder builder = TransferTokenOwnershipMsg.newBuilder();
+        builder.setFrom(ByteString.copyFrom(address));
+        builder.setSymbol(msg.getSymbol());
+        builder.setNewOwner(ByteString.copyFrom(newOwnerB));
+        TransferTokenOwnershipMsg proto = builder.build();
+        return EncodeUtils.aminoWrap(proto.toByteArray(), MessageType.TransferTokenOwnership.getTypePrefixBytes(), false);
+    }
+
+
     /**
      * Used for amino serializable message
-     * */
+     */
     public String buildTxPayload(BinanceDexTransactionMessage message) throws IOException, NoSuchAlgorithmException {
-        if (!AminoSerializable.class.isAssignableFrom(message.getClass())){
+        if (!AminoSerializable.class.isAssignableFrom(message.getClass())) {
             throw new IllegalArgumentException("Class " + message.getClass() + " should also implement AminoSerializable to support amino encoding");
         }
 

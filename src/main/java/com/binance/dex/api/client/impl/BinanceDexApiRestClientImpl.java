@@ -363,6 +363,15 @@ public class BinanceDexApiRestClientImpl implements BinanceDexApiRestClient {
     }
 
     @Override
+    public List<TransactionMetadata> transferTokenOwnership(String symbol, String newOwner, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        wallet.ensureWalletIsReady(this);
+        TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
+        RequestBody requestBody = assembler.buildTransferTokenOwnership(symbol, newOwner);
+        return broadcast(requestBody, sync, wallet);
+    }
+
+
+    @Override
     public List<TransactionMetadata> broadcast(String payload, boolean sync) {
         try {
             return BinanceDexApiClientGenerator.executeSync(binanceDexApi.broadcast(sync, RequestBody.create(MEDIA_TYPE, payload)));
