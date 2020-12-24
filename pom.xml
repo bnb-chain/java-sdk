@@ -161,13 +161,11 @@
                 </executions>
             </plugin>
         </plugins>
-             
+    </build>
     <repositories>
         <repository>
             <id>ethereum-repo</id>
             <url>https://dl.bintray.com/ethereum/maven/</url>
         </repository>
     </repositories>
-
-    </build>
 </project>
