@@ -82,7 +82,11 @@ public class Wallet {
     }
 
     public static Wallet createWalletFromMnemonicCode(List<String> words, BinanceDexEnvironment env) throws IOException {
-        String privateKey = Crypto.getPrivateKeyFromMnemonicCode(words);
+        return createWalletFromMnemonicCode(words, 0, env);
+    }
+
+    public static Wallet createWalletFromMnemonicCode(List<String> words, int seq, BinanceDexEnvironment env) throws IOException {
+        String privateKey = Crypto.getPrivateKeyFromMnemonicCode(words, seq);
         return new Wallet(privateKey, env);
     }
 

@@ -18,7 +18,7 @@ import java.util.List;
 
 public class Crypto {
 
-    private static final String HD_PATH = "44H/714H/0H/0/0";
+    private static final String HD_PATH = "44H/714H/0H/0/";
 
     public static byte[] sign(byte[] msg, String privateKey) throws NoSuchAlgorithmException {
         ECKey k = ECKey.fromPrivate(new BigInteger(privateKey, 16));
@@ -66,10 +66,14 @@ public class Crypto {
     }
 
     public static String getPrivateKeyFromMnemonicCode(List<String> words) {
+        return getPrivateKeyFromMnemonicCode(words, 0);
+    }
+
+    public static String getPrivateKeyFromMnemonicCode(List<String> words, int seq) {
         byte[] seed = MnemonicCode.INSTANCE.toSeed(words, "");
         DeterministicKey key = HDKeyDerivation.createMasterPrivateKey(seed);
 
-        List<ChildNumber> childNumbers = HDUtils.parsePath(HD_PATH);
+        List<ChildNumber> childNumbers = HDUtils.parsePath(HD_PATH + seq);
         for (ChildNumber cn : childNumbers) {
             key = HDKeyDerivation.deriveChildKey(key, cn);
         }
