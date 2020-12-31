@@ -5,10 +5,13 @@
 
     <groupId>com.binance.dex.api</groupId>
     <artifactId>binance-dex-api-client</artifactId>
-    <version>1.1.0</version>
+    <version>v1.1.0-SNAPSHOT</version>
 
     <properties>
         <com.squareup.retrofit2.version>2.6.0</com.squareup.retrofit2.version>
+        <bintray.repo>maven</bintray.repo>
+        <bintray.package>binance-chain-java-sdk</bintray.package>
+        <bintray.subject>crypitor</bintray.subject>
     </properties>
 
     <dependencies>
@@ -160,6 +163,17 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <releaseProfiles>release</releaseProfiles>
+                    <goals>deploy</goals>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <repositories>
@@ -168,4 +182,16 @@
             <url>https://dl.bintray.com/ethereum/maven/</url>
         </repository>
     </repositories>
+    <distributionManagement>
+        <repository>
+            <id>bintray-beowulf-foundation-beowulf-java</id>
+            <name>bintray</name>
+            <url>https://api.bintray.com/maven/${bintray.subject}/${bintray.repo}/${bintray.package}/;publish=1</url>
+        </repository>
+    </distributionManagement>
+    <scm>
+        <url>https://github.com/crypitor/binance-chain-java-sdk</url>
+        <connection>scm:git:git@github.com:crypitor/binance-chain-java-sdk.git</connection>
+        <developerConnection>scm:git:git@github.com:crypitor/binance-chain-java-sdk.git</developerConnection>
+    </scm>
 </project>
