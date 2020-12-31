@@ -1,11 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.binance.dex.api</groupId>
     <artifactId>binance-dex-api-client</artifactId>
-    <version>v1.1.0-SNAPSHOT</version>
+    <version>v1.1.1</version>
 
     <properties>
         <com.squareup.retrofit2.version>2.6.0</com.squareup.retrofit2.version>
@@ -193,5 +191,6 @@
         <url>https://github.com/crypitor/binance-chain-java-sdk</url>
         <connection>scm:git:git@github.com:crypitor/binance-chain-java-sdk.git</connection>
         <developerConnection>scm:git:git@github.com:crypitor/binance-chain-java-sdk.git</developerConnection>
-    </scm>
+      <tag>v1.1.1</tag>
+  </scm>
 </project>
