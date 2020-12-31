@@ -3,7 +3,7 @@
 
     <groupId>com.binance.dex.api</groupId>
     <artifactId>binance-dex-api-client</artifactId>
-    <version>v1.2-SNAPSHOT</version>
+    <version>v1.2</version>
 
     <properties>
         <com.squareup.retrofit2.version>2.6.0</com.squareup.retrofit2.version>
@@ -191,6 +191,6 @@
         <url>https://github.com/crypitor/binance-chain-java-sdk</url>
         <connection>scm:git:git@github.com:crypitor/binance-chain-java-sdk.git</connection>
         <developerConnection>scm:git:git@github.com:crypitor/binance-chain-java-sdk.git</developerConnection>
-      <tag>v1.1.1</tag>
+      <tag>v1.2</tag>
   </scm>
 </project>
