@@ -19,6 +19,9 @@ public enum ContentEnum {
     IbcValidatorSetPack(8, 2, IbcValidatorSet.class),
     GovCommonAckPack(9, 1, CommonAck.class),
     SideDowntimeSlashPack(11, 0, com.binance.dex.api.client.crosschain.content.SideDowntimeSlash.class),
+    MirrorSynPack(4, 0, MirrorSyn.class),
+    MirrorSynAckPack(4, 1, MirrorAck.class),
+    MirrorSyncSynPack(5, 0, MirrorSyncSyn.class),
     ;
 
     private Integer channelId;
