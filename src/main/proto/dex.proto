@@ -463,3 +463,10 @@ message MiniTokenList {
     string  quote_asset_symbol = 3;
     int64   init_price = 4;
 }
+
+message TransferTokenOwnershipMsg {
+    // 6d99d273
+    bytes from = 1;
+    string symbol = 2;
+    bytes new_owner = 3;
+}
