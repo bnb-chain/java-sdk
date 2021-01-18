@@ -1,4 +1,9 @@
 # Changelog
+
+## 1.1.1
+CHAIN UPGRADE
+* [\#105](https://github.com/binance-chain/java-sdk/pull/105) [RPC] [API] support for the transfer of token ownership, and decode the new types of oracle claim package
+
 ## 1.1.0
 CHAIN UPGRADE
 * [\#88](https://github.com/binance-chain/java-sdk/pull/88) [RPC] [API] enable side chain governance transaction
