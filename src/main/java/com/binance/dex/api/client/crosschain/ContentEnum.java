@@ -22,6 +22,7 @@ public enum ContentEnum {
     MirrorSynPack(4, 0, MirrorSyn.class),
     MirrorSynAckPack(4, 1, MirrorAck.class),
     MirrorSyncSynPack(5, 0, MirrorSyncSyn.class),
+    MirrorSyncAckPack(5, 1, MirrorSyncAck.class)
     ;
 
     private Integer channelId;
