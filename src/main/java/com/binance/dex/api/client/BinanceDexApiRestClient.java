@@ -8,6 +8,7 @@ import com.binance.dex.api.client.domain.request.TradesRequest;
 import com.binance.dex.api.client.domain.request.TransactionsRequest;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
@@ -121,6 +122,9 @@ public interface BinanceDexApiRestClient {
             throws IOException, NoSuchAlgorithmException;
 
     List<TransactionMetadata> transferTokenOwnership(String symbol, String newOwner, Wallet wallet, TransactionOption options, boolean sync)
+            throws IOException, NoSuchAlgorithmException;
+
+    List<TransactionMetadata> listOnGrowthMarket(String baseAssetSymbol, String quoteAssetSymbol, BigDecimal initPrice,  Wallet wallet, TransactionOption options, boolean sync)
             throws IOException, NoSuchAlgorithmException;
 
     List<TransactionMetadata> broadcast(String payload,boolean sync);

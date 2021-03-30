@@ -8,6 +8,7 @@ import com.binance.dex.api.client.encoding.amino.Amino;
 import com.binance.dex.api.client.encoding.amino.AminoSerializable;
 import com.binance.dex.api.client.encoding.amino.InternalAmino;
 import com.binance.dex.api.client.encoding.amino.WireType;
+import com.binance.dex.api.proto.ListGrowthMarketMsg;
 import com.binance.dex.api.proto.StdSignature;
 import com.binance.dex.api.proto.StdTx;
 import com.binance.dex.api.proto.TransferTokenOwnershipMsg;
@@ -636,6 +637,34 @@ public class TransactionRequestAssembler {
         builder.setNewOwner(ByteString.copyFrom(newOwnerB));
         TransferTokenOwnershipMsg proto = builder.build();
         return EncodeUtils.aminoWrap(proto.toByteArray(), MessageType.TransferTokenOwnership.getTypePrefixBytes(), false);
+    }
+
+    public RequestBody buildListGrowthMarket(String baseAsset, String quoteAsset, BigDecimal initPrice) throws IOException, NoSuchAlgorithmException {
+        return createRequestBody(buildListGrowthMarketPayload(baseAsset, quoteAsset, initPrice));
+    }
+
+    public String buildListGrowthMarketPayload(String baseAsset, String quoteAsset, BigDecimal initPrice) throws IOException, NoSuchAlgorithmException {
+        ListGrowthMarketMessage message = new ListGrowthMarketMessage();
+        message.setFrom(wallet.getAddress());
+        message.setBaseAssetSymbol(baseAsset);
+        message.setQuoteAssetSymbol(quoteAsset);
+        message.setInitPrice(initPrice.movePointRight(8).longValue());
+        byte[] msg = encodeListGrowthMarketMessage(message);
+        byte[] signature = encodeSignature(sign(message));
+        byte[] stdTx = encodeStdTx(msg, signature);
+        return EncodeUtils.bytesToHex(stdTx);
+    }
+
+    @VisibleForTesting
+    public byte[] encodeListGrowthMarketMessage(ListGrowthMarketMessage msg) throws IOException {
+        byte[] address = Crypto.decodeAddress(msg.getFrom());
+        ListGrowthMarketMsg.Builder builder = ListGrowthMarketMsg.newBuilder();
+        builder.setFrom(ByteString.copyFrom(address));
+        builder.setBaseAssetSymbol(msg.getBaseAssetSymbol());
+        builder.setQuoteAssetSymbol(msg.getQuoteAssetSymbol());
+        builder.setInitPrice(msg.getInitPrice());
+        ListGrowthMarketMsg proto = builder.build();
+        return EncodeUtils.aminoWrap(proto.toByteArray(), MessageType.ListGrowthMarket.getTypePrefixBytes(), false);
     }
 
 

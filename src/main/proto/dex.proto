@@ -470,3 +470,11 @@ message TransferTokenOwnershipMsg {
     string symbol = 2;
     bytes new_owner = 3;
 }
+
+message ListGrowthMarketMsg {
+// 0xD658D6B5
+   bytes       from  = 1;
+   string      base_asset_symbol = 2;
+   string      quote_asset_symbol = 3;
+   int64       init_price = 4;
+}

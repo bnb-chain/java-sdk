@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
@@ -395,6 +396,20 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
             wallet.ensureWalletIsReady(this);
             TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
             String requestPayload = "0x" + assembler.buildTransferTokenOwnershipPayload(symbol, newOwner);
+            if (sync) {
+                return syncBroadcast(requestPayload, wallet);
+            } else {
+                return asyncBroadcast(requestPayload, wallet);
+            }
+        }
+    }
+
+    @Override
+    public List<TransactionMetadata> listOnGrowthMarket(String baseAssetSymbol, String quoteAssetSymbol, BigDecimal initPrice, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
+            String requestPayload = "0x" + assembler.buildListGrowthMarketPayload(baseAssetSymbol, quoteAssetSymbol, initPrice);
             if (sync) {
                 return syncBroadcast(requestPayload, wallet);
             } else {

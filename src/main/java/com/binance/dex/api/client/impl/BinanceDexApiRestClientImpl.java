@@ -12,6 +12,7 @@ import okhttp3.RequestBody;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -367,6 +368,14 @@ public class BinanceDexApiRestClientImpl implements BinanceDexApiRestClient {
         wallet.ensureWalletIsReady(this);
         TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
         RequestBody requestBody = assembler.buildTransferTokenOwnership(symbol, newOwner);
+        return broadcast(requestBody, sync, wallet);
+    }
+
+    @Override
+    public List<TransactionMetadata> listOnGrowthMarket(String baseAssetSymbol, String quoteAssetSymbol, BigDecimal initPrice, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        wallet.ensureWalletIsReady(this);
+        TransactionRequestAssembler assembler = new TransactionRequestAssembler(wallet, options);
+        RequestBody requestBody = assembler.buildListGrowthMarket(baseAssetSymbol, quoteAssetSymbol, initPrice);
         return broadcast(requestBody, sync, wallet);
     }
 

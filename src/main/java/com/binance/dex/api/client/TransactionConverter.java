@@ -234,11 +234,30 @@ public class TransactionConverter {
                     return convertMiniTokenSetURI(bytes);
                 case MiniTokenList:
                     return convertMiniTokenList(bytes);
+                case ListGrowthMarket:
+                    return convertListGrowthMarket(bytes);
             }
             return null;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Transaction convertListGrowthMarket(byte[] value) throws IOException {
+        byte[] raw = ByteUtil.cut(value, 4);
+        ListGrowthMarketMsg msg = ListGrowthMarketMsg.parseFrom(raw);
+
+        ListGrowthMarket listGrowthMarket = new ListGrowthMarket();
+        listGrowthMarket.setFrom(Crypto.encodeAddress(hrp, msg.getFrom().toByteArray()));
+        listGrowthMarket.setBaseAssetSymbol(msg.getBaseAssetSymbol());
+        listGrowthMarket.setQuoteAssetSymbol(msg.getQuoteAssetSymbol());
+        listGrowthMarket.setInitPrice(msg.getInitPrice());
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.LIST_GROWTH_MARKET);
+        transaction.setRealTx(listGrowthMarket);
+        return transaction;
+
     }
 
     private Transaction convertTransferTokenOwnership(byte[] value) throws IOException {

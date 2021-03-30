@@ -29,6 +29,7 @@ public enum MessageType {
     CreateValidator("DB6A19FD"),
     RemoveValidator("C1AFE85F"),
     Listing("B41DE13F"),
+    ListGrowthMarket("D658D6B5"),
     TimeLock("07921531"),
     TimeUnlock("C4050C6C"),
     TimeRelock("504711DA"),
