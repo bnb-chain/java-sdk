@@ -21,8 +21,12 @@ public class BinanceDexApiClientFactory {
         return new BinanceDexApiRestClientImpl(baseUrl);
     }
 
-    public BinanceDexApiRestClient newRestClient(String baseUrl,String apiKey){
-        return new BinanceDexApiRestClientImpl(baseUrl,apiKey);
+    public BinanceDexApiRestClient newRestClient(String baseUrl, String apiKey) {
+        return new BinanceDexApiRestClientImpl(baseUrl, apiKey);
+    }
+
+    public BinanceDexApiRestClient newRestClient(String baseUrl, String apiKey, Long timeout) {
+        return new BinanceDexApiRestClientImpl(baseUrl, apiKey, timeout);
     }
 
     public BinanceDexApiNodeClient newNodeRpcClient() {
@@ -33,6 +37,10 @@ public class BinanceDexApiClientFactory {
         return new BinanceDexApiNodeClientImpl(baseUrl, hrp, valHrp);
     }
 
+    public BinanceDexApiNodeClient newNodeRpcClient(String baseUrl, String hrp, String valHrp, Long timeout) {
+        return new BinanceDexApiNodeClientImpl(baseUrl, hrp, valHrp, timeout);
+    }
+
     public BinanceDexApiAsyncRestClient newAsyncRestClient() {
         return newAsyncRestClient(BinanceDexEnvironment.PROD.getBaseUrl());
     }
@@ -41,8 +49,8 @@ public class BinanceDexApiClientFactory {
         return new BinanceDexApiAsyncRestClientImpl(baseUrl);
     }
 
-    public BinanceDexApiAsyncRestClient newAsyncRestClient(String baseUrl,String apiKey) {
-        return new BinanceDexApiAsyncRestClientImpl(baseUrl,apiKey);
+    public BinanceDexApiAsyncRestClient newAsyncRestClient(String baseUrl, String apiKey) {
+        return new BinanceDexApiAsyncRestClientImpl(baseUrl, apiKey);
     }
 
     public BinanceDexApiWebSocketClient newWebSocketClient() {
@@ -53,8 +61,8 @@ public class BinanceDexApiClientFactory {
         return new BinanceDexApiWebSocketClientImpl(baseUrl);
     }
 
-    public BinanceDexApiWebSocketClient newWebSocketClient(String baseUrl,String apiKey) {
-        return new BinanceDexApiWebSocketClientImpl(baseUrl,apiKey);
+    public BinanceDexApiWebSocketClient newWebSocketClient(String baseUrl, String apiKey) {
+        return new BinanceDexApiWebSocketClientImpl(baseUrl, apiKey);
     }
 
 }

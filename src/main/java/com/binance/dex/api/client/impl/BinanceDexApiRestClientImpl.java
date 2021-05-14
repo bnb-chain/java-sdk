@@ -28,11 +28,23 @@ public class BinanceDexApiRestClientImpl implements BinanceDexApiRestClient {
         this.binanceDexApi = BinanceDexApiClientGenerator.createService(BinanceDexApi.class, baseUrl);
     }
 
+    public BinanceDexApiRestClientImpl(String baseUrl, Long timeout) {
+        this.binanceDexApi = BinanceDexApiClientGenerator.createService(BinanceDexApi.class, baseUrl, timeout);
+    }
+
     public BinanceDexApiRestClientImpl(String baseUrl,String apiKey){
         if(StringUtils.isBlank(apiKey)){
             this.binanceDexApi = BinanceDexApiClientGenerator.createService(BinanceDexApi.class, baseUrl);
         }else{
             this.binanceDexApi = BinanceDexApiClientGenerator.createService(BinanceDexApi.class,apiKey,baseUrl + "/internal/");
+        }
+    }
+
+    public BinanceDexApiRestClientImpl(String baseUrl,String apiKey, Long timeout){
+        if(StringUtils.isBlank(apiKey)){
+            this.binanceDexApi = BinanceDexApiClientGenerator.createService(BinanceDexApi.class, baseUrl, timeout);
+        }else{
+            this.binanceDexApi = BinanceDexApiClientGenerator.createService(BinanceDexApi.class,apiKey,baseUrl + "/internal/", timeout);
         }
     }
 

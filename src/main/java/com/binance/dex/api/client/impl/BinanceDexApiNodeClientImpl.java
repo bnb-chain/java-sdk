@@ -72,6 +72,19 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         oracleQueryDelegate = new NodeQueryDelegateOracle(binanceDexNodeApi, hrp, valHrp);
     }
 
+    public BinanceDexApiNodeClientImpl(String nodeUrl, String hrp, String valHrp, Long timeout) {
+        this.binanceDexNodeApi = BinanceDexApiClientGenerator.createService(BinanceDexNodeApi.class, nodeUrl, timeout);
+        this.hrp = hrp;
+        this.valHrp = valHrp;
+        transactionConverter = new TransactionConverter(hrp, valHrp);
+        feeConverter = new FeeConverter();
+
+        sideChainStakingTxDelegate = new NodeTxDelegateSideChainStaking(binanceDexNodeApi, hrp, valHrp);
+        bridgeTxDelegate = new NodeTxDelegateBridge(binanceDexNodeApi, hrp, valHrp);
+        sideChainQueryDelegate = new NodeQueryDelegateSideChainStaking(binanceDexNodeApi, hrp, valHrp);
+        oracleQueryDelegate = new NodeQueryDelegateOracle(binanceDexNodeApi, hrp, valHrp);
+    }
+
     @Override
     public AccountSequence getAccountSequence(String address) {
         Account account = this.getAccount(address);
@@ -655,18 +668,24 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     protected List<TransactionMetadata> syncBroadcast(String requestBody, Wallet wallet) {
         try {
             JsonRpcResponse<CommitBroadcastResult> rpcResponse = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.commitBroadcast(requestBody));
+            if (rpcResponse.getResult() == null){
+                if (rpcResponse.getError() != null){
+                    throw new BinanceDexApiException(rpcResponse.getError().getCode(), rpcResponse.getError().getData());
+                }
+                throw new BinanceDexApiException(new RuntimeException("internal error"));
+            }
             CommitBroadcastResult commitBroadcastResult = rpcResponse.getResult();
             TransactionMetadata transactionMetadata = new TransactionMetadata();
-            transactionMetadata.setCode(commitBroadcastResult.getCheckTx().getCode());
+            transactionMetadata.setCode(commitBroadcastResult.getDeliverTx().getCode());
             if (commitBroadcastResult.getHeight() != null && StringUtils.isNoneBlank(commitBroadcastResult.getHash()) && transactionMetadata.getCode() == 0) {
                 wallet.increaseAccountSequence();
                 transactionMetadata.setHash(commitBroadcastResult.getHash());
                 transactionMetadata.setHeight(commitBroadcastResult.getHeight());
-                transactionMetadata.setLog(commitBroadcastResult.getCheckTx().getLog());
+                transactionMetadata.setLog(commitBroadcastResult.getDeliverTx().getLog());
                 transactionMetadata.setOk(true);
             } else {
                 wallet.invalidAccountSequence();
-                transactionMetadata.setLog(commitBroadcastResult.getCheckTx().getLog());
+                transactionMetadata.setLog(commitBroadcastResult.getDeliverTx().getLog());
                 transactionMetadata.setOk(false);
             }
 
@@ -680,16 +699,22 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     protected List<TransactionMetadata> syncBroadcast(String requestBody) {
         try {
             JsonRpcResponse<CommitBroadcastResult> rpcResponse = BinanceDexApiClientGenerator.executeSync(binanceDexNodeApi.commitBroadcast(requestBody));
+            if (rpcResponse.getResult() == null){
+                if (rpcResponse.getError() != null){
+                    throw new BinanceDexApiException(rpcResponse.getError().getCode(), rpcResponse.getError().getData());
+                }
+                throw new BinanceDexApiException(new RuntimeException("internal error"));
+            }
             CommitBroadcastResult commitBroadcastResult = rpcResponse.getResult();
             TransactionMetadata transactionMetadata = new TransactionMetadata();
-            transactionMetadata.setCode(commitBroadcastResult.getCheckTx().getCode());
+            transactionMetadata.setCode(commitBroadcastResult.getDeliverTx().getCode());
             if (commitBroadcastResult.getHeight() != null && StringUtils.isNoneBlank(commitBroadcastResult.getHash()) && transactionMetadata.getCode() == 0) {
                 transactionMetadata.setHash(commitBroadcastResult.getHash());
                 transactionMetadata.setHeight(commitBroadcastResult.getHeight());
-                transactionMetadata.setLog(commitBroadcastResult.getCheckTx().getLog());
+                transactionMetadata.setLog(commitBroadcastResult.getDeliverTx().getLog());
                 transactionMetadata.setOk(true);
             } else {
-                transactionMetadata.setLog(commitBroadcastResult.getCheckTx().getLog());
+                transactionMetadata.setLog(commitBroadcastResult.getDeliverTx().getLog());
                 transactionMetadata.setOk(false);
             }
 

@@ -13,8 +13,35 @@ public class CommitBroadcastResult {
     @JsonProperty("check_tx")
     private CheckTx checkTx;
 
+    @JsonProperty("deliver_tx")
+    private DeliverTx deliverTx;
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class CheckTx {
+
+        private Integer code = 0;
+
+        private String log;
+
+        public Integer getCode() {
+            return code;
+        }
+
+        public void setCode(Integer code) {
+            this.code = code;
+        }
+
+        public String getLog() {
+            return log;
+        }
+
+        public void setLog(String log) {
+            this.log = log;
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class DeliverTx {
 
         private Integer code = 0;
 
@@ -45,6 +72,14 @@ public class CommitBroadcastResult {
         this.checkTx = checkTx;
     }
 
+    public DeliverTx getDeliverTx() {
+        return deliverTx;
+    }
+
+    public void setDeliverTx(DeliverTx deliverTx) {
+        this.deliverTx = deliverTx;
+    }
+
     public String getHash() {
         return hash;
     }
@@ -60,4 +95,6 @@ public class CommitBroadcastResult {
     public void setHeight(Long height) {
         this.height = height;
     }
+
+
 }

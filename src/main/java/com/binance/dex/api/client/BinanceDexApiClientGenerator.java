@@ -28,42 +28,48 @@ public class BinanceDexApiClientGenerator {
                     BinanceDexApiError.class, new Annotation[0], null);
 
     private static OkHttpClient sharedClient;
+
     static {
         Dispatcher dispatcher = new Dispatcher();
         dispatcher.setMaxRequestsPerHost(500);
         dispatcher.setMaxRequests(500);
         sharedClient = new OkHttpClient.Builder()
-            .dispatcher(dispatcher)
-            .pingInterval(20, TimeUnit.SECONDS)
-            .build();
+                .dispatcher(dispatcher)
+                .pingInterval(20, TimeUnit.SECONDS)
+                .retryOnConnectionFailure(false)
+                .build();
     }
 
+
     public static <S> S createService(Class<S> serviceClass, String baseUrl) {
-        Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
-                .baseUrl(baseUrl)
-                .addConverterFactory(converterFactory);
+        return createService(serviceClass, null, baseUrl);
+    }
 
-        retrofitBuilder.client(sharedClient);
-
-        Retrofit retrofit = retrofitBuilder.build();
-
-        return retrofit.create(serviceClass);
+    public static <S> S createService(Class<S> serviceClass, String baseUrl, Long timeout) {
+        return createService(serviceClass, null, baseUrl, timeout);
     }
 
     public static <S> S createService(Class<S> serviceClass, String apiKey, String baseUrl) {
+        return createService(serviceClass, apiKey, baseUrl, null);
+    }
+
+    public static <S> S createService(Class<S> serviceClass, String apiKey, String baseUrl, Long timeout) {
         Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(converterFactory);
 
-        if (StringUtils.isEmpty(apiKey)) {
-            retrofitBuilder.client(sharedClient);
-        } else {
+        OkHttpClient.Builder adaptedClientBuilder = sharedClient.newBuilder();
+        if (!StringUtils.isEmpty(apiKey)) {
             // `adaptedClient` will use its own interceptor, but share thread pool etc with the 'parent' client
             InternalInvokeInterceptor interceptor = new InternalInvokeInterceptor(apiKey);
-            OkHttpClient adaptedClient = sharedClient.newBuilder().addInterceptor(interceptor).build();
-            retrofitBuilder.client(adaptedClient);
+            adaptedClientBuilder.addInterceptor(interceptor);
         }
 
+        if (timeout != null) {
+            adaptedClientBuilder.readTimeout(timeout, TimeUnit.SECONDS);
+        }
+
+        retrofitBuilder.client(adaptedClientBuilder.build());
         Retrofit retrofit = retrofitBuilder.build();
         return retrofit.create(serviceClass);
     }
