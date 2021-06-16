@@ -104,11 +104,11 @@
             <version>1.3.2</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.ethereum/ethereumj-core -->
+        <!-- https://mvnrepository.com/artifact/org.ethreum/ethereumj-core -->
         <dependency>
-            <groupId>org.ethereum</groupId>
-            <artifactId>ethereumj-core</artifactId>
-            <version>1.12.0-RELEASE</version>
+            <groupId>com.github.ethereum</groupId>
+            <artifactId>ethereumj</artifactId>
+            <version>1.12.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.ethereum</groupId>
@@ -121,6 +121,10 @@
                 <exclusion>
                     <groupId>org.iq80.leveldb</groupId>
                     <artifactId>leveldb</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.ethereum</groupId>
+                    <artifactId>leveldbjni-all</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -176,17 +180,17 @@
     </build>
     <repositories>
         <repository>
-            <id>ethereum-repo</id>
-            <url>https://dl.bintray.com/ethereum/maven/</url>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
-    <distributionManagement>
-        <repository>
-            <id>bintray-beowulf-foundation-beowulf-java</id>
-            <name>bintray</name>
-            <url>https://api.bintray.com/maven/${bintray.subject}/${bintray.repo}/${bintray.package}/;publish=1</url>
-        </repository>
-    </distributionManagement>
+<!--    <distributionManagement>-->
+<!--        <repository>-->
+<!--            <id>bintray-beowulf-foundation-beowulf-java</id>-->
+<!--            <name>bintray</name>-->
+<!--            <url>https://api.bintray.com/maven/${bintray.subject}/${bintray.repo}/${bintray.package}/;publish=1</url>-->
+<!--        </repository>-->
+<!--    </distributionManagement>-->
     <scm>
         <url>https://github.com/crypitor/binance-chain-java-sdk</url>
         <connection>scm:git:git@github.com:crypitor/binance-chain-java-sdk.git</connection>
