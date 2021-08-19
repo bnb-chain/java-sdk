@@ -6,30 +6,21 @@ import com.binance.dex.api.client.domain.TransactionType;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class TransactionsRequest {
-    private String address;
-    private Long blockHeight;
-    private Long endTime;
-    private Integer limit;
-    private Integer offset;
-    private OrderSide side;
     private Long startTime;
-    private String txAsset;
-    private TransactionType txType;
+    private Long endTime;
+    private String type;
+    private String asset;
+    private String address;
+    private String addressType;
+    private Integer offset;
+    private  Integer limit;
 
-    public String getAddress() {
-        return address;
+    public Long getStartTime() {
+        return startTime;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public Long getBlockHeight() {
-        return blockHeight;
-    }
-
-    public void setBlockHeight(Long blockHeight) {
-        this.blockHeight = blockHeight;
+    public void setStartTime(Long startTime) {
+        this.startTime = startTime;
     }
 
     public Long getEndTime() {
@@ -40,12 +31,36 @@ public class TransactionsRequest {
         this.endTime = endTime;
     }
 
-    public Integer getLimit() {
-        return limit;
+    public String getType() {
+        return type;
     }
 
-    public void setLimit(Integer limit) {
-        this.limit = limit;
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getAsset() {
+        return asset;
+    }
+
+    public void setAsset(String asset) {
+        this.asset = asset;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getAddressType() {
+        return addressType;
+    }
+
+    public void setAddressType(String addressType) {
+        this.addressType = addressType;
     }
 
     public Integer getOffset() {
@@ -56,50 +71,25 @@ public class TransactionsRequest {
         this.offset = offset;
     }
 
-    public OrderSide getSide() {
-        return side;
+    public Integer getLimit() {
+        return limit;
     }
 
-    public void setSide(OrderSide side) {
-        this.side = side;
-    }
-
-    public Long getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Long startTime) {
-        this.startTime = startTime;
-    }
-
-    public String getTxAsset() {
-        return txAsset;
-    }
-
-    public void setTxAsset(String txAsset) {
-        this.txAsset = txAsset;
-    }
-
-    public TransactionType getTxType() {
-        return txType;
-    }
-
-    public void setTxType(TransactionType txType) {
-        this.txType = txType;
+    public void setLimit(Integer limit) {
+        this.limit = limit;
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this, BinanceDexConstants.BINANCE_DEX_TO_STRING_STYLE)
-                .append("address", address)
-                .append("blockHeight", blockHeight)
+                .append("startTime", startTime)
                 .append("endTime", endTime)
+                .append("type", type)
+                .append("asset", asset)
+                .append("address", address)
+                .append("addressType", addressType)
                 .append("limit", limit)
                 .append("offset", offset)
-                .append("side", side)
-                .append("startTime", startTime)
-                .append("txAsset", txAsset)
-                .append("txType", txType)
                 .toString();
     }
 }

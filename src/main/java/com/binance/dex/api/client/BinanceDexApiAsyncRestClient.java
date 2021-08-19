@@ -51,9 +51,11 @@ public interface BinanceDexApiAsyncRestClient {
 
     void getTrades(TradesRequest request, BinanceDexApiCallback<TradePage> callback);
 
-    void getTransactions(String address, BinanceDexApiCallback<TransactionPage> callback);
+    void getTransactions(String address, BinanceDexApiCallback<TransactionPageV2> callback);
 
-    void getTransactions(TransactionsRequest request, BinanceDexApiCallback<TransactionPage> callback);
+    void getTransactions(TransactionsRequest request, BinanceDexApiCallback<TransactionPageV2> callback);
+
+    void getTransactionsInBlock(long blockHeight, BinanceDexApiCallback<TransactionPageV2> callback);
 
     // Do not support async commitBroadcast due to account sequence
 }
