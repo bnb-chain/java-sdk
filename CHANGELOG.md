@@ -10,7 +10,7 @@ Breaking Changes
 
 Please refer to TransactionConverterFactory.java to see the mappings of the fields between TransactionPageV2 and TransactionPage 
 
-Please refer to TransactionExample.java and [API Doc](https://docs.binance.org/api-reference/dex-api/block-service.html) for more details
+Please refer to TransactionExample.java and [API Doc](https://docs.binance.org/api-reference/dex-api/block-service.html) for more details, the underlying API [Migration Guide](https://github.com/binance-chain/docs-site/blob/block-service/docs/api-reference/dex-api/migration-guide.md) could be also useful 
 
 New API
 * getTransactionsInBlock(long blockHeight) will return transaction in a specific block. 
