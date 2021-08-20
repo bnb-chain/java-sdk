@@ -3,7 +3,8 @@ package com.binance.dex.api.client.examples;
 import com.binance.dex.api.client.BinanceDexApiClientFactory;
 import com.binance.dex.api.client.BinanceDexApiRestClient;
 import com.binance.dex.api.client.BinanceDexEnvironment;
-import com.binance.dex.api.client.domain.*;
+import com.binance.dex.api.client.domain.TransactionPage;
+import com.binance.dex.api.client.domain.TransactionPageV2;
 import com.binance.dex.api.client.domain.request.TransactionsRequest;
 import com.binance.dex.api.client.utils.converter.TransactionConverterFactory;
 
@@ -17,6 +18,7 @@ public class TransactionExample {
         System.out.println(transactions);
 
         //Get transactions by criteria
+        //Refer to this for more: https://docs.binance.org/api-reference/dex-api/block-service.html#apiv1txs
         TransactionsRequest request = new TransactionsRequest();
         request.setStartTime(1629272621945L);
         request.setEndTime(1629359021945L);

@@ -16,6 +16,7 @@ public class TransactionExampleAsync {
         client.getTransactions("tbnb135mqtf9gef879nmjlpwz6u2fzqcw4qlzrqwgvw", response -> System.out.println(response));
 
         //Get transactions by criteria
+        //Refer to this for more: https://docs.binance.org/api-reference/dex-api/block-service.html#apiv1txs
         TransactionsRequest request = new TransactionsRequest();
         request.setStartTime(1629272621945L);
         request.setEndTime(1629359021945L);
