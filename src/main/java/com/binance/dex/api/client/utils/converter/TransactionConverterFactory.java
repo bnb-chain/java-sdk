@@ -160,7 +160,7 @@ public class TransactionConverterFactory {
         transaction.setTxHash(transactionV2.getHash());
         transaction.setTxType(transactionV2.getType());
         transaction.setTimeStamp(formatter.format(new Date(transactionV2.getBlockTime())));
-
+        transaction.setConfirmBlocks(0L);
 
         transaction.setCode(transactionV2.getCode());
         transaction.setMemo(transactionV2.getMemo());
