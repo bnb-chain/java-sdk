@@ -2,7 +2,7 @@
 
 ## 1.1.2
 API UPGRADE
-* [\#118](https://github.com/binance-chain/java-sdk/pull/118) [RPC] [API] deco old rest transactions api, and add new rest transaction apis
+* [\#120](https://github.com/binance-chain/java-sdk/pull/120) [RPC] [API] deco old rest transactions api, and add new rest transaction apis
 
 Breaking Changes
 * getTransactions(TransactionsRequest request) will return transactions with new data model TransactionPageV2

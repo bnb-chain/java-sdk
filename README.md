@@ -19,7 +19,7 @@ The Binance Chain Java SDK works as a lightweight Java library for interacting w
 <dependency>
     <groupId>com.binance.dex.api</groupId>
     <artifactId>binance-dex-api-client</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.2</version>
 </dependency>
 ```
 # Protobuf
