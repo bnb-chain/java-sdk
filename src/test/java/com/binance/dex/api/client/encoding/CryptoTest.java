@@ -20,9 +20,9 @@ public class CryptoTest {
 
     @Test
     public void testDecodeAddress() throws Crypto.SegwitAddressException {
-        String address = "cosmosaccaddr1wqrn76z0v36pr3vx3sgue4y5rv4pzpu6ffnjj0";
+        String address = "bnb1x9nnkazcgrqr902a83k7xecu44607jpjlw4snf";
         byte[] pubKey = Crypto.decodeAddress(address);
-        Assert.assertEquals("70073f684f647411c5868c11ccd4941b2a11079a", EncodeUtils.bytesToHex(pubKey));
+        Assert.assertEquals("31673b745840c032bd5d3c6de3671cad74ff4832", EncodeUtils.bytesToHex(pubKey));
     }
 
     @Test
@@ -38,6 +38,30 @@ public class CryptoTest {
         byte[] sig = Crypto.sign(EncodeUtils.hexStringToByteArray(hex), "30c5e838578a29e3e9273edddd753d6c9b38aca2446dd84bdfe2e5988b0da0a1");
         Assert.assertEquals("9c0421217ef92d556a14e3f442b07c85f6fc706dfcd8a72d6b58f05f96e95aa226b10f7cf62ccf7c9d5d953fa2c9ae80a1eacaf0c779d0253f1a34afd17eef34",
                 EncodeUtils.bytesToHex(sig));
+    }
+
+    @Test
+    public void testCheckValidBNBAddress() {
+        String address = "bnb1x9nnkazcgrqr902a83k7xecu44607jpjlw4snf";
+        boolean result = Crypto.checkBNBAddress(address);
+        Assert.assertEquals(true,
+                result);
+    }
+
+    @Test
+    public void testCheckInvalidBNBAddress() {
+        String address = "bnb1x9nnkazcgrqr902a83k7xecu44607jpjlw4snx";
+        boolean result = Crypto.checkBNBAddress(address);
+        Assert.assertEquals(false,
+                result);
+    }
+
+    @Test
+    public void testCheckNonBNBAddress() {
+        String address = "cosmosaccaddr1wqrn76z0v36pr3vx3sgue4y5rv4pzpu6ffnjj0";
+        boolean result = Crypto.checkBNBAddress(address);
+        Assert.assertEquals(false,
+                result);
     }
 
 }
