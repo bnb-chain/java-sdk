@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,17 +23,29 @@ import java.util.stream.Collectors;
  */
 public class BinanceDexApiRestClientImpl implements BinanceDexApiRestClient {
     private BinanceDexApi binanceDexApi;
+    private BinanceTransactionApi binanceTransactionApi;
     private static final okhttp3.MediaType MEDIA_TYPE = okhttp3.MediaType.parse("text/plain; charset=utf-8");
 
     public BinanceDexApiRestClientImpl(String baseUrl) {
         this.binanceDexApi = BinanceDexApiClientGenerator.createService(BinanceDexApi.class, baseUrl);
+        String transactionUrl = BinanceDexEnvironment.inferTransactionUrl(baseUrl);
+        if (transactionUrl != null) {
+            this.binanceTransactionApi = BinanceDexApiClientGenerator.createService(BinanceTransactionApi.class, transactionUrl);
+        }
     }
 
     public BinanceDexApiRestClientImpl(String baseUrl,String apiKey){
+        String transactionUrl = BinanceDexEnvironment.inferTransactionUrl(baseUrl);
         if(StringUtils.isBlank(apiKey)){
             this.binanceDexApi = BinanceDexApiClientGenerator.createService(BinanceDexApi.class, baseUrl);
+            if (transactionUrl != null) {
+                this.binanceTransactionApi = BinanceDexApiClientGenerator.createService(BinanceTransactionApi.class, transactionUrl);
+            }
         }else{
             this.binanceDexApi = BinanceDexApiClientGenerator.createService(BinanceDexApi.class,apiKey,baseUrl + "/internal/");
+            if (transactionUrl != null) {
+                this.binanceTransactionApi = BinanceDexApiClientGenerator.createService(BinanceTransactionApi.class, transactionUrl + "/internal/");
+            }
         }
     }
 
@@ -147,21 +160,31 @@ public class BinanceDexApiRestClientImpl implements BinanceDexApiRestClient {
     }
 
     @Override
-    public TransactionPage getTransactions(String address) {
+    public TransactionPageV2 getTransactions(String address) {
         TransactionsRequest request = new TransactionsRequest();
         request.setAddress(address);
+        Long endTime = new Date().getTime();
+        Long startTime = endTime - 86400000;
+        request.setStartTime(startTime);
+        request.setEndTime(endTime);
         return getTransactions(request);
     }
 
     @Override
-    public TransactionPage getTransactions(TransactionsRequest request) {
-        String sideStr = request.getSide() != null ? request.getSide().name() : null;
-        String txTypeStr = request.getTxType() != null ? request.getTxType().name() : null;
+    public TransactionPageV2 getTransactions(TransactionsRequest request) {
         return BinanceDexApiClientGenerator.executeSync(
-                binanceDexApi.getTransactions(
-                        request.getAddress(), request.getBlockHeight(), request.getEndTime(),
-                        request.getLimit(), request.getOffset(), sideStr,
-                        request.getStartTime(), request.getTxAsset(), txTypeStr));
+                binanceTransactionApi.getTransactions(
+                        request.getStartTime(), request.getEndTime(),
+                        request.getType(), request.getAsset(),
+                        request.getAddress(), request.getAddressType(),
+                        request.getOffset(), request.getLimit()));
+    }
+
+
+    @Override
+    public TransactionPageV2 getTransactionsInBlock(long blockHeight) {
+        return BinanceDexApiClientGenerator.executeSync(
+                binanceTransactionApi.getTransactionsInBlock(blockHeight));
     }
 
     // Broadcast and handle account sequence

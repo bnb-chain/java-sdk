@@ -1,0 +1,24 @@
+package com.binance.dex.api.client.utils.converter.impl;
+
+import com.binance.dex.api.client.domain.Transaction;
+import com.binance.dex.api.client.domain.TransactionV2;
+import com.binance.dex.api.client.domain.broadcast.Deposit;
+import com.binance.dex.api.client.domain.broadcast.TxType;
+import com.binance.dex.api.client.utils.converter.NumberUtil;
+import com.binance.dex.api.client.utils.converter.TransactionConverter;
+
+
+public class FDepositConverter extends TransactionConverter<Deposit> {
+
+    @Override
+    public TxType getType() {
+        return TxType.DEPOSIT;
+    }
+
+    @Override
+    public void doConvert(TransactionV2 transactionV2, Transaction transaction) {
+        transaction.setValue(NumberUtil.longToBigDecimalString(transactionV2.getAmount()));
+
+        transaction.setData(null);
+    }
+}

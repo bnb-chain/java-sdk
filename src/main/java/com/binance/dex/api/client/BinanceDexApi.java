@@ -76,13 +76,6 @@ public interface BinanceDexApi {
                               @Query("sellerOrderId") String sellerOrderId, @Query("side") Integer side,
                               @Query("start") Long start, @Query("symbol") String symbol, @Query("total") Integer total);
 
-    @GET("api/v1/transactions")
-    Call<TransactionPage> getTransactions(@Query("address") String address, @Query("blockHeight") Long blockHeight,
-                                          @Query("endTime") Long endTime, @Query("limit") Integer limit,
-                                          @Query("offset") Integer offset, @Query("side") String side,
-                                          @Query("startTime") Long startTime, @Query("txAsset") String txAsset,
-                                          @Query("txType") String txType);
-
     @POST("api/v1/broadcast")
     Call<List<TransactionMetadata>> broadcast(@Query("sync") boolean sync, @Body RequestBody transaction);
 

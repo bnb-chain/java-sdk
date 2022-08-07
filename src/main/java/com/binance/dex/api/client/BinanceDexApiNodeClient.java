@@ -132,12 +132,17 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
     }
 
     @Override
-    default TransactionPage getTransactions(String address) {
+    default TransactionPageV2 getTransactions(String address) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    default TransactionPage getTransactions(TransactionsRequest request) {
+    default TransactionPageV2 getTransactions(TransactionsRequest request) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    default TransactionPageV2 getTransactionsInBlock(long blockHeight) {
         throw new UnsupportedOperationException();
     }
 
