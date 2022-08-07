@@ -56,9 +56,11 @@ public interface BinanceDexApiRestClient {
 
     TradePage getTrades(TradesRequest request);
 
-    TransactionPage getTransactions(String address);
+    TransactionPageV2 getTransactions(String address);
 
-    TransactionPage getTransactions(TransactionsRequest request);
+    TransactionPageV2 getTransactions(TransactionsRequest request);
+
+    TransactionPageV2 getTransactionsInBlock(long blockHeight);
 
     List<MiniToken> getMiniTokens(Integer limit);
 
