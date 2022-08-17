@@ -35,10 +35,16 @@ public class Payload implements RlpDecodable {
         }
 
         Class<? extends Content> clazz = ContentEnum.getClass(channelId, this.getPackageType());
+        Content instance;
         if (clazz == null) {
             throw new RuntimeException(String.format("unknown content of channel id = %s, package type = %s", channelId, this.getPackageType()));
         }
-        Content instance = Decoder.decodeObject(ByteUtil.cut(raw, 33), clazz);
+        if (channelId == 16) {
+            instance = clazz.newInstance();
+            instance = (Content) Decoder.decodeBytes(ByteUtil.cut(raw, 33), clazz, instance);
+        } else {
+            instance = Decoder.decodeObject(ByteUtil.cut(raw, 33), clazz);
+        }
         this.setContent(instance);
     }
 }

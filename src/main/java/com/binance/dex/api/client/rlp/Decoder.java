@@ -43,7 +43,7 @@ public class Decoder extends RLP {
     }
 
 
-    private static Object decodeBytes(byte[] value, Class<?> type, Object superInstance) throws Exception {
+    public static Object decodeBytes(byte[] value, Class<?> type, Object superInstance) throws Exception {
         if (type == Integer.class) {
 
             return decodeInt(value, 0);
