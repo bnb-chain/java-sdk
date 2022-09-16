@@ -18,11 +18,14 @@ public enum ContentEnum {
     StakingCommonAckPack(8, 1, CommonAck.class),
     IbcValidatorSetPack(8, 2, IbcValidatorSet.class),
     GovCommonAckPack(9, 1, CommonAck.class),
-    SideDowntimeSlashPack(11, 0, com.binance.dex.api.client.crosschain.content.SideDowntimeSlash.class),
+    SideDowntimeSlashPack(11, 0, SideDowntimeSlash.class),
     MirrorSynPack(4, 0, MirrorSyn.class),
     MirrorSynAckPack(4, 1, MirrorAck.class),
     MirrorSyncSynPack(5, 0, MirrorSyncSyn.class),
-    MirrorSyncAckPack(5, 1, MirrorSyncAck.class)
+    MirrorSyncAckPack(5, 1, MirrorSyncAck.class),
+    CrossStakeSynPack(16, 0, CrossStakeSyn.class),
+    CrossStakeRefundPack(16, 1, CrossStakeRefund.class),
+    CrossStakeFailAckPack(16, 2, CrossStakeFailAck.class),
     ;
 
     private Integer channelId;
