@@ -5,7 +5,14 @@
 
     <groupId>com.binance.dex.api</groupId>
     <artifactId>binance-dex-api-client</artifactId>
-    <version>1.1.2</version>
+    <version>1.1.3</version>
+    
+	<repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
 
     <properties>
         <com.squareup.retrofit2.version>2.6.0</com.squareup.retrofit2.version>
@@ -105,9 +112,9 @@
 
         <!-- https://mvnrepository.com/artifact/org.ethereum/ethereumj-core -->
         <dependency>
-            <groupId>org.ethereum</groupId>
-            <artifactId>ethereumj-core</artifactId>
-            <version>1.12.0-RELEASE</version>
+            <groupId>com.github.ethereum</groupId>
+            <artifactId>ethereumj</artifactId>
+            <version>1.12.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.ethereum</groupId>
@@ -120,6 +127,10 @@
                 <exclusion>
                     <groupId>org.iq80.leveldb</groupId>
                     <artifactId>leveldb</artifactId>
+                </exclusion>
+                <exclusion>
+                	<groupId>org.ethereum</groupId>
+					<artifactId>leveldbjni-all</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

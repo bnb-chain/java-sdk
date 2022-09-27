@@ -10,18 +10,26 @@ The Binance Chain Java SDK works as a lightweight Java library for interacting w
 ## Disclaimer
 **This branch is under active development, all subject to potential future change without notification and not ready for production use. The code and security audit have not been fully completed and not ready for any bug bounty.**
 
-# Installation
+# How to get
 
+1. Add the JitPack repository to your project's `pom.xml`:
+    ```
+        <repositories>
+            <repository>
+                <id>jitpack.io</id>
+                <url>https://jitpack.io</url>
+            </repository>
+        </repositories>
+    ```
+2. Add the dependency:
+    ```
+	<dependency>
+	    <groupId>com.github.bnb-chain</groupId>
+	    <artifactId>java-sdk</artifactId>
+	    <version>Tag</version>
+	</dependency>
+    ```
 
-1. Install library into your Maven's local repository by running `mvn install`
-2. Add the following Maven dependency to your project's `pom.xml`:
-```
-<dependency>
-    <groupId>com.binance.dex.api</groupId>
-    <artifactId>binance-dex-api-client</artifactId>
-    <version>1.1.2</version>
-</dependency>
-```
 # Protobuf
 
 The protobuf-maven-plugin is used in this SDK. It is a plugin that integrates protocol buffers compiler (protoc) into Maven lifecycle. The Plugin generates Java source files from .proto (protocol buffer definition) files for this project by running `mvn compile`. 
@@ -29,8 +37,6 @@ The protobuf-maven-plugin is used in this SDK. It is a plugin that integrates pr
 These Java source files will be packaged into the final artifact and referenced as imports from the dependent projects or modules by running `mvn clean package`.
 
 More details please refer to https://github.com/xolstice/protobuf-maven-plugin
-
- 
 
 # API
 
@@ -40,8 +46,6 @@ For examples, please check the [wiki](https://github.com/bnb-chain/java-sdk/wiki
 
 All new code changes should be covered with unit tests. You can see the existing test cases here: https://github.com/bnb-chain/java-sdk/tree/master/src/test/java/com/binance/dex/api/client/encoding 
 
-
 # Contributing
 
 Contributions to the Binance Chain Java SDK are welcome. Please ensure that you have tested the changes with a local client and have added unit test coverage for your code.
-
