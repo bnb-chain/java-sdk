@@ -10,6 +10,7 @@ import com.binance.dex.api.client.domain.request.OpenOrdersRequest;
 import com.binance.dex.api.client.domain.request.TradesRequest;
 import com.binance.dex.api.client.domain.request.TransactionsRequest;
 import com.binance.dex.api.client.domain.stake.Pool;
+import com.binance.dex.api.client.domain.stake.beaconchain.*;
 import com.binance.dex.api.client.domain.stake.sidechain.*;
 
 import javax.annotation.Nullable;
@@ -236,6 +237,39 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
     default List<TransactionMetadata> unfreeze(TokenUnfreeze unfreeze, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
         throw new UnsupportedOperationException();
     }
+    List<TransactionMetadata> createValidator(CreateBeaconChainValidator createBeaconChainValidator, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
+
+    List<TransactionMetadata> editValidator(EditBeaconChainValidator editBeaconChainValidator, Wallet wallet, TransactionOption option, boolean sync) throws IOException, NoSuchAlgorithmException ;
+
+    List<TransactionMetadata> delegate(BeaconChainDelegate beaconChainDelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
+
+    List<TransactionMetadata> redelegate(BeaconChainRedelegate beaconChainRedelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
+
+    List<TransactionMetadata> undelegate(BeaconChainUndelegate beaconChainUndelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
+
+    BeaconChainValidator getValidator(String validatorAddress) throws IOException;
+
+    List<BeaconChainValidator> getTopValidators(int top) throws IOException ;
+
+    BeaconChainDelegation getDelegation(String delegatorAddress, String validatorAddress) throws IOException;
+
+    List<BeaconChainDelegation> getDelegations(String delegatorAddress) throws IOException;
+
+    BeaconChainRedelegation getRedelegation(String delegatorAddress, String srcValidatorAddress, String dstValidatorAddress) throws IOException;
+
+    List<BeaconChainRedelegation> getRedelegations(String delegatorAddress) throws IOException;
+
+    BeaconChainUnBondingDelegation getUnBondingDelegation(String delegatorAddress, String validatorAddress) throws IOException;
+
+    List<BeaconChainUnBondingDelegation> getUnBondingDelegations(String delegatorAddress) throws IOException;
+
+    List<BeaconChainUnBondingDelegation> getUnBondingDelegationsByValidator(String validatorAddress)  throws IOException ;
+
+    List<BeaconChainRedelegation> getRedelegationsByValidator(String validatorAddress) throws IOException;
+
+    Pool getPool() throws IOException;
+
+    long getAllValidatorsCount(boolean jailInvolved) throws IOException;
 
     List<TransactionMetadata> createSideChainValidator(CreateSideChainValidator createSideChainValidator, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
 

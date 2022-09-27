@@ -9,6 +9,8 @@ import com.binance.dex.api.client.encoding.message.sidechain.value.DescriptionVa
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
+
 /**
  * @author Fitz.Lu
  **/
@@ -115,6 +117,28 @@ public class BechValidator {
     @JsonProperty(value = "side_fee_addr")
     private String sideFeeAddr;
 
+    @JsonProperty(value = "stake_snapshots")
+    private ArrayList<String> stakeSnapShots;
+
+    public ArrayList<String> getStakeSnapShots() {
+        return stakeSnapShots;
+    }
+
+    public void setStakeSnapShots(ArrayList<String> stakeSnapShots) {
+        this.stakeSnapShots = stakeSnapShots;
+    }
+
+    public String getAccumulatedStake() {
+        return accumulatedStake;
+    }
+
+    public void setAccumulatedStake(String accumulatedStake) {
+        this.accumulatedStake = accumulatedStake;
+    }
+
+    @JsonProperty(value = "accumulated_stake")
+    private String accumulatedStake;
+
     public BechValidator() {
     }
 
@@ -174,6 +198,16 @@ public class BechValidator {
                 validator.setSideFeeAddr(sideFeeAddr);
             }
         }
+
+        if(stakeSnapShots != null && stakeSnapShots.size() > 0){
+            ArrayList<String> stakeSnapShots = new ArrayList<>();
+            for(String stakeSnapShot : stakeSnapShots){
+                stakeSnapShots.add(stakeSnapShot);
+            }
+            validator.setStakeSnapShots(stakeSnapShots);
+        }
+
+        validator.setAccumulatedStake(accumulatedStake);
 
         return validator;
     }

@@ -8,8 +8,10 @@ import com.binance.dex.api.client.domain.stake.Commission;
 import com.binance.dex.api.client.domain.stake.Description;
 import com.binance.dex.api.client.domain.stake.sidechain.*;
 import com.binance.dex.api.client.encoding.amino.Amino;
+import com.binance.dex.api.client.encoding.amino.types.PubKeyEd25519;
 import com.binance.dex.api.client.encoding.message.MessageType;
 import com.binance.dex.api.client.encoding.message.Token;
+import com.binance.dex.api.client.encoding.message.beaconchain.transaction.EditBeaconChainValidatorMessage;
 import com.binance.dex.api.client.encoding.message.bridge.*;
 import com.binance.dex.api.client.encoding.message.common.*;
 import com.binance.dex.api.client.encoding.message.sidechain.transaction.*;
@@ -49,6 +51,16 @@ public class AminoTest {
         byte[] data = amino.encode(message, MessageType.Claim.getTypePrefixBytes(), false);
         Transaction transaction = transactionConverter.convert(data);
         Assert.assertNotNull(transaction.getRealTx());
+    }
+
+    public static byte[] hexStringToByteArray(String s) {
+        int len = s.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                    + Character.digit(s.charAt(i+1), 16));
+        }
+        return data;
     }
 
     @Test

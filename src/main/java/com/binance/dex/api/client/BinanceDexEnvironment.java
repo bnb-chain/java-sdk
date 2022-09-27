@@ -23,6 +23,16 @@ public class BinanceDexEnvironment {
             "bva"
     );
 
+    public static final BinanceDexEnvironment LOCAL_NET = new BinanceDexEnvironment(
+            "https://testnet-dex.binance.org",
+            "https://testnet-api.binance.org/bc/",
+            "wss://testnet-dex.binance.org/api",
+            "http://127.0.0.1:26657",
+            "wss://data-seed-pre-0-s3.binance.org/websocket",
+            "bnb",
+            "bva"
+    );
+
     // Rest API base URL
     private String baseUrl;
     // Chain transaction API base URL

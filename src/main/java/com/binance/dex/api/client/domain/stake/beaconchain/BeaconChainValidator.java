@@ -1,71 +1,59 @@
-package com.binance.dex.api.client.domain.stake.sidechain;
+package com.binance.dex.api.client.domain.stake.beaconchain;
 
 import com.binance.dex.api.client.domain.stake.Commission;
 import com.binance.dex.api.client.domain.stake.Description;
+import com.binance.dex.api.client.domain.stake.sidechain.SideChainValidator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
- * @author Fitz.Lu
+ * @author Francis.Liu
  **/
-public class SideChainValidator {
+public class BeaconChainValidator {
 
     private String feeAddr;
-
     private String operatorAddr;
-
     private byte[] consPubKey;
-
     private boolean jailed;
-
     private int status;
-
     private long tokens;
-
     private long delegatorShares;
-
     private Description description;
-
     private long bondHeight;
-
     private int bondIntraTxCounter;
-
     private long unBondingHeight;
-
     private long unBondingMinTime;
-
     private Commission commission;
-
     private String distributionAddr;
-
-    private String sideChainId;
-
-    private String sideConsAddr;
-
-    private String sideFeeAddr;
-
-    public ArrayList<String> getStakeSnapShots() {
-        return stakeSnapShots;
-    }
-
-    public void setStakeSnapShots(ArrayList<String> stakeSnapShots) {
-        this.stakeSnapShots = stakeSnapShots;
-    }
-
-    public String getAccumulatedStake() {
-        return accumulatedStake;
-    }
-
-    public void setAccumulatedStake(String accumulatedStake) {
-        this.accumulatedStake = accumulatedStake;
-    }
 
     private ArrayList<String> stakeSnapShots;
 
     private String accumulatedStake;
 
-    public SideChainValidator() {
+
+    public BeaconChainValidator() {
+    }
+
+    public static BeaconChainValidator createBySideChainValidator(SideChainValidator sideChainValidator) {
+        BeaconChainValidator validator = new BeaconChainValidator();
+        validator.setFeeAddr(sideChainValidator.getFeeAddr());
+        validator.setOperatorAddr(sideChainValidator.getOperatorAddr());
+        validator.setConsPubKey(sideChainValidator.getConsPubKey());
+        validator.setJailed(sideChainValidator.isJailed());
+        validator.setStatus(sideChainValidator.getStatus());
+        validator.setTokens(sideChainValidator.getTokens());
+        validator.setDelegatorShares(sideChainValidator.getDelegatorShares());
+        validator.setDescription(sideChainValidator.getDescription());
+        validator.setBondHeight(sideChainValidator.getBondHeight());
+        validator.setBondIntraTxCounter(sideChainValidator.getBondIntraTxCounter());
+        validator.setUnBondingHeight(sideChainValidator.getUnBondingHeight());
+        validator.setCommission(sideChainValidator.getCommission());
+        validator.setStakeSnapShots(sideChainValidator.getStakeSnapShots());
+        validator.setAccumulatedStake(sideChainValidator.getAccumulatedStake());
+        return validator;
     }
 
     public String getFeeAddr() {
@@ -180,28 +168,20 @@ public class SideChainValidator {
         this.distributionAddr = distributionAddr;
     }
 
-    public String getSideChainId() {
-        return sideChainId;
+    public ArrayList<String> getStakeSnapShots() {
+        return stakeSnapShots;
     }
 
-    public void setSideChainId(String sideChainId) {
-        this.sideChainId = sideChainId;
+    public void setStakeSnapShots(ArrayList<String> stakeSnapShots) {
+        this.stakeSnapShots = stakeSnapShots;
     }
 
-    public String getSideConsAddr() {
-        return sideConsAddr;
+    public String getAccumulatedStake() {
+        return accumulatedStake;
     }
 
-    public void setSideConsAddr(String sideConsAddr) {
-        this.sideConsAddr = sideConsAddr;
-    }
-
-    public String getSideFeeAddr() {
-        return sideFeeAddr;
-    }
-
-    public void setSideFeeAddr(String sideFeeAddr) {
-        this.sideFeeAddr = sideFeeAddr;
+    public void setAccumulatedStake(String accumulatedStake) {
+        this.accumulatedStake = accumulatedStake;
     }
 
     @Override
@@ -221,9 +201,6 @@ public class SideChainValidator {
                 ", unBondingMinTime=" + unBondingMinTime + '\n' +
                 ", commission=" + commission + '\n' +
                 ", distributionAddr=" + distributionAddr + '\n' +
-                ", sideChainId='" + sideChainId + '\'' + '\n' +
-                ", sideConsAddr=" + sideConsAddr + '\n' +
-                ", sideFeeAddr=" + sideFeeAddr + '\n' +
                 '}';
     }
 
