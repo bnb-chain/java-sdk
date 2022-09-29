@@ -2,8 +2,7 @@ package com.binance.dex.api.client.encoding.message.sidechain.query;
 
 import com.binance.dex.api.client.domain.stake.Commission;
 import com.binance.dex.api.client.domain.stake.Description;
-import com.binance.dex.api.client.domain.stake.sidechain.SideChainValidator;
-import com.binance.dex.api.client.encoding.Crypto;
+import com.binance.dex.api.client.domain.stake.Validator;
 import com.binance.dex.api.client.encoding.amino.Amino;
 import com.binance.dex.api.client.encoding.message.sidechain.value.DescriptionValue;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -143,8 +142,8 @@ public class BechValidator {
     }
 
 
-    public SideChainValidator toSideChainValidator() {
-        SideChainValidator validator = new SideChainValidator();
+    public Validator toValidator() {
+        Validator validator = new Validator();
         if (feeAddr != null) {
             validator.setFeeAddr(feeAddr);
         }

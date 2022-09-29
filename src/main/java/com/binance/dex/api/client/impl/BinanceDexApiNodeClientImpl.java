@@ -2,12 +2,15 @@ package com.binance.dex.api.client.impl;
 
 import com.binance.dex.api.client.*;
 import com.binance.dex.api.client.domain.*;
-import com.binance.dex.api.client.domain.bridge.TransferIn;
 import com.binance.dex.api.client.domain.broadcast.SideVote;
 import com.binance.dex.api.client.domain.oracle.Prophecy;
 import com.binance.dex.api.client.domain.StakeValidator;
 import com.binance.dex.api.client.domain.stake.Pool;
 import com.binance.dex.api.client.domain.stake.beaconchain.*;
+import com.binance.dex.api.client.domain.stake.Delegation;
+import com.binance.dex.api.client.domain.stake.Redelegation;
+import com.binance.dex.api.client.domain.stake.UnBondingDelegation;
+import com.binance.dex.api.client.domain.stake.Validator;
 import com.binance.dex.api.client.domain.stake.sidechain.*;
 import com.binance.dex.api.client.domain.broadcast.Transaction;
 import com.binance.dex.api.client.domain.broadcast.*;
@@ -451,32 +454,32 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     }
 
     @Override
-    public SideChainValidator getSideChainValidator(String sideChainId, String validatorAddress) throws IOException {
+    public Validator getSideChainValidator(String sideChainId, String validatorAddress) throws IOException {
         return sideChainQueryDelegate.querySideChainValidator(sideChainId, validatorAddress);
     }
 
     @Override
-    public List<SideChainValidator> getSideChainTopValidators(String sideChainId, int top) throws IOException {
+    public List<Validator> getSideChainTopValidators(String sideChainId, int top) throws IOException {
         return sideChainQueryDelegate.querySideChainTopValidators(sideChainId, top);
     }
 
     @Override
-    public SideChainDelegation getSideChainDelegation(String sideChainId, String delegatorAddress, String validatorAddress) throws IOException {
+    public Delegation getSideChainDelegation(String sideChainId, String delegatorAddress, String validatorAddress) throws IOException {
         return sideChainQueryDelegate.querySideChainDelegation(sideChainId, delegatorAddress, validatorAddress);
     }
 
     @Override
-    public List<SideChainDelegation> getSideChainDelegations(String sideChainId, String delegatorAddress) throws IOException {
+    public List<Delegation> getSideChainDelegations(String sideChainId, String delegatorAddress) throws IOException {
         return sideChainQueryDelegate.querySideChainDelegations(sideChainId, delegatorAddress);
     }
 
     @Override
-    public SideChainRedelegation getSideChainRedelegation(String sideChainId, String delegatorAddress, String srcValidatorAddress, String dstValidatorAddress) throws IOException {
+    public Redelegation getSideChainRedelegation(String sideChainId, String delegatorAddress, String srcValidatorAddress, String dstValidatorAddress) throws IOException {
         return sideChainQueryDelegate.querySideChainRedelegation(sideChainId, delegatorAddress, srcValidatorAddress, dstValidatorAddress);
     }
 
     @Override
-    public List<SideChainRedelegation> getSideChainRedelegations(String sideChainId, String delegatorAddress) throws IOException {
+    public List<Redelegation> getSideChainRedelegations(String sideChainId, String delegatorAddress) throws IOException {
         return sideChainQueryDelegate.querySideChainRedelegations(sideChainId, delegatorAddress);
     }
 
@@ -496,7 +499,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     }
 
     @Override
-    public List<SideChainRedelegation> getSideChainRedelegationsByValidator(String sideChainId, String validatorAddress) throws IOException {
+    public List<Redelegation> getSideChainRedelegationsByValidator(String sideChainId, String validatorAddress) throws IOException {
         return sideChainQueryDelegate.querySideChainRedelegationsByValidator(sideChainId, validatorAddress);
     }
 
@@ -634,52 +637,52 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     }
 
     @Override
-    public BeaconChainValidator getValidator(String validatorAddress) throws IOException {
+    public Validator getValidator(String validatorAddress) throws IOException {
         return beaconChainQueryDelegate.queryBeaconChainValidator(validatorAddress);
     }
 
     @Override
-    public List<BeaconChainValidator> getTopValidators(int top) throws IOException {
+    public List<Validator> getTopValidators(int top) throws IOException {
         return beaconChainQueryDelegate.queryBeaconChainTopValidators(top);
     }
 
     @Override
-    public BeaconChainDelegation getDelegation(String delegatorAddress, String validatorAddress) throws IOException {
+    public Delegation getDelegation(String delegatorAddress, String validatorAddress) throws IOException {
         return beaconChainQueryDelegate.queryBeaconChainDelegation(delegatorAddress, validatorAddress);
     }
 
     @Override
-    public List<BeaconChainDelegation> getDelegations(String delegatorAddress) throws IOException {
+    public List<Delegation> getDelegations(String delegatorAddress) throws IOException {
         return beaconChainQueryDelegate.queryBeaconChainDelegations(delegatorAddress);
     }
 
     @Override
-    public BeaconChainRedelegation getRedelegation(String delegatorAddress, String srcValidatorAddress, String dstValidatorAddress) throws IOException {
+    public Redelegation getRedelegation(String delegatorAddress, String srcValidatorAddress, String dstValidatorAddress) throws IOException {
         return beaconChainQueryDelegate.queryBeaconChainRedelegation(delegatorAddress, srcValidatorAddress, dstValidatorAddress);
     }
 
     @Override
-    public List<BeaconChainRedelegation> getRedelegations(String delegatorAddress) throws IOException {
+    public List<Redelegation> getRedelegations(String delegatorAddress) throws IOException {
         return beaconChainQueryDelegate.queryBeaconChainRedelegations(delegatorAddress);
     }
 
     @Override
-    public BeaconChainUnBondingDelegation getUnBondingDelegation(String delegatorAddress, String validatorAddress) throws IOException {
+    public UnBondingDelegation getUnBondingDelegation(String delegatorAddress, String validatorAddress) throws IOException {
         return beaconChainQueryDelegate.queryBeaconChainUnBondingDelegation(delegatorAddress, validatorAddress);
     }
 
     @Override
-    public List<BeaconChainUnBondingDelegation> getUnBondingDelegations(String delegatorAddress) throws IOException {
+    public List<UnBondingDelegation> getUnBondingDelegations(String delegatorAddress) throws IOException {
         return beaconChainQueryDelegate.queryBeaconChainUnBondingDelegations(delegatorAddress);
     }
 
     @Override
-    public List<BeaconChainUnBondingDelegation> getUnBondingDelegationsByValidator(String validatorAddress) throws IOException {
+    public List<UnBondingDelegation> getUnBondingDelegationsByValidator(String validatorAddress) throws IOException {
         return beaconChainQueryDelegate.queryBeaconChainUnBondingDelegationsByValidator(validatorAddress);
     }
 
     @Override
-    public List<BeaconChainRedelegation> getRedelegationsByValidator(String validatorAddress) throws IOException {
+    public List<Redelegation> getRedelegationsByValidator(String validatorAddress) throws IOException {
         return beaconChainQueryDelegate.queryBeaconChainRedelegationsByValidator(validatorAddress);
     }
 

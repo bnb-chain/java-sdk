@@ -1,7 +1,6 @@
 package com.binance.dex.api.client;
 
 import com.binance.dex.api.client.domain.*;
-import com.binance.dex.api.client.domain.bridge.TransferIn;
 import com.binance.dex.api.client.domain.broadcast.*;
 import com.binance.dex.api.client.domain.broadcast.Transaction;
 import com.binance.dex.api.client.domain.oracle.Prophecy;
@@ -11,6 +10,10 @@ import com.binance.dex.api.client.domain.request.TradesRequest;
 import com.binance.dex.api.client.domain.request.TransactionsRequest;
 import com.binance.dex.api.client.domain.stake.Pool;
 import com.binance.dex.api.client.domain.stake.beaconchain.*;
+import com.binance.dex.api.client.domain.stake.Delegation;
+import com.binance.dex.api.client.domain.stake.Redelegation;
+import com.binance.dex.api.client.domain.stake.UnBondingDelegation;
+import com.binance.dex.api.client.domain.stake.Validator;
 import com.binance.dex.api.client.domain.stake.sidechain.*;
 
 import javax.annotation.Nullable;
@@ -247,25 +250,25 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
 
     List<TransactionMetadata> undelegate(BeaconChainUndelegate beaconChainUndelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
 
-    BeaconChainValidator getValidator(String validatorAddress) throws IOException;
+    Validator getValidator(String validatorAddress) throws IOException;
 
-    List<BeaconChainValidator> getTopValidators(int top) throws IOException ;
+    List<Validator> getTopValidators(int top) throws IOException ;
 
-    BeaconChainDelegation getDelegation(String delegatorAddress, String validatorAddress) throws IOException;
+    Delegation getDelegation(String delegatorAddress, String validatorAddress) throws IOException;
 
-    List<BeaconChainDelegation> getDelegations(String delegatorAddress) throws IOException;
+    List<Delegation> getDelegations(String delegatorAddress) throws IOException;
 
-    BeaconChainRedelegation getRedelegation(String delegatorAddress, String srcValidatorAddress, String dstValidatorAddress) throws IOException;
+    Redelegation getRedelegation(String delegatorAddress, String srcValidatorAddress, String dstValidatorAddress) throws IOException;
 
-    List<BeaconChainRedelegation> getRedelegations(String delegatorAddress) throws IOException;
+    List<Redelegation> getRedelegations(String delegatorAddress) throws IOException;
 
-    BeaconChainUnBondingDelegation getUnBondingDelegation(String delegatorAddress, String validatorAddress) throws IOException;
+    UnBondingDelegation getUnBondingDelegation(String delegatorAddress, String validatorAddress) throws IOException;
 
-    List<BeaconChainUnBondingDelegation> getUnBondingDelegations(String delegatorAddress) throws IOException;
+    List<UnBondingDelegation> getUnBondingDelegations(String delegatorAddress) throws IOException;
 
-    List<BeaconChainUnBondingDelegation> getUnBondingDelegationsByValidator(String validatorAddress)  throws IOException ;
+    List<UnBondingDelegation> getUnBondingDelegationsByValidator(String validatorAddress)  throws IOException ;
 
-    List<BeaconChainRedelegation> getRedelegationsByValidator(String validatorAddress) throws IOException;
+    List<Redelegation> getRedelegationsByValidator(String validatorAddress) throws IOException;
 
     Pool getPool() throws IOException;
 
@@ -281,17 +284,17 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
 
     List<TransactionMetadata> sideChainUnbond(SideChainUnBond sideChainUndelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException;
 
-    SideChainValidator getSideChainValidator(String sideChainId, String validatorAddress) throws IOException;
+    Validator getSideChainValidator(String sideChainId, String validatorAddress) throws IOException;
 
-    List<SideChainValidator> getSideChainTopValidators(String sideChainId, int top) throws IOException ;
+    List<Validator> getSideChainTopValidators(String sideChainId, int top) throws IOException ;
 
-    SideChainDelegation getSideChainDelegation(String sideChainId, String delegatorAddress, String validatorAddress) throws IOException;
+    Delegation getSideChainDelegation(String sideChainId, String delegatorAddress, String validatorAddress) throws IOException;
 
-    List<SideChainDelegation> getSideChainDelegations(String sideChainId, String delegatorAddress) throws IOException;
+    List<Delegation> getSideChainDelegations(String sideChainId, String delegatorAddress) throws IOException;
 
-    SideChainRedelegation getSideChainRedelegation(String sideChainId, String delegatorAddress, String srcValidatorAddress, String dstValidatorAddress) throws IOException;
+    Redelegation getSideChainRedelegation(String sideChainId, String delegatorAddress, String srcValidatorAddress, String dstValidatorAddress) throws IOException;
 
-    List<SideChainRedelegation> getSideChainRedelegations(String sideChainId, String delegatorAddress) throws IOException;
+    List<Redelegation> getSideChainRedelegations(String sideChainId, String delegatorAddress) throws IOException;
 
     UnBondingDelegation getSideChainUnBondingDelegation(String sideChainId, String delegatorAddress, String validatorAddress) throws IOException;
 
@@ -299,7 +302,7 @@ public interface BinanceDexApiNodeClient extends BinanceDexApiRestClient {
 
     List<UnBondingDelegation> getSideChainUnBondingDelegationsByValidator(String sideChainId, String validatorAddress)  throws IOException ;
 
-    List<SideChainRedelegation> getSideChainRedelegationsByValidator(String sideChainId, String validatorAddress) throws IOException;
+    List<Redelegation> getSideChainRedelegationsByValidator(String sideChainId, String validatorAddress) throws IOException;
 
     Pool getSideChainPool(String sideChainId) throws IOException;
 

@@ -1,8 +1,7 @@
 package com.binance.dex.api.client.encoding.message.beaconchain.query;
 
 
-import com.binance.dex.api.client.domain.stake.beaconchain.BeaconChainRedelegation;
-import com.binance.dex.api.client.domain.stake.sidechain.SideChainRedelegation;
+import com.binance.dex.api.client.domain.stake.Redelegation;
 import com.binance.dex.api.client.encoding.message.Token;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -54,8 +53,8 @@ public class BeaconChainRedelegationMessage {
     public BeaconChainRedelegationMessage() {
     }
 
-    public BeaconChainRedelegation toBeaconChainRedelegation(){
-        BeaconChainRedelegation redelegation = new BeaconChainRedelegation(this.getDelegatorAddress(),
+    public Redelegation toRedelegation(){
+        Redelegation redelegation = new Redelegation(this.getDelegatorAddress(),
                 this.getSrcValidatorAddress(),
                 this.getDstValidatorAddress(),
                 this.getCreateHeight(),

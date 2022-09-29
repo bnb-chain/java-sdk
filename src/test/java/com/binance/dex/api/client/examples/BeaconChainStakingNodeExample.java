@@ -9,9 +9,7 @@ import com.binance.dex.api.client.domain.StakeValidator;
 import com.binance.dex.api.client.domain.TransactionMetadata;
 import com.binance.dex.api.client.domain.broadcast.TransactionOption;
 import com.binance.dex.api.client.domain.broadcast.Transfer;
-import com.binance.dex.api.client.domain.stake.Commission;
-import com.binance.dex.api.client.domain.stake.Description;
-import com.binance.dex.api.client.domain.stake.Pool;
+import com.binance.dex.api.client.domain.stake.*;
 import com.binance.dex.api.client.domain.stake.beaconchain.*;
 import com.binance.dex.api.client.domain.stake.sidechain.CreateSideChainValidator;
 import com.binance.dex.api.client.domain.stake.sidechain.EditSideChainValidator;
@@ -200,15 +198,15 @@ public class BeaconChainStakingNodeExample {
 
         // query top validators
         int topValidatorNum = 3;
-        List<BeaconChainValidator> topValidators = nodeClient.getTopValidators(topValidatorNum);
+        List<Validator> topValidators = nodeClient.getTopValidators(topValidatorNum);
         logger.info(String.format("top validators %s \n", topValidators));
         Assert.assertTrue("top validators should be 1", topValidators.size() == topValidatorNum);
-        BeaconChainValidator topValidator = topValidators.get(0);
+        Validator topValidator = topValidators.get(0);
 
         // query validator
         String validator0ValAddr = Crypto.getAddressFromPrivateKey(validator0.getPrivateKey(), env.getValHrp());
         logger.info(String.format("validator addr %s \n", validator0ValAddr));
-        BeaconChainValidator validator = nodeClient.getValidator(validator0ValAddr);
+        Validator validator = nodeClient.getValidator(validator0ValAddr);
         logger.info(String.format("query validator: %s \n", validator));
         Assert.assertNotNull("validator should not be nil", validator);
         Assert.assertEquals("validator address should be equal", validator.getFeeAddr(), validator0.getAddress());
@@ -245,29 +243,29 @@ public class BeaconChainStakingNodeExample {
         Assert.assertEquals("delegate tokens should be equal", tokenAfterDelegate - tokenBeforeDelegate, delegateAmount);
 
         // query delegation
-        BeaconChainDelegation delegationQuery = nodeClient.getDelegation(delegator.getAddress(), validator0ValAddr);
+        Delegation delegationQuery = nodeClient.getDelegation(delegator.getAddress(), validator0ValAddr);
         logger.info(String.format("query delegation: %s \n", delegationQuery));
         Assert.assertEquals("delegation shares should be equal", delegationQuery.getDelegation().getShares(), delegateAmount);
 
         // query delegations
-        List<BeaconChainDelegation> delegations = nodeClient.getDelegations(delegator.getAddress());
+        List<Delegation> delegations = nodeClient.getDelegations(delegator.getAddress());
         logger.info(String.format("query delegations: %s \n", delegations));
 
         // check redelegate preparation
         String topValAddr = topValidator.getOperatorAddr();
-        BeaconChainValidator topValidatorBeforeRedelegate = nodeClient.getValidator(topValAddr);
+        Validator topValidatorBeforeRedelegate = nodeClient.getValidator(topValAddr);
         logger.info(String.format("top validator before redelegate: %s \n", topValidatorBeforeRedelegate));
 
         // redelegate from validator0 to top validator, should success immediately
         long redelegateAmount = 200000000L;
         this.beaconChainRedelegate(delegator, validator0.getAddress(), topValAddr, redelegateAmount);
-        BeaconChainValidator topValidatorAfterRedelegate = nodeClient.getValidator(topValAddr);
+        Validator topValidatorAfterRedelegate = nodeClient.getValidator(topValAddr);
         logger.info(String.format("top validator after redelegate: %s \n", topValidatorAfterRedelegate));
         Assert.assertEquals("redelegate tokens should be equal", topValidatorAfterRedelegate.getTokens() - topValidatorBeforeRedelegate.getTokens(), redelegateAmount);
 
         // undelegate
         this.beaconChainUndelegate(delegator, topValAddr, redelegateAmount);
-        BeaconChainValidator topValidatorAfterUndelegate = nodeClient.getValidator(topValAddr);
+        Validator topValidatorAfterUndelegate = nodeClient.getValidator(topValAddr);
         logger.info(String.format("top validator after undelegate: %s \n", topValidatorAfterUndelegate));
         Assert.assertEquals("check undelegation token change", topValidatorAfterUndelegate.getTokens(), topValidatorBeforeRedelegate.getTokens());
 
@@ -276,15 +274,15 @@ public class BeaconChainStakingNodeExample {
         logger.info(String.format("pool: %s \n", pool));
 
         // query unbonding delegation
-        BeaconChainUnBondingDelegation unbondingDelegation = nodeClient.getUnBondingDelegation(delegator.getAddress(), topValAddr);
+        UnBondingDelegation unbondingDelegation = nodeClient.getUnBondingDelegation(delegator.getAddress(), topValAddr);
         logger.info(String.format("query unbonding delegation: %s \n", unbondingDelegation));
 
         // query unbonding delegations
-        List<BeaconChainUnBondingDelegation> unbondingDelegations = nodeClient.getUnBondingDelegations(delegator.getAddress());
+        List<UnBondingDelegation> unbondingDelegations = nodeClient.getUnBondingDelegations(delegator.getAddress());
         logger.info(String.format("query unbonding delegations: %s \n", unbondingDelegations));
 
         // query unbonding delegations by validator
-        List<BeaconChainUnBondingDelegation> unbondingDelegationsByValidator = nodeClient.getUnBondingDelegationsByValidator(topValAddr);
+        List<UnBondingDelegation> unbondingDelegationsByValidator = nodeClient.getUnBondingDelegationsByValidator(topValAddr);
         logger.info(String.format("query unbonding delegations by validator: %s \n", unbondingDelegationsByValidator));
 
         // delegate to top validator and then redelegate
@@ -297,17 +295,17 @@ public class BeaconChainStakingNodeExample {
         this.beaconChainRedelegate(delegator0, topValAddr, validator0.getAddress(), delegateAmount);
 
         // query redelegation
-        BeaconChainRedelegation redelegation = nodeClient.getRedelegation(delegator0.getAddress(), topValAddr, validator0ValAddr);
+        Redelegation redelegation = nodeClient.getRedelegation(delegator0.getAddress(), topValAddr, validator0ValAddr);
         logger.info(String.format("query redelegation: %s \n", redelegation));
         Assert.assertNotNull("redelegation should not be nil", redelegation);
 
         // query redelegations
-        List<BeaconChainRedelegation> redelegations = nodeClient.getRedelegations(delegator0.getAddress());
+        List<Redelegation> redelegations = nodeClient.getRedelegations(delegator0.getAddress());
         logger.info(String.format("query redelegations: %s \n", redelegations));
         Assert.assertTrue("redelegations should not be empty", redelegations.size() > 0);
 
         // query redelegations by source validator
-        List<BeaconChainRedelegation> redelegationsByValidator = nodeClient.getRedelegationsByValidator(topValAddr);
+        List<Redelegation> redelegationsByValidator = nodeClient.getRedelegationsByValidator(topValAddr);
         logger.info(String.format("query redelegations by validator: %s \n", redelegationsByValidator));
         Assert.assertTrue("redelegations by validator should not be empty", redelegationsByValidator.size() > 0);
 

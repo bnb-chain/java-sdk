@@ -1,12 +1,11 @@
-package com.binance.dex.api.client.domain.stake.beaconchain;
+package com.binance.dex.api.client.domain.stake;
 
-import com.binance.dex.api.client.domain.stake.sidechain.UnBondingDelegation;
 import com.binance.dex.api.client.encoding.message.Token;
 
 /**
- * @author Francis.Liu
+ * @author Fitz.Lu
  **/
-public class BeaconChainUnBondingDelegation {
+public class UnBondingDelegation {
 
     private String delegatorAddress;
 
@@ -22,7 +21,10 @@ public class BeaconChainUnBondingDelegation {
 
     private Token balance;
 
-    public BeaconChainUnBondingDelegation(String delegatorAddress, String validatorAddress, long createHeight, long minTimeInMs, String minTime, Token initialBalance, Token balance) {
+    public UnBondingDelegation() {
+    }
+
+    public UnBondingDelegation(String delegatorAddress, String validatorAddress, long createHeight, long minTimeInMs, String minTime, Token initialBalance, Token balance) {
         this.delegatorAddress = delegatorAddress;
         this.validatorAddress = validatorAddress;
         this.createHeight = createHeight;
@@ -30,20 +32,6 @@ public class BeaconChainUnBondingDelegation {
         this.minTime = minTime;
         this.initialBalance = initialBalance;
         this.balance = balance;
-    }
-
-    public static BeaconChainUnBondingDelegation createByUnBondingDelegation(UnBondingDelegation unBondingDelegation) {
-        BeaconChainUnBondingDelegation beaconChainRedelegation = new BeaconChainUnBondingDelegation(
-                unBondingDelegation.getDelegatorAddress(),
-                unBondingDelegation.getValidatorAddress(),
-                unBondingDelegation.getCreateHeight(),
-                unBondingDelegation.getMinTimeInMs(),
-                unBondingDelegation.getMinTime(),
-                unBondingDelegation.getInitialBalance(),
-                unBondingDelegation.getBalance()
-
-        );
-        return beaconChainRedelegation;
     }
 
     public String getDelegatorAddress() {

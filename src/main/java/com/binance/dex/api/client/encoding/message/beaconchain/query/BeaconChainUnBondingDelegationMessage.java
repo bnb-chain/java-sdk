@@ -1,7 +1,6 @@
 package com.binance.dex.api.client.encoding.message.beaconchain.query;
 
-import com.binance.dex.api.client.domain.stake.beaconchain.BeaconChainUnBondingDelegation;
-import com.binance.dex.api.client.domain.stake.sidechain.UnBondingDelegation;
+import com.binance.dex.api.client.domain.stake.UnBondingDelegation;
 import com.binance.dex.api.client.encoding.message.Token;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -29,8 +28,8 @@ public class BeaconChainUnBondingDelegationMessage {
     @JsonProperty(value = "cross_stake")
     private boolean crossStake;
 
-    public BeaconChainUnBondingDelegation toBeaconChainUnBondingDelegation() {
-        BeaconChainUnBondingDelegation beaconChainRedelegation = new BeaconChainUnBondingDelegation(
+    public UnBondingDelegation toBeaconChainUnBondingDelegation() {
+        UnBondingDelegation redelegation = new UnBondingDelegation(
                 this.getDelegatorAddress(),
                 this.getValidatorAddress(),
                 this.getCreateHeight(),
@@ -40,7 +39,7 @@ public class BeaconChainUnBondingDelegationMessage {
                 this.getBalance()
 
         );
-        return beaconChainRedelegation;
+        return redelegation;
     }
 
     public String getDelegatorAddress() {

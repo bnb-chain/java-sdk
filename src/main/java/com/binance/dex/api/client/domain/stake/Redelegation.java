@@ -1,13 +1,12 @@
-package com.binance.dex.api.client.domain.stake.beaconchain;
+package com.binance.dex.api.client.domain.stake;
 
 
-import com.binance.dex.api.client.domain.stake.sidechain.SideChainRedelegation;
 import com.binance.dex.api.client.encoding.message.Token;
 
 /**
- * @author Francis.Liu
+ * @author Fitz.Lu
  **/
-public class BeaconChainRedelegation {
+public class Redelegation {
 
     //delegator address
     private String delegatorAddress;
@@ -38,25 +37,7 @@ public class BeaconChainRedelegation {
     //amount of destination shares redelegating
     private long dstShare;
 
-    public BeaconChainRedelegation() {
-    }
-
-    public static BeaconChainRedelegation createBySideChainRedelegation(SideChainRedelegation sideChainRedelegation){
-        BeaconChainRedelegation redelegation = new BeaconChainRedelegation(sideChainRedelegation.getDelegatorAddress(),
-                sideChainRedelegation.getSrcValidatorAddress(),
-                sideChainRedelegation.getDstValidatorAddress(),
-                sideChainRedelegation.getCreateHeight(),
-                sideChainRedelegation.getMinTime(),
-                sideChainRedelegation.getMinTimeInMs(),
-                sideChainRedelegation.getInitialBalance(),
-                sideChainRedelegation.getBalance(),
-                sideChainRedelegation.getSrcShares(),
-                sideChainRedelegation.getDstShare()
-        );
-        return redelegation;
-    }
-
-    public BeaconChainRedelegation(String delegatorAddress, String srcValidatorAddress, String dstValidatorAddress, long createHeight, String minTime, long minTimeInMs, Token initialBalance, Token balance, long srcShares, long dstShare) {
+    public Redelegation(String delegatorAddress, String srcValidatorAddress, String dstValidatorAddress, long createHeight, String minTime, long minTimeInMs, Token initialBalance, Token balance, long srcShares, long dstShare) {
         this.delegatorAddress = delegatorAddress;
         this.srcValidatorAddress = srcValidatorAddress;
         this.dstValidatorAddress = dstValidatorAddress;
@@ -67,6 +48,9 @@ public class BeaconChainRedelegation {
         this.balance = balance;
         this.srcShares = srcShares;
         this.dstShare = dstShare;
+    }
+
+    public Redelegation() {
     }
 
     public String getDelegatorAddress() {

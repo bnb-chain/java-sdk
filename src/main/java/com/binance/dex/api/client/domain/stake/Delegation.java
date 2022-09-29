@@ -1,29 +1,29 @@
-package com.binance.dex.api.client.domain.stake.sidechain;
+package com.binance.dex.api.client.domain.stake;
 
 import com.binance.dex.api.client.encoding.message.Token;
 
 /**
  * @author Fitz.Lu
  **/
-public class SideChainDelegation {
+public class Delegation {
 
-    private Delegation delegation;
+    private DelegationItem delegation;
 
     private Token balance;
 
-    public SideChainDelegation() {
+    public Delegation() {
     }
 
-    public SideChainDelegation(Delegation delegation, Token balance) {
+    public Delegation(DelegationItem delegation, Token balance) {
         this.delegation = delegation;
         this.balance = balance;
     }
 
-    public Delegation getDelegation() {
+    public DelegationItem getDelegation() {
         return delegation;
     }
 
-    public void setDelegation(Delegation delegation) {
+    public void setDelegation(DelegationItem delegation) {
         this.delegation = delegation;
     }
 

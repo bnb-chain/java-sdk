@@ -1,11 +1,8 @@
 package com.binance.dex.api.client.impl.node;
 
 import com.binance.dex.api.client.*;
-import com.binance.dex.api.client.domain.stake.Commission;
-import com.binance.dex.api.client.domain.stake.Description;
-import com.binance.dex.api.client.domain.stake.Pool;
-import com.binance.dex.api.client.domain.stake.sidechain.*;
-import com.binance.dex.api.client.domain.stake.sidechain.Delegation;
+import com.binance.dex.api.client.domain.stake.*;
+import com.binance.dex.api.client.domain.stake.Delegation;
 import com.binance.dex.api.client.encoding.ByteUtil;
 import com.binance.dex.api.client.encoding.Crypto;
 import com.binance.dex.api.client.encoding.EncodeUtils;
@@ -52,7 +49,7 @@ public class NodeQueryDelegateSideChainStaking extends NodeQuery {
         amino = InternalAmino.get();
     }
 
-    public SideChainValidator querySideChainValidator(String sideChainId, String validatorAddress) throws IOException {
+    public Validator querySideChainValidator(String sideChainId, String validatorAddress) throws IOException {
         byte[] storePrefix = getSideChainStorePrefixKey(sideChainId);
         byte[] key = ByteUtil.appendBytesArray(storePrefix, getValidatorKey(Crypto.decodeAddress(validatorAddress)));
         byte[] result = queryStore(stakeStoreName, key);
@@ -66,7 +63,7 @@ public class NodeQueryDelegateSideChainStaking extends NodeQuery {
         }
     }
 
-    public List<SideChainValidator> querySideChainTopValidators(String sideChainId, int top) throws IOException {
+    public List<Validator> querySideChainTopValidators(String sideChainId, int top) throws IOException {
         if (top > 50 || top < 1){
             throw new IllegalArgumentException("top must be between 1 and 50");
         }
@@ -81,19 +78,19 @@ public class NodeQueryDelegateSideChainStaking extends NodeQuery {
 
         List<BechValidator> bechValidator = EncodeUtils.getObjectMapper().readValue(jsonStr, new TypeReference<List<BechValidator>>(){});
 
-        List<SideChainValidator> sideChainValidators = new ArrayList<>();
+        List<Validator> sideChainValidators = new ArrayList<>();
 
         if (bechValidator != null && !bechValidator.isEmpty()){
             for (BechValidator validator : bechValidator) {
-                sideChainValidators.add(validator.toSideChainValidator());
+                sideChainValidators.add(validator.toValidator());
             }
         }
 
         return sideChainValidators;
     }
 
-    private SideChainValidator convert(SideChainValidatorMessage message){
-        SideChainValidator sideChainValidator = new SideChainValidator();
+    private Validator convert(SideChainValidatorMessage message){
+        Validator sideChainValidator = new Validator();
 
         if (message.getFeeAddr() != null) {
             sideChainValidator.setFeeAddr(EncodeUtils.bytesToPrefixHex(message.getFeeAddr()));
@@ -168,7 +165,7 @@ public class NodeQueryDelegateSideChainStaking extends NodeQuery {
         return sideChainValidator;
     }
 
-    public SideChainDelegation querySideChainDelegation(String sideChainId, String delegatorAddress, String validatorAddress) throws IOException {
+    public Delegation querySideChainDelegation(String sideChainId, String delegatorAddress, String validatorAddress) throws IOException {
         QueryBondsParams params = new QueryBondsParams();
         params.setSideChainId(sideChainId);
         params.setDelegatorAddr(delegatorAddress);
@@ -185,7 +182,7 @@ public class NodeQueryDelegateSideChainStaking extends NodeQuery {
         return null;
     }
 
-    public List<SideChainDelegation> querySideChainDelegations(String sideChainId, String delegatorAddress) throws IOException {
+    public List<Delegation> querySideChainDelegations(String sideChainId, String delegatorAddress) throws IOException {
         QueryDelegatorParams params = new QueryDelegatorParams();
         params.setSideChainId(sideChainId);
         params.setDelegatorAddr(delegatorAddress);
@@ -193,7 +190,7 @@ public class NodeQueryDelegateSideChainStaking extends NodeQuery {
         byte[] paramsBytes = EncodeUtils.toJsonEncodeBytes(params);
         byte[] response = queryWithData("\"custom/stake/delegatorDelegations\"", paramsBytes);
 
-        List<SideChainDelegation> results = new ArrayList<>();
+        List<Delegation> results = new ArrayList<>();
 
         if (!ByteUtil.isEmpty(response)){
             String a = new String(response);
@@ -206,10 +203,10 @@ public class NodeQueryDelegateSideChainStaking extends NodeQuery {
         return results;
     }
 
-    private SideChainDelegation convert(DelegationResponse delegationResponse){
-        SideChainDelegation sideChainDelegation = new SideChainDelegation();
+    private Delegation convert(DelegationResponse delegationResponse){
+        Delegation sideChainDelegation = new Delegation();
         if (delegationResponse.getDelegation() != null) {
-            Delegation delegation = new Delegation();
+            DelegationItem delegation = new DelegationItem();
             delegation.setDelegatorAddress(delegationResponse.getDelegation().getDelegatorAddress());
             delegation.setValidatorAddress(delegationResponse.getDelegation().getValidatorAddress());
             delegation.setShares(delegationResponse.getDelegation().getShares());
@@ -222,7 +219,7 @@ public class NodeQueryDelegateSideChainStaking extends NodeQuery {
         return sideChainDelegation;
     }
 
-    public SideChainRedelegation querySideChainRedelegation(String sideChainId, String delegatorAddress, String srcValidatorAddress, String dstValidatorAddress) throws IOException {
+    public Redelegation querySideChainRedelegation(String sideChainId, String delegatorAddress, String srcValidatorAddress, String dstValidatorAddress) throws IOException {
         byte[] storePrefix = getSideChainStorePrefixKey(sideChainId);
         byte[] redKey = getRedelegationKey(Crypto.decodeAddress(delegatorAddress), Crypto.decodeAddress(srcValidatorAddress),
                 Crypto.decodeAddress(dstValidatorAddress));
@@ -238,12 +235,12 @@ public class NodeQueryDelegateSideChainStaking extends NodeQuery {
         return null;
     }
 
-    public List<SideChainRedelegation> querySideChainRedelegations(String sideChainId, String delegatorAddress) throws IOException {
+    public List<Redelegation> querySideChainRedelegations(String sideChainId, String delegatorAddress) throws IOException {
         byte[] storePrefix = getSideChainStorePrefixKey(sideChainId);
         byte[] redsKey = getRedelegationsKey(Crypto.decodeAddress(delegatorAddress));
         byte[] key = ByteUtil.appendBytesArray(storePrefix, redsKey);
         List<common.Types.KVPair> result = queryStoreSubspaceKVPairs(stakeStoreName, key);
-        List<SideChainRedelegation> redelegations = new ArrayList<>();
+        List<Redelegation> redelegations = new ArrayList<>();
         if (result != null && !result.isEmpty()){
             for (common.Types.KVPair kvPair : result) {
                 byte[] k = ByteUtil.cut(kvPair.getKey().toByteArray(), storePrefix.length);
@@ -256,7 +253,7 @@ public class NodeQueryDelegateSideChainStaking extends NodeQuery {
         return redelegations;
     }
 
-    private SideChainRedelegation convert(RedelegationValue value, byte[] key){
+    private Redelegation convert(RedelegationValue value, byte[] key){
         byte[] addresses = ByteUtil.cut(key, 1);
         if (addresses.length != addressLength * 3){
             throw new IllegalStateException("unexpected address length for (address, srcValidator, dstValidator)");
@@ -266,7 +263,7 @@ public class NodeQueryDelegateSideChainStaking extends NodeQuery {
         String srcValAddr = Crypto.encodeAddress(valHrp, ByteUtil.pick(addresses, addressLength, addressLength));
         String dstValAddr = Crypto.encodeAddress(valHrp, ByteUtil.pick(addresses, addressLength * 2, addressLength));
 
-        SideChainRedelegation redelegation = new SideChainRedelegation();
+        Redelegation redelegation = new Redelegation();
         redelegation.setDelegatorAddress(delAddr);
         redelegation.setSrcValidatorAddress(srcValAddr);
         redelegation.setDstValidatorAddress(dstValAddr);
@@ -343,12 +340,12 @@ public class NodeQueryDelegateSideChainStaking extends NodeQuery {
         return unBondingDelegations;
     }
 
-    public List<SideChainRedelegation> querySideChainRedelegationsByValidator(String sideChainId, String validatorAddress) throws IOException {
+    public List<Redelegation> querySideChainRedelegationsByValidator(String sideChainId, String validatorAddress) throws IOException {
         QueryValidatorParams params = new QueryValidatorParams(sideChainId, Bech32AddressValue.fromBech32StringWithNewHrp(validatorAddress, valHrp));
         byte[] data = EncodeUtils.toJsonEncodeBytes(params);
         byte[] result = queryWithData("\"custom/stake/validatorRedelegations\"", data);
 
-        List<SideChainRedelegation> redelegations = new ArrayList<>();
+        List<Redelegation> redelegations = new ArrayList<>();
 
         if (!ByteUtil.isEmpty(result)){
             List<SideChainRedelegationMessage> messages = EncodeUtils.getObjectMapper().readValue(result, new TypeReference<List<SideChainRedelegationMessage>>(){});
@@ -405,8 +402,8 @@ public class NodeQueryDelegateSideChainStaking extends NodeQuery {
         return 0L;
     }
 
-    private SideChainRedelegation convert(SideChainRedelegationMessage message){
-        SideChainRedelegation redelegation = new SideChainRedelegation();
+    private Redelegation convert(SideChainRedelegationMessage message){
+        Redelegation redelegation = new Redelegation();
         redelegation.setDelegatorAddress(message.getDelegatorAddress());
         redelegation.setSrcValidatorAddress(message.getSrcValidatorAddress());
         redelegation.setDstValidatorAddress(message.getDstValidatorAddress());
