@@ -53,7 +53,14 @@ public enum MessageType {
     TinyTokenIssue("ED2832D4"),
     MiniTokenIssue("A3F16C41"),
     MiniTokenSetURI("7B1D34E7"),
-    MiniTokenList("4C264019");
+    MiniTokenList("4C264019"),
+
+    // open staking
+    CreateBeaconChainValidator("E9FB7335"),
+    EditBeaconChainValidator("C2E8BCCD"),
+    BeaconChainDelegate("921D2E4E"),
+    BeaconChainRedelegate("47A5ED9C"),
+    BeaconChainUndelegate("5C80810D");
 
     private byte[] typePrefixBytes;
 
