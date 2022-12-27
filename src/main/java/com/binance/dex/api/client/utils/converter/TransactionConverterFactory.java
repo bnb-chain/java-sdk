@@ -138,6 +138,21 @@ public class TransactionConverterFactory {
         FUnfreezeConverter unfreezeConverter = new FUnfreezeConverter();
         converterMap.put(unfreezeConverter.getType(), unfreezeConverter);
 
+        FCreateBeaconChainValidatorConverter createValConverter = new FCreateBeaconChainValidatorConverter();
+        converterMap.put(createValConverter.getType(), createValConverter);
+
+        FEditBeaconChainValidatorConverter editValConverter = new FEditBeaconChainValidatorConverter();
+        converterMap.put(editValConverter.getType(), editValConverter);
+
+        FBeaconChainDelegateConverter delegateConverter = new FBeaconChainDelegateConverter();
+        converterMap.put(delegateConverter.getType(), delegateConverter);
+
+        FBeaconChainRedelegateConverter redelegateConverter = new FBeaconChainRedelegateConverter();
+        converterMap.put(redelegateConverter.getType(), redelegateConverter);
+
+        FBeaconChainUndelegateConverter undelegateConverter = new FBeaconChainUndelegateConverter();
+        converterMap.put(undelegateConverter.getType(), undelegateConverter);
+
         FVoteConverter voteConverter = new FVoteConverter();
         converterMap.put(voteConverter.getType(), voteConverter);
     }

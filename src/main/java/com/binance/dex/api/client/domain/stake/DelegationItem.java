@@ -1,9 +1,9 @@
-package com.binance.dex.api.client.domain.stake.sidechain;
+package com.binance.dex.api.client.domain.stake;
 
 /**
  * @author Fitz.Lu
  **/
-public class Delegation {
+public class DelegationItem {
 
     private String delegatorAddress;
 
@@ -11,7 +11,7 @@ public class Delegation {
 
     private long shares;
 
-    public Delegation() {
+    public DelegationItem() {
     }
 
     public String getDelegatorAddress() {

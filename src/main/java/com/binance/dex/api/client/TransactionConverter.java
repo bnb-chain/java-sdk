@@ -32,14 +32,15 @@ import com.binance.dex.api.client.domain.slash.BscSubmitEvidence;
 import com.binance.dex.api.client.domain.slash.SideChainUnJail;
 import com.binance.dex.api.client.domain.stake.Commission;
 import com.binance.dex.api.client.domain.stake.Description;
+import com.binance.dex.api.client.domain.stake.beaconchain.*;
 import com.binance.dex.api.client.domain.stake.sidechain.*;
 import com.binance.dex.api.client.encoding.ByteUtil;
 import com.binance.dex.api.client.encoding.Crypto;
-import com.binance.dex.api.client.encoding.EncodeUtils;
 import com.binance.dex.api.client.encoding.amino.Amino;
 import com.binance.dex.api.client.encoding.message.InputOutput;
 import com.binance.dex.api.client.encoding.message.MessageType;
 import com.binance.dex.api.client.encoding.message.Token;
+import com.binance.dex.api.client.encoding.message.beaconchain.transaction.*;
 import com.binance.dex.api.client.encoding.message.bridge.BindMsgMessage;
 import com.binance.dex.api.client.encoding.message.bridge.ClaimMsgMessage;
 import com.binance.dex.api.client.encoding.message.bridge.TransferOutMsgMessage;
@@ -234,11 +235,190 @@ public class TransactionConverter {
                     return convertMiniTokenSetURI(bytes);
                 case MiniTokenList:
                     return convertMiniTokenList(bytes);
+                case CreateBeaconChainValidator:
+                    return convertCreateBeaconChainValidator(bytes);
+                case EditBeaconChainValidator:
+                    return convertEditBeaconChainValidator(bytes);
+                case BeaconChainDelegate:
+                    return convertBeaconChainDelegate(bytes);
+                case BeaconChainRedelegate:
+                    return convertBeaconChainRedelegate(bytes);
+                case BeaconChainUndelegate:
+                    return convertBeaconChainUndelegate(bytes);
             }
             return null;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Transaction convertBeaconChainUndelegate(byte[] value) throws IOException {
+        byte[] raw = ByteUtil.cut(value, 4);
+        BeaconChainUndelegateMessage message = new BeaconChainUndelegateMessage();
+        amino.decodeBare(raw, message);
+
+        BeaconChainUndelegate unBond = new BeaconChainUndelegate();
+
+        if (message.getDelegatorAddress() != null && message.getDelegatorAddress().getRaw() != null) {
+            unBond.setDelegatorAddress(Crypto.encodeAddress(hrp, message.getDelegatorAddress().getRaw()));
+        }
+
+        if (message.getValidatorAddress() != null && message.getValidatorAddress().getRaw() != null) {
+            unBond.setValidatorAddress(Crypto.encodeAddress(valHrp, message.getValidatorAddress().getRaw()));
+        }
+
+        Token amount = new Token();
+        if (message.getAmount() != null) {
+            amount.setAmount(message.getAmount().getAmount());
+            amount.setDenom(message.getAmount().getDenom());
+        }
+        unBond.setAmount(amount);
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.BEACONCHAIN_UNDELEGATE);
+        transaction.setRealTx(unBond);
+
+        return transaction;
+    }
+
+    private Transaction convertBeaconChainRedelegate(byte[] value) throws IOException {
+        byte[] raw = ByteUtil.cut(value, 4);
+        BeaconChainRedelegateMessage message = new BeaconChainRedelegateMessage();
+        amino.decodeBare(raw, message);
+
+        BeaconChainRedelegate redelegate = new BeaconChainRedelegate();
+        if (message.getDelegatorAddress() != null && message.getDelegatorAddress().getRaw() != null) {
+            redelegate.setDelegatorAddress(Crypto.encodeAddress(hrp, message.getDelegatorAddress().getRaw()));
+        }
+
+        if (message.getSrcValidatorAddress() != null && message.getSrcValidatorAddress().getRaw() != null) {
+            redelegate.setSrcValidatorAddress(Crypto.encodeAddress(valHrp, message.getSrcValidatorAddress().getRaw()));
+        }
+
+        if (message.getDstValidatorAddress() != null && message.getDstValidatorAddress().getRaw() != null) {
+            redelegate.setDstValidatorAddress(Crypto.encodeAddress(valHrp, message.getDstValidatorAddress().getRaw()));
+        }
+
+        Token amount = new Token();
+        if (message.getAmount() != null) {
+            amount.setAmount(message.getAmount().getAmount());
+            amount.setDenom(message.getAmount().getDenom());
+        }
+        redelegate.setAmount(amount);
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.BEACONCHAIN_REDELEGATE);
+        transaction.setRealTx(redelegate);
+
+        return transaction;
+    }
+
+    private Transaction convertBeaconChainDelegate(byte[] value) throws IOException {
+        byte[] raw = ByteUtil.cut(value, 4);
+        BeaconChainDelegateMessage message = new BeaconChainDelegateMessage();
+        amino.decodeBare(raw, message);
+
+        BeaconChainDelegate beaconChainDelegate = new BeaconChainDelegate();
+        if (message.getDelegatorAddress() != null && message.getDelegatorAddress().getRaw() != null) {
+            beaconChainDelegate.setDelegatorAddress(Crypto.encodeAddress(hrp, message.getDelegatorAddress().getRaw()));
+        }
+
+        if (message.getValidatorAddress() != null && message.getValidatorAddress().getRaw() != null) {
+            beaconChainDelegate.setValidatorAddress(Crypto.encodeAddress(valHrp, message.getValidatorAddress().getRaw()));
+        }
+
+        Token token = new Token();
+        if (message.getDelegation() != null) {
+            token.setDenom(message.getDelegation().getDenom());
+            token.setAmount(message.getDelegation().getAmount());
+        }
+        beaconChainDelegate.setDelegation(token);
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.BEACONCHAIN_DELEGATE);
+        transaction.setRealTx(beaconChainDelegate);
+
+        return transaction;
+    }
+
+    private Transaction convertEditBeaconChainValidator(byte[] value) throws IOException {
+        byte[] raw = ByteUtil.cut(value, 4);
+        EditBeaconChainValidatorMessage message = new EditBeaconChainValidatorMessage();
+        amino.decodeBare(raw, message);
+
+        EditBeaconChainValidator editBeaconChainValidator = new EditBeaconChainValidator();
+
+        Description description = new Description();
+        if (message.getDescription() != null) {
+            description.setMoniker(message.getDescription().getMoniker());
+            description.setDetails(message.getDescription().getDetails());
+            description.setIdentity(message.getDescription().getIdentity());
+            description.setWebsite(message.getDescription().getWebsite());
+        }
+        editBeaconChainValidator.setDescription(description);
+
+        if (message.getValidatorOperatorAddress() != null && message.getValidatorOperatorAddress().getRaw() != null) {
+            editBeaconChainValidator.setValidatorAddress(Crypto.encodeAddress(valHrp, message.getValidatorOperatorAddress().getRaw()));
+        }
+
+        if (message.getCommissionRate() != null) {
+            editBeaconChainValidator.setCommissionRate(message.getCommissionRate().getValue());
+        }
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.EDIT_BEACONCHAIN_VALIDATOR);
+        transaction.setRealTx(editBeaconChainValidator);
+
+        return transaction;
+    }
+
+    private Transaction convertCreateBeaconChainValidator(byte[] value) throws IOException {
+        byte[] raw = ByteUtil.cut(value, 4);
+        CreateBeaconChainValidatorMessage message = new CreateBeaconChainValidatorMessage();
+        amino.decodeBare(raw, message);
+
+        CreateBeaconChainValidator createBeaconChainValidator = new CreateBeaconChainValidator();
+
+        Description description = new Description();
+        if (message.getDescription() != null) {
+            description.setMoniker(message.getDescription().getMoniker());
+            description.setDetails(message.getDescription().getDetails());
+            description.setIdentity(message.getDescription().getIdentity());
+            description.setWebsite(message.getDescription().getWebsite());
+        }
+        createBeaconChainValidator.setDescription(description);
+
+        Commission commission = new Commission();
+        if (message.getCommission() != null) {
+            try {
+                commission.setRate(message.getCommission().getRate().getValue());
+                commission.setMaxRate(message.getCommission().getMaxRate().getValue());
+                commission.setMaxChangeRate(message.getCommission().getMaxChangeRate().getValue());
+            } catch (NullPointerException e) {
+                //ignore
+            }
+        }
+        createBeaconChainValidator.setCommission(commission);
+
+        if (message.getDelegatorAddr() != null && message.getDelegatorAddr().getRaw() != null) {
+            createBeaconChainValidator.setDelegatorAddr(Crypto.encodeAddress(hrp, message.getDelegatorAddr().getRaw()));
+        }
+
+        if (message.getValidatorOperatorAddr() != null && message.getValidatorOperatorAddr().getRaw() != null) {
+            createBeaconChainValidator.setValidatorAddr(Crypto.encodeAddress(valHrp, message.getValidatorOperatorAddr().getRaw()));
+        }
+
+        Token delegation = new Token();
+        if (message.getDelegation() != null) {
+            delegation.setAmount(message.getDelegation().getAmount());
+            delegation.setDenom(message.getDelegation().getDenom());
+        }
+        createBeaconChainValidator.setDelegation(delegation);
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.CREATE_BEACONCHAIN_VALIDATOR);
+        transaction.setRealTx(createBeaconChainValidator);
+        return transaction;
     }
 
     private Transaction convertTransferTokenOwnership(byte[] value) throws IOException {

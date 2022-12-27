@@ -1,6 +1,7 @@
 package com.binance.dex.api.client.encoding.amino;
 
 import com.binance.dex.api.client.encoding.amino.types.PubKeyEd25519;
+import com.binance.dex.api.client.encoding.message.beaconchain.transaction.*;
 import com.binance.dex.api.client.encoding.message.bridge.BindMsgMessage;
 import com.binance.dex.api.client.encoding.message.bridge.ClaimMsgMessage;
 import com.binance.dex.api.client.encoding.message.bridge.TransferOutMsgMessage;
@@ -21,6 +22,12 @@ public class WireType {
 
     static {
         classToTypeName.put(PubKeyEd25519.class, "tendermint/PubKeyEd25519");
+
+        classToTypeName.put(CreateBeaconChainValidatorMessage.class, "cosmos-sdk/MsgCreateValidatorOpen");
+        classToTypeName.put(EditBeaconChainValidatorMessage.class, "cosmos-sdk/MsgEditValidator");
+        classToTypeName.put(BeaconChainDelegateMessage.class, "cosmos-sdk/MsgDelegate");
+        classToTypeName.put(BeaconChainRedelegateMessage.class, "cosmos-sdk/MsgRedelegate");
+        classToTypeName.put(BeaconChainUndelegateMessage.class, "cosmos-sdk/MsgUndelegate");
 
         classToTypeName.put(CreateSideChainValidatorMessage.class, "cosmos-sdk/MsgCreateSideChainValidator");
         classToTypeName.put(EditSideChainValidatorMessage.class, "cosmos-sdk/MsgEditSideChainValidator");

@@ -1,4 +1,4 @@
-package com.binance.dex.api.client.domain.stake.sidechain;
+package com.binance.dex.api.client.domain.stake;
 
 
 import com.binance.dex.api.client.encoding.message.Token;
@@ -6,7 +6,7 @@ import com.binance.dex.api.client.encoding.message.Token;
 /**
  * @author Fitz.Lu
  **/
-public class SideChainRedelegation {
+public class Redelegation {
 
     //delegator address
     private String delegatorAddress;
@@ -37,7 +37,20 @@ public class SideChainRedelegation {
     //amount of destination shares redelegating
     private long dstShare;
 
-    public SideChainRedelegation() {
+    public Redelegation(String delegatorAddress, String srcValidatorAddress, String dstValidatorAddress, long createHeight, String minTime, long minTimeInMs, Token initialBalance, Token balance, long srcShares, long dstShare) {
+        this.delegatorAddress = delegatorAddress;
+        this.srcValidatorAddress = srcValidatorAddress;
+        this.dstValidatorAddress = dstValidatorAddress;
+        this.createHeight = createHeight;
+        this.minTime = minTime;
+        this.minTimeInMs = minTimeInMs;
+        this.initialBalance = initialBalance;
+        this.balance = balance;
+        this.srcShares = srcShares;
+        this.dstShare = dstShare;
+    }
+
+    public Redelegation() {
     }
 
     public String getDelegatorAddress() {

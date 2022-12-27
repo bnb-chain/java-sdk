@@ -2,11 +2,15 @@ package com.binance.dex.api.client.impl;
 
 import com.binance.dex.api.client.*;
 import com.binance.dex.api.client.domain.*;
-import com.binance.dex.api.client.domain.bridge.TransferIn;
 import com.binance.dex.api.client.domain.broadcast.SideVote;
 import com.binance.dex.api.client.domain.oracle.Prophecy;
 import com.binance.dex.api.client.domain.StakeValidator;
 import com.binance.dex.api.client.domain.stake.Pool;
+import com.binance.dex.api.client.domain.stake.beaconchain.*;
+import com.binance.dex.api.client.domain.stake.Delegation;
+import com.binance.dex.api.client.domain.stake.Redelegation;
+import com.binance.dex.api.client.domain.stake.UnBondingDelegation;
+import com.binance.dex.api.client.domain.stake.Validator;
 import com.binance.dex.api.client.domain.stake.sidechain.*;
 import com.binance.dex.api.client.domain.broadcast.Transaction;
 import com.binance.dex.api.client.domain.broadcast.*;
@@ -53,9 +57,13 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
 
     private final NodeTxDelegateSideChainStaking sideChainStakingTxDelegate;
 
+    private final NodeTxDelegateBeaconChainStaking beaconChainStakingTxDelegate;
+
     private final NodeTxDelegateBridge bridgeTxDelegate;
 
     private final NodeQueryDelegateSideChainStaking sideChainQueryDelegate;
+
+    private final NodeQueryDelegateBeaconChainStaking beaconChainQueryDelegate;
 
     private final NodeQueryDelegateOracle oracleQueryDelegate;
 
@@ -67,8 +75,10 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         feeConverter = new FeeConverter();
 
         sideChainStakingTxDelegate = new NodeTxDelegateSideChainStaking(binanceDexNodeApi, hrp, valHrp);
+        beaconChainStakingTxDelegate = new NodeTxDelegateBeaconChainStaking(binanceDexNodeApi, hrp, valHrp);
         bridgeTxDelegate = new NodeTxDelegateBridge(binanceDexNodeApi, hrp, valHrp);
         sideChainQueryDelegate = new NodeQueryDelegateSideChainStaking(binanceDexNodeApi, hrp, valHrp);
+        beaconChainQueryDelegate = new NodeQueryDelegateBeaconChainStaking(binanceDexNodeApi, hrp, valHrp, sideChainQueryDelegate);
         oracleQueryDelegate = new NodeQueryDelegateOracle(binanceDexNodeApi, hrp, valHrp);
     }
 
@@ -444,32 +454,32 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     }
 
     @Override
-    public SideChainValidator getSideChainValidator(String sideChainId, String validatorAddress) throws IOException {
+    public Validator getSideChainValidator(String sideChainId, String validatorAddress) throws IOException {
         return sideChainQueryDelegate.querySideChainValidator(sideChainId, validatorAddress);
     }
 
     @Override
-    public List<SideChainValidator> getSideChainTopValidators(String sideChainId, int top) throws IOException {
+    public List<Validator> getSideChainTopValidators(String sideChainId, int top) throws IOException {
         return sideChainQueryDelegate.querySideChainTopValidators(sideChainId, top);
     }
 
     @Override
-    public SideChainDelegation getSideChainDelegation(String sideChainId, String delegatorAddress, String validatorAddress) throws IOException {
+    public Delegation getSideChainDelegation(String sideChainId, String delegatorAddress, String validatorAddress) throws IOException {
         return sideChainQueryDelegate.querySideChainDelegation(sideChainId, delegatorAddress, validatorAddress);
     }
 
     @Override
-    public List<SideChainDelegation> getSideChainDelegations(String sideChainId, String delegatorAddress) throws IOException {
+    public List<Delegation> getSideChainDelegations(String sideChainId, String delegatorAddress) throws IOException {
         return sideChainQueryDelegate.querySideChainDelegations(sideChainId, delegatorAddress);
     }
 
     @Override
-    public SideChainRedelegation getSideChainRedelegation(String sideChainId, String delegatorAddress, String srcValidatorAddress, String dstValidatorAddress) throws IOException {
+    public Redelegation getSideChainRedelegation(String sideChainId, String delegatorAddress, String srcValidatorAddress, String dstValidatorAddress) throws IOException {
         return sideChainQueryDelegate.querySideChainRedelegation(sideChainId, delegatorAddress, srcValidatorAddress, dstValidatorAddress);
     }
 
     @Override
-    public List<SideChainRedelegation> getSideChainRedelegations(String sideChainId, String delegatorAddress) throws IOException {
+    public List<Redelegation> getSideChainRedelegations(String sideChainId, String delegatorAddress) throws IOException {
         return sideChainQueryDelegate.querySideChainRedelegations(sideChainId, delegatorAddress);
     }
 
@@ -489,7 +499,7 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
     }
 
     @Override
-    public List<SideChainRedelegation> getSideChainRedelegationsByValidator(String sideChainId, String validatorAddress) throws IOException {
+    public List<Redelegation> getSideChainRedelegationsByValidator(String sideChainId, String validatorAddress) throws IOException {
         return sideChainQueryDelegate.querySideChainRedelegationsByValidator(sideChainId, validatorAddress);
     }
 
@@ -584,6 +594,106 @@ public class BinanceDexApiNodeClientImpl implements BinanceDexApiNodeClient {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<TransactionMetadata> createValidator(CreateBeaconChainValidator createBeaconChainValidator, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            return beaconChainStakingTxDelegate.createBeaconChainValidator(createBeaconChainValidator, wallet, options, sync);
+        }
+    }
+
+    @Override
+    public List<TransactionMetadata> editValidator(EditBeaconChainValidator editBeaconChainValidator, Wallet wallet, TransactionOption option, boolean sync) throws IOException, NoSuchAlgorithmException {
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            return beaconChainStakingTxDelegate.editBeaconChainValidator(editBeaconChainValidator, wallet, option, sync);
+        }
+    }
+
+    @Override
+    public List<TransactionMetadata> delegate(BeaconChainDelegate beaconChainDelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            return beaconChainStakingTxDelegate.beaconChainDelegate(beaconChainDelegate, wallet, options, sync);
+        }
+    }
+
+    @Override
+    public List<TransactionMetadata> redelegate(BeaconChainRedelegate beaconChainRedelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            return beaconChainStakingTxDelegate.beaconChainRedelegate(beaconChainRedelegate, wallet, options, sync);
+        }
+    }
+
+    @Override
+    public List<TransactionMetadata> undelegate(BeaconChainUndelegate beaconChainUndelegate, Wallet wallet, TransactionOption options, boolean sync) throws IOException, NoSuchAlgorithmException {
+        synchronized (wallet) {
+            wallet.ensureWalletIsReady(this);
+            return beaconChainStakingTxDelegate.beaconChainUndelegate(beaconChainUndelegate, wallet, options, sync);
+        }
+    }
+
+    @Override
+    public Validator getValidator(String validatorAddress) throws IOException {
+        return beaconChainQueryDelegate.queryBeaconChainValidator(validatorAddress);
+    }
+
+    @Override
+    public List<Validator> getTopValidators(int top) throws IOException {
+        return beaconChainQueryDelegate.queryBeaconChainTopValidators(top);
+    }
+
+    @Override
+    public Delegation getDelegation(String delegatorAddress, String validatorAddress) throws IOException {
+        return beaconChainQueryDelegate.queryBeaconChainDelegation(delegatorAddress, validatorAddress);
+    }
+
+    @Override
+    public List<Delegation> getDelegations(String delegatorAddress) throws IOException {
+        return beaconChainQueryDelegate.queryBeaconChainDelegations(delegatorAddress);
+    }
+
+    @Override
+    public Redelegation getRedelegation(String delegatorAddress, String srcValidatorAddress, String dstValidatorAddress) throws IOException {
+        return beaconChainQueryDelegate.queryBeaconChainRedelegation(delegatorAddress, srcValidatorAddress, dstValidatorAddress);
+    }
+
+    @Override
+    public List<Redelegation> getRedelegations(String delegatorAddress) throws IOException {
+        return beaconChainQueryDelegate.queryBeaconChainRedelegations(delegatorAddress);
+    }
+
+    @Override
+    public UnBondingDelegation getUnBondingDelegation(String delegatorAddress, String validatorAddress) throws IOException {
+        return beaconChainQueryDelegate.queryBeaconChainUnBondingDelegation(delegatorAddress, validatorAddress);
+    }
+
+    @Override
+    public List<UnBondingDelegation> getUnBondingDelegations(String delegatorAddress) throws IOException {
+        return beaconChainQueryDelegate.queryBeaconChainUnBondingDelegations(delegatorAddress);
+    }
+
+    @Override
+    public List<UnBondingDelegation> getUnBondingDelegationsByValidator(String validatorAddress) throws IOException {
+        return beaconChainQueryDelegate.queryBeaconChainUnBondingDelegationsByValidator(validatorAddress);
+    }
+
+    @Override
+    public List<Redelegation> getRedelegationsByValidator(String validatorAddress) throws IOException {
+        return beaconChainQueryDelegate.queryBeaconChainRedelegationsByValidator(validatorAddress);
+    }
+
+    @Override
+    public Pool getPool() throws IOException {
+        return beaconChainQueryDelegate.queryBeaconChainPool();
+    }
+
+    @Override
+    public long getAllValidatorsCount(boolean jailInvolved) throws IOException {
+        return beaconChainQueryDelegate.queryAllBeaconChainValidatorsCount(jailInvolved);
     }
 
     protected Infos convert(NodeInfos nodeInfos) {

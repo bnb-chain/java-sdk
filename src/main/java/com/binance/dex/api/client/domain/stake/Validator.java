@@ -1,14 +1,14 @@
-package com.binance.dex.api.client.domain.stake.sidechain;
+package com.binance.dex.api.client.domain.stake;
 
 import com.binance.dex.api.client.domain.stake.Commission;
 import com.binance.dex.api.client.domain.stake.Description;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 
 /**
  * @author Fitz.Lu
  **/
-public class SideChainValidator {
+public class Validator {
 
     private String feeAddr;
 
@@ -44,7 +44,27 @@ public class SideChainValidator {
 
     private String sideFeeAddr;
 
-    public SideChainValidator() {
+    public ArrayList<String> getStakeSnapShots() {
+        return stakeSnapShots;
+    }
+
+    public void setStakeSnapShots(ArrayList<String> stakeSnapShots) {
+        this.stakeSnapShots = stakeSnapShots;
+    }
+
+    public String getAccumulatedStake() {
+        return accumulatedStake;
+    }
+
+    public void setAccumulatedStake(String accumulatedStake) {
+        this.accumulatedStake = accumulatedStake;
+    }
+
+    private ArrayList<String> stakeSnapShots;
+
+    private String accumulatedStake;
+
+    public Validator() {
     }
 
     public String getFeeAddr() {

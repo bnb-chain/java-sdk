@@ -1,4 +1,4 @@
-package com.binance.dex.api.client.domain.stake.sidechain;
+package com.binance.dex.api.client.domain.stake;
 
 import com.binance.dex.api.client.encoding.message.Token;
 
@@ -20,6 +20,19 @@ public class UnBondingDelegation {
     private Token initialBalance;
 
     private Token balance;
+
+    public UnBondingDelegation() {
+    }
+
+    public UnBondingDelegation(String delegatorAddress, String validatorAddress, long createHeight, long minTimeInMs, String minTime, Token initialBalance, Token balance) {
+        this.delegatorAddress = delegatorAddress;
+        this.validatorAddress = validatorAddress;
+        this.createHeight = createHeight;
+        this.minTimeInMs = minTimeInMs;
+        this.minTime = minTime;
+        this.initialBalance = initialBalance;
+        this.balance = balance;
+    }
 
     public String getDelegatorAddress() {
         return delegatorAddress;
