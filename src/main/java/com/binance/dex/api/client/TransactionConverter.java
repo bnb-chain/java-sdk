@@ -30,6 +30,7 @@ import com.binance.dex.api.client.domain.jsonrpc.TxResult;
 import com.binance.dex.api.client.domain.oracle.ClaimMsg;
 import com.binance.dex.api.client.domain.slash.BscSubmitEvidence;
 import com.binance.dex.api.client.domain.slash.SideChainUnJail;
+import com.binance.dex.api.client.domain.slash.UnJail;
 import com.binance.dex.api.client.domain.stake.Commission;
 import com.binance.dex.api.client.domain.stake.Description;
 import com.binance.dex.api.client.domain.stake.beaconchain.*;
@@ -245,6 +246,8 @@ public class TransactionConverter {
                     return convertBeaconChainRedelegate(bytes);
                 case BeaconChainUndelegate:
                     return convertBeaconChainUndelegate(bytes);
+                case UnJail:
+                    return convertUnJail(bytes);
             }
             return null;
         } catch (Exception e) {
@@ -418,6 +421,19 @@ public class TransactionConverter {
         Transaction transaction = new Transaction();
         transaction.setTxType(TxType.CREATE_BEACONCHAIN_VALIDATOR);
         transaction.setRealTx(createBeaconChainValidator);
+        return transaction;
+    }
+
+    private Transaction convertUnJail(byte[] value) throws IOException {
+        byte[] raw = ByteUtil.cut(value, 4);
+        UnJailMsg message = UnJailMsg.parseFrom(raw);
+
+        UnJail unJail = new UnJail();
+        unJail.setValidatorAddr(Crypto.encodeAddress(valHrp, message.getAddress().toByteArray()));
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.UNJAIL);
+        transaction.setRealTx(unJail);
         return transaction;
     }
 

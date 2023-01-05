@@ -470,3 +470,8 @@ message TransferTokenOwnershipMsg {
     string symbol = 2;
     bytes new_owner = 3;
 }
+
+message UnJailMsg {
+    // 543AEC70
+    bytes address = 1;
+}

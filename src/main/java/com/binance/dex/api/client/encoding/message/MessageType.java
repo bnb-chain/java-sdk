@@ -60,7 +60,8 @@ public enum MessageType {
     EditBeaconChainValidator("C2E8BCCD"),
     BeaconChainDelegate("921D2E4E"),
     BeaconChainRedelegate("47A5ED9C"),
-    BeaconChainUndelegate("5C80810D");
+    BeaconChainUndelegate("5C80810D"),
+    UnJail("543AEC70");
 
     private byte[] typePrefixBytes;
 
