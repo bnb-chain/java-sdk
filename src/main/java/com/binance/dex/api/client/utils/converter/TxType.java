@@ -44,7 +44,13 @@ public enum TxType {
     TINY_TOKEN_ISSUE(com.binance.dex.api.client.domain.broadcast.TxType.TINY_TOKEN_ISSUE),
     MINI_TOKEN_ISSUE(com.binance.dex.api.client.domain.broadcast.TxType.MINI_TOKEN_ISSUE),
     MINI_TOKEN_LIST(com.binance.dex.api.client.domain.broadcast.TxType.MINI_TOKEN_LIST),
-    MINI_TOKEN_SET_URI(com.binance.dex.api.client.domain.broadcast.TxType.MINI_TOKEN_SET_URI);
+    MINI_TOKEN_SET_URI(com.binance.dex.api.client.domain.broadcast.TxType.MINI_TOKEN_SET_URI),
+    CREATE_BEACONCHAIN_VALIDATOR(com.binance.dex.api.client.domain.broadcast.TxType.CREATE_BEACONCHAIN_VALIDATOR),
+    EDIT_BEACONCHAIN_VALIDATOR(com.binance.dex.api.client.domain.broadcast.TxType.EDIT_BEACONCHAIN_VALIDATOR),
+    BEACONCHAIN_DELEGATE(com.binance.dex.api.client.domain.broadcast.TxType.BEACONCHAIN_DELEGATE),
+    BEACONCHAIN_REDELEGATE(com.binance.dex.api.client.domain.broadcast.TxType.BEACONCHAIN_REDELEGATE),
+    BEACONCHAIN_UNDELEGATE(com.binance.dex.api.client.domain.broadcast.TxType.BEACONCHAIN_UNDELEGATE),
+    UNJAIL(com.binance.dex.api.client.domain.broadcast.TxType.UNJAIL);
 
     private com.binance.dex.api.client.domain.broadcast.TxType code;
 

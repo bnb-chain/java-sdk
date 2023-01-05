@@ -21,7 +21,7 @@ public class FIssueTokenConverter extends TransactionConverter<Issue> {
     @Override
     public void doConvert(TransactionV2 transactionV2, Transaction transaction) {
         Map<String, Object> map = JsonUtil.fromJson(transactionV2.getData(), Map.class);
-        Long totalSupply = (Long) map.get("totalSupply");
+        Long totalSupply = Long.valueOf(map.get("totalSupply").toString());
         transaction.setValue(NumberUtil.longToBigDecimalString(totalSupply));
         transaction.setData(null);
     }
