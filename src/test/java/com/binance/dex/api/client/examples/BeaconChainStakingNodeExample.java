@@ -11,11 +11,8 @@ import com.binance.dex.api.client.domain.broadcast.TransactionOption;
 import com.binance.dex.api.client.domain.broadcast.Transfer;
 import com.binance.dex.api.client.domain.stake.*;
 import com.binance.dex.api.client.domain.stake.beaconchain.*;
-import com.binance.dex.api.client.domain.stake.sidechain.CreateSideChainValidator;
-import com.binance.dex.api.client.domain.stake.sidechain.EditSideChainValidator;
 import com.binance.dex.api.client.encoding.Crypto;
 import com.binance.dex.api.client.encoding.message.Token;
-import com.binance.dex.api.client.encoding.message.sidechain.SideChainIds;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +36,7 @@ public class BeaconChainStakingNodeExample {
     private BinanceDexEnvironment env;
     private Wallet wallet;
 
-    private List<String> getMnemonicCodeWords(){
+    private List<String> getMnemonicCodeWords() {
         String mnemonicCodeWordStr = "bottom quick strong ranch section decide pepper broken oven demand coin run jacket curious business achieve mule bamboo remain vote kid rigid bench rubber";
         List<String> mnemonicCodeWords = new ArrayList<String>();
         String[] mnemonicCodeWordStrs = mnemonicCodeWordStr.split(" ");
@@ -54,7 +51,7 @@ public class BeaconChainStakingNodeExample {
         env = BinanceDexEnvironment.LOCAL_NET;
 
         nodeClient = BinanceDexApiClientFactory.newInstance().newNodeRpcClient(env.getNodeUrl()
-                ,env.getHrp(), env.getValHrp());
+                , env.getHrp(), env.getValHrp());
         try {
             wallet = Wallet.createWalletFromMnemonicCode(this.getMnemonicCodeWords(), env);
         } catch (IOException e) {
@@ -210,10 +207,10 @@ public class BeaconChainStakingNodeExample {
         logger.info(String.format("query validator: %s \n", validator));
         Assert.assertNotNull("validator should not be nil", validator);
         Assert.assertEquals("validator address should be equal", validator.getFeeAddr(), validator0.getAddress());
-        Assert.assertEquals("validator tokens should be 123e8", validator.getTokens(),  12300000000L);
-        Assert.assertEquals("validator description should be equal", validator.getDescription().getMoniker(),  "node1");
-        Assert.assertEquals("validator rate should be equal", validator.getCommission().getRate(),  1);
-        Assert.assertEquals("validator consensusPubKey should be equal", new String(validator.getConsPubKey()),  consensusPubKey);
+        Assert.assertEquals("validator tokens should be 123e8", validator.getTokens(), 12300000000L);
+        Assert.assertEquals("validator description should be equal", validator.getDescription().getMoniker(), "node1");
+        Assert.assertEquals("validator rate should be equal", validator.getCommission().getRate(), 1);
+        Assert.assertEquals("validator consensusPubKey should be equal", new String(validator.getConsPubKey()), consensusPubKey);
 
         // edit validator todo
         String consensusPubKey2 = genPubKey();
@@ -312,8 +309,6 @@ public class BeaconChainStakingNodeExample {
 
         logger.info("-------------------- end staking test -------------------");
     }
-
-
 
 
     public void createBeaconChainValidator(Wallet wallet, String pubKey) throws IOException, NoSuchAlgorithmException {
@@ -440,8 +435,8 @@ public class BeaconChainStakingNodeExample {
      * Create a transaction option for test
      *
      * @return TransactionOption
-     * */
-    private TransactionOption createTransactionOptionForTest(){
+     */
+    private TransactionOption createTransactionOptionForTest() {
         return new TransactionOption("", 0, null);
     }
 

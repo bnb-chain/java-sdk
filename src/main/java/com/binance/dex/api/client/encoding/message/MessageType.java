@@ -61,7 +61,11 @@ public enum MessageType {
     BeaconChainDelegate("921D2E4E"),
     BeaconChainRedelegate("47A5ED9C"),
     BeaconChainUndelegate("5C80810D"),
-    UnJail("543AEC70");
+    UnJail("543AEC70"),
+
+    // fast finality
+    CreateSideChainValidatorWithVoteAddr("A0032998"),
+    EditSideChainValidatorWithVoteAddr("852FDADD");
 
     private byte[] typePrefixBytes;
 

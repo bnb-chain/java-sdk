@@ -58,7 +58,7 @@ public class AminoTest {
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
             data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                    + Character.digit(s.charAt(i+1), 16));
+                    + Character.digit(s.charAt(i + 1), 16));
         }
         return data;
     }
@@ -242,10 +242,86 @@ public class AminoTest {
         Assert.assertNotNull(tx.getRealTx());
     }
 
-    EditSideChainValidatorMessage convert(EditSideChainValidator editSideChainValidator){
+    @Test
+    public void testCreateSideChainValidatorWithVoteAddr() throws IOException {
+        CreateSideChainValidatorWithVoteAddr createSideChainValidator = new CreateSideChainValidatorWithVoteAddr();
+
+        //create and set description
+        Description validatorDescription = new Description();
+        validatorDescription.setMoniker("custom-moniker");
+        validatorDescription.setIdentity("ide");
+        validatorDescription.setWebsite("https://www.website.com");
+        validatorDescription.setDetails("This is a side-chain validator");
+
+        createSideChainValidator.setDescription(validatorDescription);
+
+        //create and set commission
+        Commission commission = new Commission();
+        commission.setRate(5L);
+        commission.setMaxRate(100L);
+        commission.setMaxChangeRate(5L);
+
+        createSideChainValidator.setCommission(commission);
+
+        //set delegator address, here use self address
+        createSideChainValidator.setDelegatorAddr(wallet.getAddress());
+
+        createSideChainValidator.setValidatorAddr(wallet.getAddress());
+
+        //set delegation token, here use 1000000 BNB
+        Token delegationToken = new Token();
+        delegationToken.setDenom("BNB");
+        delegationToken.setAmount(10000000000L);
+        createSideChainValidator.setDelegation(delegationToken);
+
+        //set side-chain id
+        createSideChainValidator.setSideChainId("bsc");
+
+        //set side-chain validator cons address
+        createSideChainValidator.setSideConsAddr("0xd1B22dCC24C55f4d728E7aaA5c9b5a22e1512C08");
+
+        //set side-chain validator fee address
+        createSideChainValidator.setSideFeeAddr("0x9fB29AAc15b9A4B7F17c3385939b007540f4d791");
+
+        createSideChainValidator.setSideVoteAddr("0x11FfBAC7fA17f5c9084a15C8f0f15dAe845A5712");
+
+        byte[] msg = amino.encode(convert(createSideChainValidator), MessageType.CreateSideChainValidatorWithVoteAddr.getTypePrefixBytes(), false);
+
+        Transaction tx = transactionConverter.convert(msg);
+        Assert.assertNotNull(tx.getRealTx());
+    }
+
+    @Test
+    public void testDecodeEditSideChainValidatorWithVoteAddr() throws IOException {
+        EditSideChainValidatorWithVoteAddr editSideChainValidator = new EditSideChainValidatorWithVoteAddr();
+
+        //set new description if needed
+        Description description = new Description();
+        description.setMoniker("new Moniker");
+        editSideChainValidator.setDescription(description);
+
+        editSideChainValidator.setValidatorAddress(wallet.getAddress());
+
+        //set new rate if needed
+        editSideChainValidator.setCommissionRate(1L);
+
+        //set new fee address if needed
+        editSideChainValidator.setSideFeeAddr("0xd1B22dCC24C55f4d728E7aaA5c9b5a22e1512C08");
+
+        editSideChainValidator.setSideChainId("bsc");
+
+        editSideChainValidator.setSideVoteAddr("0x11FfBAC7fA17f5c9084a15C8f0f15dAe845A5712");
+
+        byte[] msg = amino.encode(convert(editSideChainValidator), MessageType.EditSideChainValidatorWithVoteAddr.getTypePrefixBytes(), false);
+
+        Transaction tx = transactionConverter.convert(msg);
+        Assert.assertNotNull(tx.getRealTx());
+    }
+
+    EditSideChainValidatorMessage convert(EditSideChainValidator editSideChainValidator) {
         EditSideChainValidatorMessage message = new EditSideChainValidatorMessage();
 
-        if (editSideChainValidator.getDescription() != null){
+        if (editSideChainValidator.getDescription() != null) {
             message.setDescription(convert(editSideChainValidator.getDescription()));
         }
 
@@ -258,20 +334,20 @@ public class AminoTest {
         return message;
     }
 
-    CreateSideChainValidatorMessage convert(CreateSideChainValidator createSideChainValidator){
+    CreateSideChainValidatorMessage convert(CreateSideChainValidator createSideChainValidator) {
         CreateSideChainValidatorMessage message = new CreateSideChainValidatorMessage();
 
-        if (createSideChainValidator.getDescription() != null){
+        if (createSideChainValidator.getDescription() != null) {
             message.setDescription(convert(createSideChainValidator.getDescription()));
         }
-        if (createSideChainValidator.getCommission() != null){
+        if (createSideChainValidator.getCommission() != null) {
             message.setCommission(convert(createSideChainValidator.getCommission()));
         }
 
         message.setDelegatorAddr(Bech32AddressValue.fromBech32String(createSideChainValidator.getDelegatorAddr()));
         message.setValidatorOperatorAddr(Bech32AddressValue.fromBech32String(createSideChainValidator.getValidatorAddr()));
 
-        if (createSideChainValidator.getDelegation() != null){
+        if (createSideChainValidator.getDelegation() != null) {
             message.setDelegation(convert(createSideChainValidator.getDelegation()));
         }
 
@@ -281,7 +357,7 @@ public class AminoTest {
         return message;
     }
 
-    private DescriptionValue convert(Description description){
+    private DescriptionValue convert(Description description) {
         DescriptionValue value = new DescriptionValue();
         value.setMoniker(description.getMoniker());
         value.setDetails(description.getDetails());
@@ -290,7 +366,7 @@ public class AminoTest {
         return value;
     }
 
-    private CommissionMsgValue convert(Commission commission){
+    private CommissionMsgValue convert(Commission commission) {
         CommissionMsgValue value = new CommissionMsgValue();
         value.setRate(Dec.newInstance(commission.getRate()));
         value.setMaxRate(Dec.newInstance(commission.getMaxRate()));
@@ -298,14 +374,14 @@ public class AminoTest {
         return value;
     }
 
-    private CoinValueStr convert(Token token){
+    private CoinValueStr convert(Token token) {
         CoinValueStr value = new CoinValueStr();
         value.setDenom(token.getDenom());
         value.setAmount(token.getAmount());
         return value;
     }
 
-    private SideChainDelegateMessage convert(SideChainDelegate sideChainDelegate){
+    private SideChainDelegateMessage convert(SideChainDelegate sideChainDelegate) {
         SideChainDelegateMessage message = new SideChainDelegateMessage();
         message.setDelegatorAddress(Bech32AddressValue.fromBech32String(sideChainDelegate.getDelegatorAddress()));
         message.setValidatorAddress(Bech32AddressValue.fromBech32String(sideChainDelegate.getValidatorAddress()));
@@ -318,7 +394,7 @@ public class AminoTest {
         return message;
     }
 
-    private SideChainRedelegateMessage convert(SideChainRedelegate redelegate){
+    private SideChainRedelegateMessage convert(SideChainRedelegate redelegate) {
         SideChainRedelegateMessage message = new SideChainRedelegateMessage();
         message.setDelegatorAddress(Bech32AddressValue.fromBech32String(redelegate.getDelegatorAddress()));
         message.setSrcValidatorAddress(Bech32AddressValue.fromBech32String(redelegate.getSrcValidatorAddress()));
@@ -330,7 +406,7 @@ public class AminoTest {
         return message;
     }
 
-    private SideChainUndelegateMessage convert(SideChainUnBond unBond){
+    private SideChainUndelegateMessage convert(SideChainUnBond unBond) {
         SideChainUndelegateMessage message = new SideChainUndelegateMessage();
         message.setDelegatorAddress(Bech32AddressValue.fromBech32String(unBond.getDelegatorAddress()));
         message.setValidatorAddress(Bech32AddressValue.fromBech32String(unBond.getValidatorAddress()));
@@ -341,9 +417,50 @@ public class AminoTest {
         return message;
     }
 
-    private byte[] decodeHexAddress(String address){
+    CreateSideChainValidatorWithVoteAddrMessage convert(CreateSideChainValidatorWithVoteAddr createSideChainValidator) {
+        CreateSideChainValidatorWithVoteAddrMessage message = new CreateSideChainValidatorWithVoteAddrMessage();
+
+        if (createSideChainValidator.getDescription() != null) {
+            message.setDescription(convert(createSideChainValidator.getDescription()));
+        }
+        if (createSideChainValidator.getCommission() != null) {
+            message.setCommission(convert(createSideChainValidator.getCommission()));
+        }
+
+        message.setDelegatorAddr(Bech32AddressValue.fromBech32String(createSideChainValidator.getDelegatorAddr()));
+        message.setValidatorOperatorAddr(Bech32AddressValue.fromBech32String(createSideChainValidator.getValidatorAddr()));
+
+        if (createSideChainValidator.getDelegation() != null) {
+            message.setDelegation(convert(createSideChainValidator.getDelegation()));
+        }
+
+        message.setSideChainId(createSideChainValidator.getSideChainId());
+        message.setSideConsAddr(decodeHexAddress(createSideChainValidator.getSideConsAddr()));
+        message.setSideFeeAddr(decodeHexAddress(createSideChainValidator.getSideFeeAddr()));
+        message.setSideVoteAddr(decodeHexAddress(createSideChainValidator.getSideVoteAddr()));
+        return message;
+    }
+
+    EditSideChainValidatorWithVoteAddrMessage convert(EditSideChainValidatorWithVoteAddr editSideChainValidator) {
+        EditSideChainValidatorWithVoteAddrMessage message = new EditSideChainValidatorWithVoteAddrMessage();
+
+        if (editSideChainValidator.getDescription() != null) {
+            message.setDescription(convert(editSideChainValidator.getDescription()));
+        }
+
+        message.setValidatorOperatorAddress(Bech32AddressValue.fromBech32String(editSideChainValidator.getValidatorAddress()));
+
+        message.setCommissionRate(Dec.newInstance(editSideChainValidator.getCommissionRate()));
+        message.setSideChainId(editSideChainValidator.getSideChainId());
+        message.setSideFeeAddr(decodeHexAddress(editSideChainValidator.getSideFeeAddr()));
+        message.setSideVoteAddr(decodeHexAddress(editSideChainValidator.getSideVoteAddr()));
+
+        return message;
+    }
+
+    private byte[] decodeHexAddress(String address) {
         String addr = address;
-        if (addr.startsWith("0x")){
+        if (addr.startsWith("0x")) {
             addr = address.substring(2);
         }
         return Hex.decode(addr);

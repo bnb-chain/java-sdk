@@ -248,6 +248,10 @@ public class TransactionConverter {
                     return convertBeaconChainUndelegate(bytes);
                 case UnJail:
                     return convertUnJail(bytes);
+                case CreateSideChainValidatorWithVoteAddr:
+                    return convertCreateSideChainValidatorWithVoteAddr(bytes);
+                case EditSideChainValidatorWithVoteAddr:
+                    return convertEditSideChainValidatorWithVoteAddr(bytes);
             }
             return null;
         } catch (Exception e) {
@@ -1323,6 +1327,110 @@ public class TransactionConverter {
         Transaction transaction = new Transaction();
         transaction.setTxType(TxType.MINI_TOKEN_LIST);
         transaction.setRealTx(listing);
+        return transaction;
+    }
+
+    private Transaction convertCreateSideChainValidatorWithVoteAddr(byte[] value) throws IOException {
+        byte[] raw = ByteUtil.cut(value, 4);
+        CreateSideChainValidatorWithVoteAddrMessage message = new CreateSideChainValidatorWithVoteAddrMessage();
+        amino.decodeBare(raw, message);
+
+        CreateSideChainValidatorWithVoteAddr createSideChainValidator = new CreateSideChainValidatorWithVoteAddr();
+
+        Description description = new Description();
+        if (message.getDescription() != null) {
+            description.setMoniker(message.getDescription().getMoniker());
+            description.setDetails(message.getDescription().getDetails());
+            description.setIdentity(message.getDescription().getIdentity());
+            description.setWebsite(message.getDescription().getWebsite());
+        }
+        createSideChainValidator.setDescription(description);
+
+        Commission commission = new Commission();
+        if (message.getCommission() != null) {
+            try {
+                commission.setRate(message.getCommission().getRate().getValue());
+                commission.setMaxRate(message.getCommission().getMaxRate().getValue());
+                commission.setMaxChangeRate(message.getCommission().getMaxChangeRate().getValue());
+            } catch (NullPointerException e) {
+                //ignore
+            }
+        }
+        createSideChainValidator.setCommission(commission);
+
+        if (message.getDelegatorAddr() != null && message.getDelegatorAddr().getRaw() != null) {
+            createSideChainValidator.setDelegatorAddr(Crypto.encodeAddress(hrp, message.getDelegatorAddr().getRaw()));
+        }
+
+        if (message.getValidatorOperatorAddr() != null && message.getValidatorOperatorAddr().getRaw() != null) {
+            createSideChainValidator.setValidatorAddr(Crypto.encodeAddress(valHrp, message.getValidatorOperatorAddr().getRaw()));
+        }
+
+        Token delegation = new Token();
+        if (message.getDelegation() != null) {
+            delegation.setAmount(message.getDelegation().getAmount());
+            delegation.setDenom(message.getDelegation().getDenom());
+        }
+        createSideChainValidator.setDelegation(delegation);
+
+        createSideChainValidator.setSideChainId(message.getSideChainId());
+
+        if (message.getSideConsAddr() != null) {
+            createSideChainValidator.setSideConsAddr("0x" + Hex.toHexString(message.getSideConsAddr()));
+        }
+
+        if (message.getSideFeeAddr() != null) {
+            createSideChainValidator.setSideFeeAddr("0x" + Hex.toHexString(message.getSideFeeAddr()));
+        }
+
+        if (message.getSideVoteAddr() != null) {
+            createSideChainValidator.setSideVoteAddr("0x" + Hex.toHexString(message.getSideVoteAddr()));
+        }
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.CREATE_SIDECHAIN_VALIDATOR_WITH_VOTE_ADDR);
+        transaction.setRealTx(createSideChainValidator);
+        return transaction;
+    }
+
+    private Transaction convertEditSideChainValidatorWithVoteAddr(byte[] value) throws IOException {
+        byte[] raw = ByteUtil.cut(value, 4);
+        EditSideChainValidatorWithVoteAddrMessage message = new EditSideChainValidatorWithVoteAddrMessage();
+        amino.decodeBare(raw, message);
+
+        EditSideChainValidatorWithVoteAddr editSideChainValidator = new EditSideChainValidatorWithVoteAddr();
+
+        Description description = new Description();
+        if (message.getDescription() != null) {
+            description.setMoniker(message.getDescription().getMoniker());
+            description.setDetails(message.getDescription().getDetails());
+            description.setIdentity(message.getDescription().getIdentity());
+            description.setWebsite(message.getDescription().getWebsite());
+        }
+        editSideChainValidator.setDescription(description);
+
+        if (message.getValidatorOperatorAddress() != null && message.getValidatorOperatorAddress().getRaw() != null) {
+            editSideChainValidator.setValidatorAddress(Crypto.encodeAddress(valHrp, message.getValidatorOperatorAddress().getRaw()));
+        }
+
+        if (message.getCommissionRate() != null) {
+            editSideChainValidator.setCommissionRate(message.getCommissionRate().getValue());
+        }
+
+        editSideChainValidator.setSideChainId(message.getSideChainId());
+
+        if (message.getSideFeeAddr() != null) {
+            editSideChainValidator.setSideFeeAddr("0x" + Hex.toHexString(message.getSideFeeAddr()));
+        }
+
+        if (message.getSideVoteAddr() != null) {
+            editSideChainValidator.setSideVoteAddr("0x" + Hex.toHexString(message.getSideVoteAddr()));
+        }
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.EDIT_SIDECHAIN_VALIDATOR_WITH_VOTE_ADDR);
+        transaction.setRealTx(editSideChainValidator);
+
         return transaction;
     }
 }

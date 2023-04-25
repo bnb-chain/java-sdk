@@ -1,6 +1,5 @@
 package com.binance.dex.api.client.examples;
 
-
 import com.binance.dex.api.client.BinanceDexApiClientFactory;
 import com.binance.dex.api.client.BinanceDexApiNodeClient;
 import com.binance.dex.api.client.BinanceDexEnvironment;
@@ -28,7 +27,7 @@ public class NodeClientExample {
 
     @Before
     public void setup() {
-        binanceDexNodeApi = BinanceDexApiClientFactory.newInstance().newNodeRpcClient(BinanceDexEnvironment.TEST_NET.getNodeUrl(),BinanceDexEnvironment.TEST_NET.getHrp(), BinanceDexEnvironment.TEST_NET.getValHrp());
+        binanceDexNodeApi = BinanceDexApiClientFactory.newInstance().newNodeRpcClient(BinanceDexEnvironment.LOCAL_NET.getNodeUrl(), BinanceDexEnvironment.LOCAL_NET.getHrp(), BinanceDexEnvironment.LOCAL_NET.getValHrp());
     }
 
     @Test
@@ -39,7 +38,7 @@ public class NodeClientExample {
     }
 
     @Test
-    public void testCommittedAccount(){
+    public void testCommittedAccount() {
         String address = "tbnb16hywxpvvkaz6cecjz89mf2w0da3vfeg6z6yky2";
         Account account = binanceDexNodeApi.getCommittedAccount(address);
         Assert.assertEquals(address, account.getAddress());
@@ -253,17 +252,17 @@ public class NodeClientExample {
     }
 
     @Test
-    public void testGetTokenInfoBySymbol(){
+    public void testGetTokenInfoBySymbol() {
         Token token = binanceDexNodeApi.getTokenInfoBySymbol("BNB");
         Assert.assertNotNull(token);
-        Assert.assertEquals("BNB",token.getSymbol());
+        Assert.assertEquals("BNB", token.getSymbol());
     }
 
     @Test
-    public void testGetMiniTokenInfoBySymbol(){
+    public void testGetMiniTokenInfoBySymbol() {
         MiniToken token = binanceDexNodeApi.getMiniTokenInfoBySymbol("TTT-873M");
         Assert.assertNotNull(token);
-        Assert.assertEquals("TTT-873M",token.getSymbol());
+        Assert.assertEquals("TTT-873M", token.getSymbol());
     }
 
     @Test
@@ -281,14 +280,28 @@ public class NodeClientExample {
     }
 
     @Test
-    public void testGetProposalById(){
+    public void testGetProposalById() {
         Proposal proposal = binanceDexNodeApi.getProposalById("1");
-        Assert.assertEquals("1",proposal.getValue().getProposalId());
+        Assert.assertEquals("1", proposal.getValue().getProposalId());
     }
 
     @Test
-    public void testGetSideProposalById(){
+    public void testGetSideProposalById() {
         Proposal proposal = binanceDexNodeApi.getSideProposalById("4", "rialto");
-        Assert.assertEquals("4",proposal.getValue().getProposalId());
+        Assert.assertEquals("4", proposal.getValue().getProposalId());
+    }
+
+    @Test
+    public void testCreateSidechainValidatorWithVoteAddr() {
+        Transaction transaction = binanceDexNodeApi.getTransaction("0B660182B6E571A2BF9644624EA75890FC5C87F45759B4B0CC74BAA63B61501C");
+        Assert.assertNotNull(transaction);
+        Assert.assertEquals(transaction.getTxType(), TxType.CREATE_SIDECHAIN_VALIDATOR_WITH_VOTE_ADDR);
+    }
+
+    @Test
+    public void testEditSidechainValidatorWithVoteAddr() {
+        Transaction transaction = binanceDexNodeApi.getTransaction("037A67C45ADFEE6F978D1B02EEB18BAD6EE427C3BA55674B3F2C421E42E7D1DB");
+        Assert.assertNotNull(transaction);
+        Assert.assertEquals(transaction.getTxType(), TxType.EDIT_SIDECHAIN_VALIDATOR_WITH_VOTE_ADDR);
     }
 }
