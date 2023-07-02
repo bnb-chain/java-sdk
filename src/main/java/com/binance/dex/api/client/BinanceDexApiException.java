@@ -1,30 +1,30 @@
 package com.binance.dex.api.client;
 
 
-public class BinanceDexApiException extends RuntimeException {
+public class BNBDexApiException extends RuntimeException {
     private static final long serialVersionUID = 3788669840036201041L;
-    private BinanceDexApiError error;
+    private BNBDexApiError error;
 
-    public BinanceDexApiException(BinanceDexApiError error) {
+    public BNBDexApiException(BNBDexApiError error) {
         this.error = error;
     }
 
-    public BinanceDexApiException(Throwable cause) {
+    public BNBDexApiException(Throwable cause) {
         super(cause);
     }
 
-    public BinanceDexApiException(int code,String message){
-        BinanceDexApiError apiError = new BinanceDexApiError();
+    public BNBDexApiException(int code,String message){
+        BNBDexApiError apiError = new BNBDexApiError();
         apiError.setCode(code);
         apiError.setMessage(message);
         this.error = apiError;
     }
 
-    public BinanceDexApiException(String message, Throwable cause) {
+    public BNBDexApiException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public BinanceDexApiError getError() {
+    public BNBDexApiError getError() {
         return error;
     }
 

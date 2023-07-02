@@ -6,7 +6,7 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
-public interface BinanceDexNodeApi {
+public interface BNBDexNodeApi {
 
     @GET("/abci_query")
     Call<JsonRpcResponse<AccountResult>> getAccount(@Query("path") String pathWithAddress);

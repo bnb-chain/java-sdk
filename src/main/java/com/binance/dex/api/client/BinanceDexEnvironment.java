@@ -3,8 +3,8 @@ package com.binance.dex.api.client;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class BinanceDexEnvironment {
-    public static final BinanceDexEnvironment PROD = new BinanceDexEnvironment(
+public class BNBDexEnvironment {
+    public static final BNBDexEnvironment PROD = new BNBDexEnvironment(
             "https://dex.binance.org",
             "https://api.binance.org/bc/",
             "wss://dex.binance.org/api",
@@ -13,7 +13,7 @@ public class BinanceDexEnvironment {
             "bnb",
             "bva"
     );
-    public static final BinanceDexEnvironment TEST_NET = new BinanceDexEnvironment(
+    public static final BNBDexEnvironment TEST_NET = new BNBDexEnvironment(
             "https://testnet-dex.binance.org",
             "https://testnet-api.binance.org/bc/",
             "wss://testnet-dex.binance.org/api",
@@ -23,7 +23,7 @@ public class BinanceDexEnvironment {
             "bva"
     );
 
-    public static final BinanceDexEnvironment LOCAL_NET = new BinanceDexEnvironment(
+    public static final BNBDexEnvironment LOCAL_NET = new BNBDexEnvironment(
             "https://testnet-dex.binance.org",
             "https://testnet-api.binance.org/bc/",
             "wss://testnet-dex.binance.org/api",
