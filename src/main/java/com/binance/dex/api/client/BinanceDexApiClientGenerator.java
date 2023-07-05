@@ -18,14 +18,14 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.concurrent.TimeUnit;
 
-public class BinanceDexApiClientGenerator {
+public class BNBDexApiClientGenerator {
     private static final Converter.Factory converterFactory =
             JacksonConverterFactory.create(new ObjectMapper().registerModule(new JodaModule()));
 
     @SuppressWarnings("unchecked")
-    private static final Converter<ResponseBody, BinanceDexApiError> errorBodyConverter =
-            (Converter<ResponseBody, BinanceDexApiError>) converterFactory.responseBodyConverter(
-                    BinanceDexApiError.class, new Annotation[0], null);
+    private static final Converter<ResponseBody, BNBDexApiError> errorBodyConverter =
+            (Converter<ResponseBody, BNBDexApiError>) converterFactory.responseBodyConverter(
+                    BNBDexApiError.class, new Annotation[0], null);
 
     private static OkHttpClient sharedClient;
     static {
@@ -78,21 +78,21 @@ public class BinanceDexApiClientGenerator {
                 return response.body();
             } else {
                 try {
-                    BinanceDexApiError apiError = getBinanceApiError(response);
-                    throw new BinanceDexApiException(apiError);
+                    BNBDexApiError apiError = getBNBApiError(response);
+                    throw new BNBDexApiException(apiError);
                 } catch (IOException e) {
-                    throw new BinanceDexApiException(response.code(), response.toString());
+                    throw new BNBDexApiException(response.code(), response.toString());
                 }
             }
         } catch (IOException e) {
-            throw new BinanceDexApiException(e);
+            throw new BNBDexApiException(e);
         }
     }
 
     /**
      * Extracts and converts the response error body into an object.
      */
-    public static BinanceDexApiError getBinanceApiError(Response<?> response) throws IOException {
+    public static BNBDexApiError getBNBApiError(Response<?> response) throws IOException {
         return errorBodyConverter.convert(response.errorBody());
     }
 

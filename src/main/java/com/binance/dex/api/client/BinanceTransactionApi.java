@@ -6,7 +6,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
-public interface BinanceTransactionApi {
+public interface BNBTransactionApi {
     @GET("api/v1/txs")
     Call<TransactionPageV2> getTransactions(@Query(value = "startTime") Long startTime,
                                             @Query(value = "endTime") Long endTime,
