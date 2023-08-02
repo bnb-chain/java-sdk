@@ -5,7 +5,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class BNBDexApiError {
+public class BinanceDexApiError {
     private int code;
     private String message;
 
