@@ -1423,8 +1423,12 @@ public class TransactionConverter {
             editSideChainValidator.setSideFeeAddr("0x" + Hex.toHexString(message.getSideFeeAddr()));
         }
 
+        if (message.getSideConsAddr() != null) {
+            editSideChainValidator.setSideConsAddr("0x" + Hex.toHexString(message.getSideConsAddr()));
+        }
+
         if (message.getSideVoteAddr() != null) {
-            editSideChainValidator.setSideVoteAddr("0x" + Hex.toHexString(message.getSideVoteAddr()));
+            editSideChainValidator.setSideVoteAddr("0x"+ Hex.toHexString(message.getSideVoteAddr()));
         }
 
         Transaction transaction = new Transaction();

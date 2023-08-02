@@ -305,17 +305,18 @@ public class AminoTest {
         //set new rate if needed
         editSideChainValidator.setCommissionRate(1L);
 
-        //set new fee address if needed
-        editSideChainValidator.setSideFeeAddr("0xd1B22dCC24C55f4d728E7aaA5c9b5a22e1512C08");
-
         editSideChainValidator.setSideChainId("bsc");
 
-        editSideChainValidator.setSideVoteAddr("0x11FfBAC7fA17f5c9084a15C8f0f15dAe845A5712");
+        //set new fee address if needed
+        editSideChainValidator.setSideFeeAddr("0xd1B22dCC24C55f4d728E7aaA5c9b5a22e1512C08");
+        editSideChainValidator.setSideConsAddr("0xd1B22dCC24C55f4d728E7aaA5c9b5a22e1512C99");
+        editSideChainValidator.setSideVoteAddr("0xa96c45e0043e98a4271d84265a0a5177795c61aa188c42a94ecc4b2e54073613a46f49ff1c03e29d4a744fd56589e3a0");
 
         byte[] msg = amino.encode(convert(editSideChainValidator), MessageType.EditSideChainValidatorWithVoteAddr.getTypePrefixBytes(), false);
 
         Transaction tx = transactionConverter.convert(msg);
         Assert.assertNotNull(tx.getRealTx());
+        Assert.assertEquals("0xa96c45e0043e98a4271d84265a0a5177795c61aa188c42a94ecc4b2e54073613a46f49ff1c03e29d4a744fd56589e3a0", ((EditSideChainValidatorWithVoteAddr)tx.getRealTx()).getSideVoteAddr());
     }
 
     EditSideChainValidatorMessage convert(EditSideChainValidator editSideChainValidator) {
@@ -453,6 +454,7 @@ public class AminoTest {
         message.setCommissionRate(Dec.newInstance(editSideChainValidator.getCommissionRate()));
         message.setSideChainId(editSideChainValidator.getSideChainId());
         message.setSideFeeAddr(decodeHexAddress(editSideChainValidator.getSideFeeAddr()));
+        message.setSideConsAddr(decodeHexAddress(editSideChainValidator.getSideConsAddr()));
         message.setSideVoteAddr(decodeHexAddress(editSideChainValidator.getSideVoteAddr()));
 
         return message;

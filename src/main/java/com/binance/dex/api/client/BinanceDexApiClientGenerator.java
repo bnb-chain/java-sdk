@@ -18,14 +18,14 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.concurrent.TimeUnit;
 
-public class BNBDexApiClientGenerator {
+public class BinanceDexApiClientGenerator {
     private static final Converter.Factory converterFactory =
             JacksonConverterFactory.create(new ObjectMapper().registerModule(new JodaModule()));
 
     @SuppressWarnings("unchecked")
-    private static final Converter<ResponseBody, BNBDexApiError> errorBodyConverter =
-            (Converter<ResponseBody, BNBDexApiError>) converterFactory.responseBodyConverter(
-                    BNBDexApiError.class, new Annotation[0], null);
+    private static final Converter<ResponseBody, BinanceDexApiError> errorBodyConverter =
+            (Converter<ResponseBody, BinanceDexApiError>) converterFactory.responseBodyConverter(
+                    BinanceDexApiError.class, new Annotation[0], null);
 
     private static OkHttpClient sharedClient;
     static {
@@ -78,21 +78,21 @@ public class BNBDexApiClientGenerator {
                 return response.body();
             } else {
                 try {
-                    BNBDexApiError apiError = getBNBApiError(response);
-                    throw new BNBDexApiException(apiError);
+                    BinanceDexApiError apiError = getBinanceApiError(response);
+                    throw new BinanceDexApiException(apiError);
                 } catch (IOException e) {
-                    throw new BNBDexApiException(response.code(), response.toString());
+                    throw new BinanceDexApiException(response.code(), response.toString());
                 }
             }
         } catch (IOException e) {
-            throw new BNBDexApiException(e);
+            throw new BinanceDexApiException(e);
         }
     }
 
     /**
      * Extracts and converts the response error body into an object.
      */
-    public static BNBDexApiError getBNBApiError(Response<?> response) throws IOException {
+    public static BinanceDexApiError getBinanceApiError(Response<?> response) throws IOException {
         return errorBodyConverter.convert(response.errorBody());
     }
 
