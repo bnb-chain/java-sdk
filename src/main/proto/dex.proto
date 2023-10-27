@@ -129,6 +129,7 @@ message AppAccount {
     string name = 2;
     repeated Token frozen = 3;
     repeated Token locked = 4;
+    uint64 flags = 5;
 }
 
 message AtomicSwapInfo {
