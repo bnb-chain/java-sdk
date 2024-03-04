@@ -65,7 +65,9 @@ public enum MessageType {
 
     // fast finality
     CreateSideChainValidatorWithVoteAddr("A0032998"),
-    EditSideChainValidatorWithVoteAddr("852FDADD");
+    EditSideChainValidatorWithVoteAddr("852FDADD"),
+
+    SideChainStakeMigration("38589196");
 
     private byte[] typePrefixBytes;
 

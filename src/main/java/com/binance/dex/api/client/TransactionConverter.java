@@ -252,6 +252,8 @@ public class TransactionConverter {
                     return convertCreateSideChainValidatorWithVoteAddr(bytes);
                 case EditSideChainValidatorWithVoteAddr:
                     return convertEditSideChainValidatorWithVoteAddr(bytes);
+                case SideChainStakeMigration:
+                    return convertSideChainStakeMigration(bytes);
             }
             return null;
         } catch (Exception e) {
@@ -1428,12 +1430,50 @@ public class TransactionConverter {
         }
 
         if (message.getSideVoteAddr() != null) {
-            editSideChainValidator.setSideVoteAddr("0x"+ Hex.toHexString(message.getSideVoteAddr()));
+            editSideChainValidator.setSideVoteAddr("0x" + Hex.toHexString(message.getSideVoteAddr()));
         }
 
         Transaction transaction = new Transaction();
         transaction.setTxType(TxType.EDIT_SIDECHAIN_VALIDATOR_WITH_VOTE_ADDR);
         transaction.setRealTx(editSideChainValidator);
+
+        return transaction;
+    }
+
+    private Transaction convertSideChainStakeMigration(byte[] value) throws IOException {
+        byte[] raw = ByteUtil.cut(value, 4);
+        SideChainStakeMigrationMessage message = new SideChainStakeMigrationMessage();
+        amino.decodeBare(raw, message);
+
+        SideChainStakeMigration stakeMigration = new SideChainStakeMigration();
+
+        if (message.getValidatorSrcAddr() != null && message.getValidatorSrcAddr().getRaw() != null) {
+            stakeMigration.setValidatorSrcAddr(Crypto.encodeAddress(valHrp, message.getValidatorSrcAddr().getRaw()));
+        }
+
+        if (message.getValidatorDstAddr() != null) {
+            stakeMigration.setValidatorDstAddr("0x" + Hex.toHexString(message.getValidatorDstAddr()));
+        }
+
+        if (message.getDelegatorAddr() != null) {
+            stakeMigration.setDelegatorAddr("0x" + Hex.toHexString(message.getDelegatorAddr()));
+        }
+
+        if (message.getRefundAddr() != null && message.getRefundAddr().getRaw() != null) {
+            stakeMigration.setRefundAddr(Crypto.encodeAddress(hrp, message.getRefundAddr().getRaw()));
+        }
+
+        Token amount = new Token();
+        if (message.getAmount() != null) {
+            amount.setAmount(message.getAmount().getAmount());
+            amount.setDenom(message.getAmount().getDenom());
+        }
+        stakeMigration.setAmount(amount);
+
+
+        Transaction transaction = new Transaction();
+        transaction.setTxType(TxType.SIDECHAIN_STAKE_MIGRATION);
+        transaction.setRealTx(stakeMigration);
 
         return transaction;
     }
