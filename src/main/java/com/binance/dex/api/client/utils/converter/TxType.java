@@ -52,7 +52,8 @@ public enum TxType {
     BEACONCHAIN_UNDELEGATE(com.binance.dex.api.client.domain.broadcast.TxType.BEACONCHAIN_UNDELEGATE),
     UNJAIL(com.binance.dex.api.client.domain.broadcast.TxType.UNJAIL),
     CREATE_SIDECHAIN_VALIDATOR_WITH_VOTE_ADDR(com.binance.dex.api.client.domain.broadcast.TxType.CREATE_SIDECHAIN_VALIDATOR_WITH_VOTE_ADDR),
-    EDIT_SIDECHAIN_VALIDATOR_WITH_VOTE_ADDR(com.binance.dex.api.client.domain.broadcast.TxType.EDIT_SIDECHAIN_VALIDATOR_WITH_VOTE_ADDR);
+    EDIT_SIDECHAIN_VALIDATOR_WITH_VOTE_ADDR(com.binance.dex.api.client.domain.broadcast.TxType.EDIT_SIDECHAIN_VALIDATOR_WITH_VOTE_ADDR),
+    SIDECHAIN_STAKE_MIGRATION(com.binance.dex.api.client.domain.broadcast.TxType.SIDECHAIN_STAKE_MIGRATION);
 
     private com.binance.dex.api.client.domain.broadcast.TxType code;
 

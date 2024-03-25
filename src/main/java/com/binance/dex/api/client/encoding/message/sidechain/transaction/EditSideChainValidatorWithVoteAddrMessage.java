@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * @author Fitz.Lu
@@ -38,6 +39,9 @@ public class EditSideChainValidatorWithVoteAddrMessage implements BinanceDexTran
     @JsonProperty(value = "side_fee_addr")
     private byte[] sideFeeAddr;
 
+    @JsonProperty(value = "side_cons_addr")
+    private byte[] sideConsAddr;
+
     @JsonProperty(value = "side_vote_addr")
     private byte[] sideVoteAddr;
 
@@ -60,7 +64,10 @@ public class EditSideChainValidatorWithVoteAddrMessage implements BinanceDexTran
                 sideFeeAddr = ((byte[]) value);
                 break;
             case 6:
-                sideVoteAddr = ((byte[]) value);
+                sideConsAddr = ((byte[]) value);
+                break;
+            case 7:
+                setSideVoteAddr((byte[]) value);
                 break;
             default:
                 break;
@@ -110,11 +117,22 @@ public class EditSideChainValidatorWithVoteAddrMessage implements BinanceDexTran
         this.sideFeeAddr = sideFeeAddr;
     }
 
+    public byte[] getSideConsAddr() {
+        return sideConsAddr;
+    }
+
+    public void setSideConsAddr(byte[] sideConsAddr) {
+        this.sideConsAddr = sideConsAddr;
+    }
+
     public byte[] getSideVoteAddr() {
         return sideVoteAddr;
     }
 
     public void setSideVoteAddr(byte[] sideVoteAddr) {
+        if (sideVoteAddr != null && sideVoteAddr.length > 48) {
+            sideVoteAddr = Arrays.copyOfRange(sideVoteAddr, 0, 48);
+        }
         this.sideVoteAddr = sideVoteAddr;
     }
 
@@ -136,6 +154,7 @@ public class EditSideChainValidatorWithVoteAddrMessage implements BinanceDexTran
                 .addField(Dec.class, commissionRate, commissionRate == null || commissionRate.isDefaultOrEmpty())
                 .addField(String.class, sideChainId, StringUtils.isEmpty(sideChainId))
                 .addField(byte[].class, sideFeeAddr, sideFeeAddr == null || sideFeeAddr.length == 0)
+                .addField(byte[].class, sideConsAddr, sideConsAddr == null || sideConsAddr.length == 0)
                 .addField(byte[].class, sideVoteAddr, sideVoteAddr == null || sideVoteAddr.length == 0)
                 .build();
     }

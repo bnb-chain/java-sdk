@@ -14,6 +14,8 @@ public class EditSideChainValidatorWithVoteAddr {
 
     private String sideFeeAddr;
 
+    private String sideConsAddr;
+
     private String sideVoteAddr;
 
     public EditSideChainValidatorWithVoteAddr() {
@@ -59,6 +61,14 @@ public class EditSideChainValidatorWithVoteAddr {
         this.sideFeeAddr = sideFeeAddr;
     }
 
+    public String getSideConsAddr() {
+        return sideConsAddr;
+    }
+
+    public void setSideConsAddr(String sideConsAddr) {
+        this.sideConsAddr = sideConsAddr;
+    }
+
     public String getSideVoteAddr() {
         return sideVoteAddr;
     }
@@ -69,12 +79,13 @@ public class EditSideChainValidatorWithVoteAddr {
 
     @Override
     public String toString() {
-        return "EditSideChainValidator{" +
+        return "EditSideChainValidatorWithVoteAddr{" +
                 "description=" + description + "\n" +
                 ", validatorAddress='" + validatorAddress + '\'' + "\n" +
                 ", commissionRate=" + commissionRate + "\n" +
                 ", sideChainId='" + sideChainId + '\'' + "\n" +
                 ", sideFeeAddr='" + sideFeeAddr + '\'' + "\n" +
+                ", sideConsAddr='" + sideConsAddr + '\'' + "\n" +
                 ", sideVoteAddr='" + sideVoteAddr + '\'' + "\n" +
                 '}';
     }

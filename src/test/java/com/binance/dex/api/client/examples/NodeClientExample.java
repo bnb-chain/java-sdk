@@ -27,7 +27,7 @@ public class NodeClientExample {
 
     @Before
     public void setup() {
-        binanceDexNodeApi = BinanceDexApiClientFactory.newInstance().newNodeRpcClient(BinanceDexEnvironment.LOCAL_NET.getNodeUrl(), BinanceDexEnvironment.LOCAL_NET.getHrp(), BinanceDexEnvironment.LOCAL_NET.getValHrp());
+        binanceDexNodeApi = BinanceDexApiClientFactory.newInstance().newNodeRpcClient(BinanceDexEnvironment.PROD.getNodeUrl(), BinanceDexEnvironment.PROD.getHrp(), BinanceDexEnvironment.PROD.getValHrp());
     }
 
     @Test
@@ -293,14 +293,14 @@ public class NodeClientExample {
 
     @Test
     public void testCreateSidechainValidatorWithVoteAddr() {
-        Transaction transaction = binanceDexNodeApi.getTransaction("0B660182B6E571A2BF9644624EA75890FC5C87F45759B4B0CC74BAA63B61501C");
+        Transaction transaction = binanceDexNodeApi.getTransaction("7A6A818048DBE4330BC72DD169F684F2E51E8780185A140E1F1B0AF5414EA48A");
         Assert.assertNotNull(transaction);
         Assert.assertEquals(transaction.getTxType(), TxType.CREATE_SIDECHAIN_VALIDATOR_WITH_VOTE_ADDR);
     }
 
     @Test
     public void testEditSidechainValidatorWithVoteAddr() {
-        Transaction transaction = binanceDexNodeApi.getTransaction("037A67C45ADFEE6F978D1B02EEB18BAD6EE427C3BA55674B3F2C421E42E7D1DB");
+        Transaction transaction = binanceDexNodeApi.getTransaction("30A5699E193929FB04F1D6C151303ABAA4E9D51CC1F718A9E8BD4E086DFDE305");
         Assert.assertNotNull(transaction);
         Assert.assertEquals(transaction.getTxType(), TxType.EDIT_SIDECHAIN_VALIDATOR_WITH_VOTE_ADDR);
     }
