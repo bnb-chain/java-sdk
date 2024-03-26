@@ -16,6 +16,7 @@ public class Account {
     @JsonProperty("public_key")
     private List<Integer> publicKey;
     private Long sequence;
+    private Long flags;
 
     public Integer getAccountNumber() {
         return accountNumber;
@@ -57,6 +58,14 @@ public class Account {
         this.sequence = sequence;
     }
 
+    public Long getFlags() {
+        return flags;
+    }
+
+    public void setFlags(Long flags) {
+        this.flags = flags;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this, BinanceDexConstants.BINANCE_DEX_TO_STRING_STYLE)
@@ -65,6 +74,7 @@ public class Account {
                 .append("balances", balances)
                 .append("publicKey", publicKey)
                 .append("sequence", sequence)
+                .append("flags", flags)
                 .toString();
     }
 }
