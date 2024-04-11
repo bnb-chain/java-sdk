@@ -26,6 +26,9 @@ public enum ContentEnum {
     CrossStakeSynPack(16, 0, CrossStakeSyn.class),
     CrossStakeRefundPack(16, 1, CrossStakeRefund.class),
     CrossStakeFailAckPack(16, 2, CrossStakeFailAck.class),
+    StakeMigrationSynPack(17, 0, StakeMigrationSyn.class),
+    StakeMigrationAckPack(17, 1, StakeMigrationSyn.class),
+    StakeMigrationFailAckPack(17, 2, StakeMigrationSyn.class),
     ;
 
     private Integer channelId;
