@@ -9,14 +9,15 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class StakeMigration extends Content {
+public class StakeMigrationRefund extends Content {
 
     private EthAddressValue operatorAddress;
     private EthAddressValue delegatorAddress;
-    private UnsignedNumber amount;
     private Bech32AddressValue refundAddress;
+    private UnsignedNumber amount;
+
     @Override
     protected void setHrp(String hrp) {
-        refundAddress.setHrp(hrp);
+        this.refundAddress.setHrp(hrp);
     }
 }
